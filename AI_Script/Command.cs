@@ -472,7 +472,7 @@ public class Command : MonoBehaviour
                         string s_field_title="";
                         string s_field_val="";
 
-                        if (s_key == "user_sex")
+                        if (s_key == "sex_user")
                         {
                             s_field_title=PlayerPrefs.GetString("user_sex", "User Sex");
                             if (s_data_val == "0") s_field_val = PlayerPrefs.GetString("user_sex_boy", "Male");
@@ -483,6 +483,16 @@ public class Command : MonoBehaviour
                             s_field_title=PlayerPrefs.GetString("setting_char_sex", "Character Sex");
                             if (s_data_val=="0") s_field_val = PlayerPrefs.GetString("user_sex_boy", "Male");
                             else s_field_val=PlayerPrefs.GetString("user_sex_girl", "Female");
+                        }
+                        else if(s_key== "face")
+                        {
+                            s_field_title = PlayerPrefs.GetString("face", "Face");
+                            s_field_val = PlayerPrefs.GetString("face", "Face") + " " + s_data_val;
+                        }
+                        else if(s_key == "action")
+                        {
+                            s_field_title = PlayerPrefs.GetString("act", "Action");
+                            s_field_val = PlayerPrefs.GetString("act", "Action") + " " + s_data_val;
                         }
                         else
                         {
