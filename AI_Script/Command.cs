@@ -54,6 +54,7 @@ public class Command : MonoBehaviour
     private Carrot.Carrot_Box box_list;
     private string s_command_chat_last;
     private string id_cur_chat;
+    private IDictionary data_chat_cur;
 
     public void send_command()
     {
@@ -185,6 +186,7 @@ public class Command : MonoBehaviour
 
     public void act_chat(IDictionary data_chat,bool is_test=false)
     {
+        this.data_chat_cur = data_chat;
         this.app.panel_main.SetActive(true);
         this.is_test_command = is_test;
         if (is_test) this.obj_btn_info_chat.SetActive(false); else this.obj_btn_info_chat.SetActive(true);
@@ -428,5 +430,74 @@ public class Command : MonoBehaviour
     public void set_color(Color32 color_set)
     {
         this.img_border_color_chat.color = color_set;
+    }
+
+    public void show_info_chat()
+    {
+        if (this.data_chat_cur == null) return;
+
+        if (this.box_list != null) this.box_list.close();
+        this.box_list = this.app.carrot.Create_Box("info_chat");
+        this.box_list.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
+        this.box_list.set_icon(this.icon_info_chat);
+
+        foreach(var key in this.data_chat_cur.Keys){
+            if (this.data_chat_cur[key] != null)
+            {
+                if (key.ToString()== "user")
+                {
+                    IDictionary data_user = (IDictionary) this.data_chat_cur[key];
+                    string user_id = data_user["id"].ToString();
+                    string user_lang = data_user["lang"].ToString();
+                    Carrot.Carrot_Box_Item item_user = this.box_list.create_item("item_" + key.ToString());
+                    item_user.set_title(PlayerPrefs.GetString("chat_creator","Creator"));
+                    item_user.set_icon(this.icon_info_chat);
+                    item_user.set_tip(data_user["name"].ToString());
+
+                    if (data_user["avatar"] != null)
+                    {
+                        Sprite sp_avatar = this.app.carrot.get_tool().get_sprite_to_playerPrefs("avatar_user_" + data_user["id"]);
+                        if (sp_avatar != null) item_user.set_icon_white(sp_avatar);
+                        else this.app.carrot.get_img_and_save_playerPrefs(data_user["avatar"].ToString(),item_user.img_icon, "avatar_user_" + data_user["id"]);
+                    }
+
+                    item_user.set_act(()=>this.app.carrot.user.show_user_by_id(user_id,user_lang));
+                }
+                else
+                {
+                    string s_data_val = this.data_chat_cur[key].ToString();
+                    string s_key = key.ToString();
+                    if (s_data_val != "")
+                    {
+                        string s_field_title="";
+                        string s_field_val="";
+
+                        if (s_key == "user_sex")
+                        {
+                            s_field_title=PlayerPrefs.GetString("user_sex", "User Sex");
+                            if (s_data_val == "0") s_field_val = PlayerPrefs.GetString("user_sex_boy", "Male");
+                            else s_field_val=PlayerPrefs.GetString("user_sex_girl", "Female");
+                        }
+                        else if(s_key== "sex_character")
+                        {
+                            s_field_title=PlayerPrefs.GetString("setting_char_sex", "Character Sex");
+                            if (s_data_val=="0") s_field_val = PlayerPrefs.GetString("user_sex_boy", "Male");
+                            else s_field_val=PlayerPrefs.GetString("user_sex_girl", "Female");
+                        }
+                        else
+                        {
+                            s_field_title=s_key;
+                            s_field_val=s_data_val;
+                        }
+
+                        Carrot.Carrot_Box_Item item_field = this.box_list.create_item("item_" + key.ToString());
+                        item_field.set_icon(this.icon_info_chat);
+                        item_field.set_title(s_field_title);
+                        item_field.set_tip(s_field_val);
+                    }
+                }
+
+            }
+        }
     }
 }
