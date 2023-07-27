@@ -1,4 +1,5 @@
-﻿using Firebase.Extensions;
+﻿using Carrot;
+using Firebase.Extensions;
 using Firebase.Firestore;
 using Newtonsoft.Json;
 using System;
@@ -48,7 +49,7 @@ public struct chat
     [FirestoreProperty]
     public string icon { get; set; }
     [FirestoreProperty]
-    public string user { get; set; }
+    public Carrot_Rate_user_data user { get; set; }
     [FirestoreProperty]
     public string func { get; set; }
     [FirestoreProperty]
@@ -818,10 +819,19 @@ public class Command_storage : MonoBehaviour
             color = this.s_color,
             icon = this.s_id_icon,
             status = "pending",
-            user = this.app.carrot.user.get_id_user_login(),
             func = this.item_run_control.get_val(),
             date_create = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ")
         };
+
+        if (this.app.carrot.user.get_id_user_login() != "")
+        {
+            Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
+            user_login.name = this.app.carrot.user.get_data_user_login("name");
+            user_login.id = this.app.carrot.user.get_id_user_login();
+            user_login.lang = this.app.carrot.user.get_lang_user_login();
+            user_login.avatar = this.app.carrot.user.get_data_user_login("avatar");
+            c.user = user_login;
+        }
         return c;
     }
 
