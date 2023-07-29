@@ -137,7 +137,7 @@ public class App : MonoBehaviour
         this.command_storage.check_load_command_storage();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
         this.command.send_chat("hi_" + DateTime.Now.ToString("HH"));
-        //this.command.load_chat_tip();
+        this.command.load_chat_tip();
     }
 
     public void load_app_where_online()

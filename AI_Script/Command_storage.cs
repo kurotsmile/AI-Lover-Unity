@@ -112,6 +112,7 @@ public class Command_storage : MonoBehaviour
 
     private Carrot.Carrot_Box box_list;
     private Carrot.Carrot_Box box_list_icon;
+    private Carrot.Carrot_Box box_list_icon_category;
     private Carrot.Carrot_Box box_add_chat;
     private Carrot.Carrot_Box_Item item_patert;
     private Carrot.Carrot_Box_Item item_msg;
@@ -409,16 +410,19 @@ public class Command_storage : MonoBehaviour
     private void act_load_icon_and_emoji(QuerySnapshot query_icon)
     {
         this.app.carrot.hide_loading();
+        if (this.box_list_icon != null) this.box_list_icon.close();
         this.box_list_icon = this.app.carrot.Create_Box();
         this.box_list_icon.set_icon(this.sp_icon_icons);
         this.box_list_icon.set_title(PlayerPrefs.GetString("setting_bubble_icon", "Icons and colors"));
+        Carrot_Box_Btn_Item btn_icon_category=this.box_list_icon.create_btn_menu_header(this.app.carrot.icon_carrot_all_category);
+        btn_icon_category.set_act(()=> list_category_icon());
 
         foreach (DocumentSnapshot document in query_icon)
         {
             string id_icon = document.Id;
             string s_color = "#FFFFFF";
             IDictionary icon_data = document.ToDictionary();
-            Carrot.Carrot_Box_Item item_icon = this.box_list_icon.create_item();
+            Carrot_Box_Item item_icon = this.box_list_icon.create_item();
             item_icon.set_title(document.Id);
             item_icon.set_tip(icon_data["icon"].ToString());
 
@@ -441,6 +445,54 @@ public class Command_storage : MonoBehaviour
         }
     }
 
+    private void list_category_icon()
+    {
+        this.app.carrot.show_loading();
+        Query iconQuery = this.app.carrot.db.Collection("icon_category");
+        iconQuery.Limit(20);
+        iconQuery.GetSnapshotAsync().ContinueWithOnMainThread(Task => {
+            QuerySnapshot IconQuerySnapshot = Task.Result;
+            if (Task.IsCompleted)
+            {
+                this.app.carrot.hide_loading();
+                if (this.box_list_icon_category != null) this.box_list_icon_category.close();
+                this.box_list_icon_category = this.app.carrot.Create_Box();
+                this.box_list_icon_category.set_icon(this.app.carrot.icon_carrot_all_category);
+                this.box_list_icon_category.set_title("Bundle of object styles");
+
+                foreach (DocumentSnapshot documentSnapshot in IconQuerySnapshot.Documents)
+                {
+                    IDictionary icon_data = documentSnapshot.ToDictionary();
+                    Carrot_Box_Item item_cat = this.box_list_icon_category.create_item("item_icon");
+                    item_cat.set_icon(this.sp_icon_icons);
+                    if (icon_data["key"] != null)
+                    {
+                        string s_key_cat = icon_data["key"].ToString();
+                        item_cat.set_title(icon_data["key"].ToString());
+                        item_cat.set_tip(icon_data["key"].ToString());
+                        item_cat.set_act(()=>this.view_list_icon_by_category_key(s_key_cat));
+                    }
+                };
+
+                this.box_list_icon_category.update_color_table_row();
+            }
+        });
+    }
+
+    private void view_list_icon_by_category_key(string s_key)
+    {
+        Query IconRef = this.app.carrot.db.Collection("icon");
+        IconRef=IconRef.WhereEqualTo("category", s_key);
+        IconRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                this.IconQuerySnapshot = task.Result;
+                this.act_load_icon_and_emoji(this.IconQuerySnapshot);
+            }
+        });
+    }
+
     public void set_icon_and_emoji(Color32 color_cm,Sprite sp_cm,string s_color,string s_id)
     {
         this.s_color = s_color;
@@ -449,6 +501,7 @@ public class Command_storage : MonoBehaviour
         this.item_icon.set_icon_white(sp_cm);
         this.item_icon.txt_val.color = color_cm;
         if (this.box_list_icon != null) this.box_list_icon.close();
+        if (this.box_list_icon_category != null) this.box_list_icon_category.close();
     }
 
 
