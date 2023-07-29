@@ -133,6 +133,7 @@ public class Command_storage : MonoBehaviour
     private IList list_key_block;
     private IDictionary data_chat_test;
     private QuerySnapshot IconQuerySnapshot;
+    private QuerySnapshot IconCategoryQuerySnapshot=null;
 
     private List<string> list_key_tip;
 
@@ -394,8 +395,9 @@ public class Command_storage : MonoBehaviour
         this.app.carrot.show_loading();
         if (IconQuerySnapshot == null)
         {
-            CollectionReference IconRef = this.app.carrot.db.Collection("icon");
-            IconRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+            Query IconQuery = this.app.carrot.db.Collection("icon");
+            IconQuery = IconQuery.Limit(50);
+            IconQuery.GetSnapshotAsync().ContinueWithOnMainThread(task =>
             {
                 this.IconQuerySnapshot = task.Result;
                 this.act_load_icon_and_emoji(this.IconQuerySnapshot);
@@ -448,35 +450,47 @@ public class Command_storage : MonoBehaviour
     private void list_category_icon()
     {
         this.app.carrot.show_loading();
-        Query iconQuery = this.app.carrot.db.Collection("icon_category");
-        iconQuery.Limit(20);
-        iconQuery.GetSnapshotAsync().ContinueWithOnMainThread(Task => {
-            QuerySnapshot IconQuerySnapshot = Task.Result;
-            if (Task.IsCompleted)
-            {
-                this.app.carrot.hide_loading();
-                if (this.box_list_icon_category != null) this.box_list_icon_category.close();
-                this.box_list_icon_category = this.app.carrot.Create_Box();
-                this.box_list_icon_category.set_icon(this.app.carrot.icon_carrot_all_category);
-                this.box_list_icon_category.set_title("Bundle of object styles");
-
-                foreach (DocumentSnapshot documentSnapshot in IconQuerySnapshot.Documents)
+        if (this.IconCategoryQuerySnapshot == null)
+        {
+            Query iconQuery = this.app.carrot.db.Collection("icon_category");
+            iconQuery.Limit(20);
+            iconQuery.GetSnapshotAsync().ContinueWithOnMainThread(Task => {
+                if (Task.IsCompleted)
                 {
-                    IDictionary icon_data = documentSnapshot.ToDictionary();
-                    Carrot_Box_Item item_cat = this.box_list_icon_category.create_item("item_icon");
-                    item_cat.set_icon(this.sp_icon_icons);
-                    if (icon_data["key"] != null)
-                    {
-                        string s_key_cat = icon_data["key"].ToString();
-                        item_cat.set_title(icon_data["key"].ToString());
-                        item_cat.set_tip(icon_data["key"].ToString());
-                        item_cat.set_act(()=>this.view_list_icon_by_category_key(s_key_cat));
-                    }
-                };
+                    this.IconCategoryQuerySnapshot = Task.Result;
+                    this.load_data_category_icon_by_query(IconCategoryQuerySnapshot);
+                }
+            });
+        }
+        else
+        {
+            this.load_data_category_icon_by_query(this.IconCategoryQuerySnapshot);
+        }
+    }
 
-                this.box_list_icon_category.update_color_table_row();
+    private void load_data_category_icon_by_query(QuerySnapshot IconCategoryQuerySnapshot)
+    {
+        this.app.carrot.hide_loading();
+        if (this.box_list_icon_category != null) this.box_list_icon_category.close();
+        this.box_list_icon_category = this.app.carrot.Create_Box();
+        this.box_list_icon_category.set_icon(this.app.carrot.icon_carrot_all_category);
+        this.box_list_icon_category.set_title("Bundle of object styles");
+
+        foreach (DocumentSnapshot documentSnapshot in IconCategoryQuerySnapshot.Documents)
+        {
+            IDictionary icon_data = documentSnapshot.ToDictionary();
+            Carrot_Box_Item item_cat = this.box_list_icon_category.create_item("item_icon");
+            item_cat.set_icon(this.sp_icon_icons);
+            if (icon_data["key"] != null)
+            {
+                string s_key_cat = icon_data["key"].ToString();
+                item_cat.set_title(s_key_cat);
+                item_cat.set_tip(s_key_cat);
+                item_cat.set_act(() => this.view_list_icon_by_category_key(s_key_cat));
             }
-        });
+        };
+
+        this.box_list_icon_category.update_color_table_row();
     }
 
     private void view_list_icon_by_category_key(string s_key)
