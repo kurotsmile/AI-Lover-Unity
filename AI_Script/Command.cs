@@ -469,6 +469,4 @@ public class Command : MonoBehaviour
             }
         }
     }
-
-
 }

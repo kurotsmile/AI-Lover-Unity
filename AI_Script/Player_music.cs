@@ -1,6 +1,7 @@
 ﻿using Crosstales.Radio;
 using System;
 using System.Collections;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -154,7 +155,7 @@ public class Player_music : MonoBehaviour
         if (data_music["lyrics"] != null)
         {
             this.button_lyrics.SetActive(true);
-            this.data_lyrics = data_music["lyrics"].ToString();
+            this.data_lyrics = this.StripHTML(data_music["lyrics"].ToString());
         }
 
         this.slider_download_music.gameObject.SetActive(true);
@@ -528,5 +529,10 @@ public class Player_music : MonoBehaviour
     public int get_index_music_play()
     {
         return this.sel_index_music;
+    }
+
+    public string StripHTML(string input)
+    {
+        return Regex.Replace(input, "<.*?>", String.Empty);
     }
 }
