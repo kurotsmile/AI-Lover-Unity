@@ -1018,17 +1018,4 @@ public class Command_storage : MonoBehaviour
             item_key.set_tip(this.list_key_block[i].ToString());
         } 
     }
-
-    public List<string> get_list_key_tip()
-    {
-        this.list_key_tip = new List<string>();
-        for (int i = this.length; i >= 0; i--)
-        {
-            string s_data = PlayerPrefs.GetString("command_offline_" + i);
-            if (s_data == "") continue;
-            IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
-            this.list_key_tip.Add(data_chat["key"].ToString());
-        }
-        return this.list_key_tip;
-    }
 }

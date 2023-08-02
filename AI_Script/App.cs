@@ -136,8 +136,6 @@ public class App : MonoBehaviour
         
         this.command_storage.check_load_command_storage();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
-        this.command.send_chat("hi_" + DateTime.Now.ToString("HH"));
-        this.command.load_chat_tip();
     }
 
     public void load_app_where_online()
@@ -168,6 +166,7 @@ public class App : MonoBehaviour
         this.get_character().gameObject.SetActive(true);
         this.sel_menu_func_app(0);
         this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice", "vi-VN"));
+        this.command.send_chat("hi_" + DateTime.Now.ToString("HH"));
         if (!this.is_radio_func) this.button_randio.SetActive(false);
     }
 
@@ -315,7 +314,6 @@ public class App : MonoBehaviour
         this.txt_sunrise.color = this.carrot.color_highlight;
         this.txt_sunset.color = this.carrot.color_highlight;
         this.player_music.txt_name_song_full.color = this.carrot.color_highlight;
-        this.GetComponent<Command>().txt_tip_chat.color = this.carrot.color_highlight;
         this.sel_func_app();
 
         for (int i = 0; i < this.txt_change_color.Length; i++) this.txt_change_color[i].color = this.carrot.color_highlight;
@@ -442,7 +440,17 @@ public class App : MonoBehaviour
         this.s_weather_temp_min = main["temp_min"].ToString();
         this.s_weather_temp_max = main["temp_max"].ToString();
         this.setting.set_name_address_weather(data["name"].ToString());
-        this.carrot.get_img("http://openweathermap.org/img/wn/" + weather["icon"].ToString() + "@2x.png", this.img_weather_icon);
+        string id_icon_weather = weather["icon"].ToString();
+        Sprite sp_icon_weather = this.carrot.get_tool().get_sprite_to_playerPrefs("w" + id_icon_weather);
+        if (sp_icon_weather != null)
+        {
+            this.img_weather_icon.sprite = sp_icon_weather;
+            this.img_weather_icon.color = Color.white;
+        }
+        else
+        {
+            this.carrot.get_img_and_save_playerPrefs("https://openweathermap.org/img/wn/" + id_icon_weather + "@2x.png", this.img_weather_icon, "w" + id_icon_weather);
+        }
         this.show_tip_weather();
     }
 

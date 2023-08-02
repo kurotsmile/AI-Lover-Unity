@@ -23899,86 +23899,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Background Image
---- !u!1 &2755477471572967490
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2755477471572967493}
-  - component: {fileID: 2755477471572967495}
-  - component: {fileID: 2755477471572967492}
-  m_Layer: 5
-  m_Name: Text_tip
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2755477471572967493
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2755477471572967490}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2755477472397272196}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -12.569946, y: -21}
-  m_SizeDelta: {x: -45.860104, y: 33.59}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &2755477471572967495
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2755477471572967490}
-  m_CullTransparentMesh: 0
---- !u!114 &2755477471572967492
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2755477471572967490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.14391243, g: 0.87775654, b: 0.9245283, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 0
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: ...
 --- !u!1 &2755477471574952159
 GameObject:
   m_ObjectHideFlags: 0
@@ -33604,7 +33524,6 @@ MonoBehaviour:
   sp_icon_info_add_chat: {fileID: 21300000, guid: 9b6d1e5e13e6eec47a2253cf8923827a, type: 3}
   sp_icon_info_share_chat: {fileID: 21300000, guid: 50324046bf2a646458da8873d1e5512e, type: 3}
   sp_icon_info_report_chat: {fileID: 21300000, guid: a4b93dcd36347f84c9f5ce4617036959, type: 3}
-  txt_tip_chat: {fileID: 2755477471572967492}
   txt_show_chat: {fileID: 2755477472366650649}
   img_border_color_chat: {fileID: 6087187166589125441}
   panel_show_msg_chat: {fileID: 2755477472353399001}
@@ -33812,7 +33731,6 @@ MonoBehaviour:
   - {fileID: 391381462429881460}
   - {fileID: 409195131917476574}
   - {fileID: 2755477471196747683}
-  - {fileID: 2755477471572967490}
   - {fileID: 2755477471912186824}
   - {fileID: 2016827399986293312}
   - {fileID: 5052952850802131627}
@@ -34045,6 +33963,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a61f3037ca05eb42bfece8be6e6359b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  app: {fileID: 2755477471257207454}
   prefab_item_panel_btn: {fileID: 428795718057345318, guid: b481e4b26f50df54483bd9c26594e5f3, type: 3}
   icon_report: {fileID: 21300000, guid: a4b93dcd36347f84c9f5ce4617036959, type: 3}
   icon_report_chat: {fileID: 21300000, guid: 53fb6b28651d44a4082693907e7077d0, type: 3}
@@ -37481,7 +37400,6 @@ RectTransform:
   m_Children:
   - {fileID: 2755477470501782173}
   - {fileID: 2755477471631273561}
-  - {fileID: 2755477471572967493}
   - {fileID: 8806610484810482222}
   m_Father: {fileID: 2755477471779012193}
   m_RootOrder: 0

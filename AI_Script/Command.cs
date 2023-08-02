@@ -21,7 +21,6 @@ public class Command : MonoBehaviour
     public ScrollRect ScrollRect_log_command;
     public AudioSource sound_command;
     public string chat_pater="";
-    private string s_hint= "Hint";
     private bool is_test_command = false;
 
     public Sprite icon_pc_music;
@@ -29,14 +28,6 @@ public class Command : MonoBehaviour
     public Sprite sp_icon_info_add_chat;
     public Sprite sp_icon_info_share_chat;
     public Sprite sp_icon_info_report_chat;
-
-    [Header("Tip command")]
-    private List<string> list_tip;
-    private float time_next_tip = 2f;
-    private float count_timer_tip = 0;
-    private bool is_act_tip = false;
-    private int index_tip = 0;
-    public Text txt_tip_chat;
 
     [Header("Effect show text chat")]
     public Text txt_show_chat;
@@ -251,27 +242,8 @@ public class Command : MonoBehaviour
         this.GetComponent<App>().get_character().play_ani_waitting();
     }
 
-    public void load_chat_tip()
-    {
-        this.s_hint = PlayerPrefs.GetString("hint", "Hint");
-        this.list_tip = this.GetComponent<Command_storage>().get_list_key_tip();
-        if(this.list_tip.Count>0) this.is_act_tip = true;
-    }
-
     void Update()
     {
-        if (this.is_act_tip)
-        {
-            this.count_timer_tip = this.count_timer_tip + Time.deltaTime;
-            if (this.count_timer_tip > this.time_next_tip)
-            {
-                this.count_timer_tip = 0;
-                this.index_tip++;
-                if (this.index_tip >= this.list_tip.Count) this.index_tip = 0;
-                this.txt_tip_chat.text = this.s_hint+" : "+this.list_tip[this.index_tip].ToString();
-            }
-        }
-
         if (this.is_show_text)
         {
             this.count_timer_show_text = this.count_timer_show_text + Time.deltaTime;
@@ -399,19 +371,6 @@ public class Command : MonoBehaviour
     public void show_box_link_share_chat(string s_link_share)
     {
         this.app.carrot.show_share(s_link_share, PlayerPrefs.GetString("share_chat_tip", "You can share and show this dialogue to others if they also have the app installed"));
-    }
-
-    private void show_box_learn_chat(string s_data)
-    {
-        IDictionary data_learn = (IDictionary)Carrot.Json.Deserialize(s_data);
-        this.app.command_storage.show_add_command_with_pater(data_learn["msg"].ToString(), data_learn["id"].ToString());
-        if (this.box_list != null) this.box_list.close();
-    }
-
-    private void show_box_report_chat()
-    {
-        this.app.show_report();
-        if (this.box_list != null) this.box_list.close();
     }
 
     public string get_s_command_chat_last()
