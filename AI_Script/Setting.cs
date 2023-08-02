@@ -368,7 +368,7 @@ public class Setting : MonoBehaviour
         item_shop_mp3.set_icon(this.sp_icon_shop_mp3);
         item_shop_mp3.set_title("Download Mp3 music");
         item_shop_mp3.set_tip("Unlock mp3 music download function");
-        item_shop_mp3.set_lang_data("shop_mp3", "shop_mp3_tip");
+        item_shop_mp3.set_lang_data("shop_all_mp3", "shop_all_mp3_tip");
         item_shop_mp3.load_lang_data();
         item_shop_mp3.set_act(() => this.app.carrot.buy_product(7));
         Carrot.Carrot_Box_Btn_Item btn_buy_mp3 = item_shop_mp3.create_item();
@@ -793,7 +793,7 @@ public class Setting : MonoBehaviour
         item_shop_mp3.set_icon(this.sp_icon_shop_mp3);
         item_shop_mp3.set_title("Download Mp3 music");
         item_shop_mp3.set_tip("Unlock mp3 music download function");
-        item_shop_mp3.set_lang_data("shop_mp3", "shop_mp3_tip");
+        item_shop_mp3.set_lang_data("shop_all_mp3", "shop_all_mp3_tip");
         item_shop_mp3.load_lang_data();
         item_shop_mp3.set_act(() => this.app.carrot.buy_product(7));
         this.add_btn_buy(item_shop_mp3,7);
