@@ -44,7 +44,7 @@ public class Command : MonoBehaviour
 
     private Carrot.Carrot_Box box_list;
     private string s_command_chat_last;
-    private string id_cur_chat;
+    private string id_cur_chat = "";
     private IDictionary data_chat_cur;
 
     public void send_command()
@@ -75,19 +75,13 @@ public class Command : MonoBehaviour
 
     private void play_chat(string s_key)
     {
-        Debug.Log("play_chat:" + s_key);
-        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.setting.get_lang());
+        Debug.Log("play_chat:" + s_key+" "+ this.app.carrot.lang.get_key_lang());
+        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
         ChatQuery=ChatQuery.WhereEqualTo("key", s_key);
-        ChatQuery=ChatQuery.WhereEqualTo("sex_user", this.app.setting.get_user_sex());
-        ChatQuery=ChatQuery.WhereEqualTo("sex_character", this.app.setting.get_character_sex());
+        //ChatQuery=ChatQuery.WhereEqualTo("sex_user", this.app.setting.get_user_sex());
+        //ChatQuery=ChatQuery.WhereEqualTo("sex_character", this.app.setting.get_character_sex());
 
-        if (this.id_cur_chat != "") ChatQuery=ChatQuery.WhereEqualTo("pater", this.id_cur_chat);
-
-        if (Random.Range(0, 2) == 0)
-            ChatQuery.OrderBy("msg");
-        else
-            ChatQuery.OrderByDescending("msg");
-        ChatQuery.Limit(1);
+        if (this.id_cur_chat.ToString() != "") ChatQuery=ChatQuery.WhereEqualTo("pater", this.id_cur_chat);
         ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted)
@@ -107,8 +101,11 @@ public class Command : MonoBehaviour
                         this.id_cur_chat = documentSnapshot.Id;
                         IDictionary c = documentSnapshot.ToDictionary();
                         c["id"] = this.id_cur_chat;
-                        list_chat.Add(c);
-                        this.app.command_storage.add_command_offline(c);
+                        if(c["sex_user"].ToString()== this.app.setting.get_user_sex()&&c["sex_character"].ToString() == this.app.setting.get_character_sex())
+                        {
+                            list_chat.Add(c);
+                            this.app.command_storage.add_command_offline(c);
+                        }
                     };
 
                     if (list_chat.Count > 1)

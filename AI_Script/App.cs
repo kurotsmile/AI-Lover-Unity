@@ -166,7 +166,9 @@ public class App : MonoBehaviour
         this.get_character().gameObject.SetActive(true);
         this.sel_menu_func_app(0);
         this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice", "vi-VN"));
-        this.command.send_chat("hi_" + DateTime.Now.ToString("HH"));
+        DateTime currentTime = DateTime.Now;
+        int hour = currentTime.Hour;
+        this.command.send_chat("hi_" + hour);
         if (!this.is_radio_func) this.button_randio.SetActive(false);
     }
 
