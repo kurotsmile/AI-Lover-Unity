@@ -120,9 +120,17 @@ public class Command : MonoBehaviour
                 }
                 else
                 {
-                    this.id_cur_chat = "";
-                    this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
-                    this.set_color(Color.red);
+                    if (this.id_cur_chat != "")
+                    {
+                        this.id_cur_chat = "";
+                        this.play_chat(s_key);
+                    }
+                    else
+                    {
+                        this.id_cur_chat = "";
+                        this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
+                        this.set_color(Color.red);
+                    }
                 }
             }
         });

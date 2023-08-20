@@ -223,10 +223,13 @@ public class Command_storage : MonoBehaviour
 
     public void add_command_offline(IDictionary data_chat)
     {
-        string s = Carrot.Json.Serialize(data_chat);
-        PlayerPrefs.SetString("command_offline_" + this.length, s);
-        this.length++;
-        PlayerPrefs.SetInt("cm_length", this.length);
+        if (!this.check_existence_cm_offline(data_chat["id"].ToString()))
+        {
+            string s = Carrot.Json.Serialize(data_chat);
+            PlayerPrefs.SetString("command_offline_" + this.length, s);
+            this.length++;
+            PlayerPrefs.SetInt("cm_length", this.length);
+        }
     }
 
     public void add_command_offline(string s_data)
@@ -269,6 +272,19 @@ public class Command_storage : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public bool check_existence_cm_offline(string id_chat)
+    {
+        for (int i = 0; i < this.length; i++)
+        {
+            if (PlayerPrefs.GetString("command_offline_" + i) != "")
+            {
+                IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + i));
+                if (data_chat["id"].ToString() == id_chat) return true;
+            }
+        }
+        return false;
     }
 
     [ContextMenu("Delete all command")]
