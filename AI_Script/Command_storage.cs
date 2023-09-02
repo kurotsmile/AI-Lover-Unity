@@ -953,11 +953,12 @@ public class Command_storage : MonoBehaviour
             if (this.app.carrot.is_online())
             {
                 CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.setting.get_lang());
-                DocumentReference chatRef = chatDbRef.Document(this.item_keyword.get_val() + " - " + this.app.carrot.generateID());
+                DocumentReference chatRef = chatDbRef.Document("chat"+this.app.carrot.generateID());
                 chatRef.SetAsync(c);
             }
             else
             {
+                c.id = "chat" + this.app.carrot.generateID();
                 IDictionary chat_data= (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
                 this.add_command_offline(chat_data);
             }
