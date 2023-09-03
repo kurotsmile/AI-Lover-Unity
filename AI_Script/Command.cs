@@ -205,6 +205,9 @@ public class Command : MonoBehaviour
         {
             string index_func = data_chat["func"].ToString();
             if (index_func == "1") this.app.sel_menu_with_sound(2);
+            if (index_func == "2") this.app.sel_menu_with_sound(0);
+            if (index_func == "3") this.app.sel_menu_with_sound(3);
+            if (index_func == "4") this.app.command_storage.show_add_command_new();
         }
         if (data_chat["icon"]!= null)
         {

@@ -33565,7 +33565,10 @@ MonoBehaviour:
   - Keyphrase just entered
   func_app_name:
   - None
-  - 'fnc_open_music '
+  - fnc_open_music
+  - fnc_open_weather
+  - fnc_open_fashion_shop
+  - fnc_open_brain
   obj_button_next_command_test: {fileID: 249239798421708654}
   obj_button_prev_command_test: {fileID: 6492396854497497505}
   sp_icon_add_chat: {fileID: 21300000, guid: 9b6d1e5e13e6eec47a2253cf8923827a, type: 3}

@@ -135,8 +135,6 @@ public class Command_storage : MonoBehaviour
     private QuerySnapshot IconQuerySnapshot;
     private QuerySnapshot IconCategoryQuerySnapshot=null;
 
-    private List<string> list_key_tip;
-
     public void check_load_command_storage()
     {
         this.length = PlayerPrefs.GetInt("cm_length", 0);
