@@ -850,11 +850,6 @@ public class Setting : MonoBehaviour
         return this.is_sound_voice;
     }
 
-    public string get_lang()
-    {
-        return PlayerPrefs.GetString("lang","en");
-    }
-
     public string get_character_sex()
     {
         return this.character_sex;

@@ -174,13 +174,13 @@ public class Command_storage : MonoBehaviour
         this.type_act = Command_Type_Act.edit_command;
         this.show_edit(index);
     }
-
+     
     public void show_edit(int index)
     {
         this.index_cm_update = index;
         this.show_add();
 
-        string s_data = PlayerPrefs.GetString("command_offline_" + index);
+        string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + index);
         IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
 
         if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
@@ -188,8 +188,11 @@ public class Command_storage : MonoBehaviour
 
         if (data_chat["func"] != null)
         {
-            int index_control_app = int.Parse(data_chat["func"].ToString());
-            this.item_run_control.set_val(index_control_app.ToString());
+            if (data_chat["func"].ToString() != "")
+            {
+                int index_control_app = int.Parse(data_chat["func"].ToString());
+                this.item_run_control.set_val(index_control_app.ToString());
+            }
         }
 
         if(data_chat["key"]!=null) this.item_keyword.set_val(data_chat["key"].ToString());
@@ -224,15 +227,13 @@ public class Command_storage : MonoBehaviour
         if (!this.check_existence_cm_offline(data_chat["id"].ToString()))
         {
             string s = Carrot.Json.Serialize(data_chat);
-            PlayerPrefs.SetString("command_offline_" + this.length, s);
-            this.length++;
-            PlayerPrefs.SetInt("cm_length", this.length);
+            this.add_command_offline(s);
         }
     }
 
     public void add_command_offline(string s_data)
     {
-        PlayerPrefs.SetString("command_offline_" + this.length, s_data);
+        PlayerPrefs.SetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.length, s_data);
         this.length++;
         PlayerPrefs.SetInt("cm_length", this.length);
     }
@@ -243,9 +244,10 @@ public class Command_storage : MonoBehaviour
         List<IDictionary> list_chat = new List<IDictionary>();
         for (int i = 0; i < this.length; i++)
         {
-            if(PlayerPrefs.GetString("command_offline_" + i) != "")
+            string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
+            if (s_data!= "")
             {
-                IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + i));
+                IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
                 if (id_pather == "")
                 {
                     if (cm_cmd.Equals(data_chat["key"].ToString().ToLower())) list_chat.Add(data_chat);
@@ -276,9 +278,10 @@ public class Command_storage : MonoBehaviour
     {
         for (int i = 0; i < this.length; i++)
         {
-            if (PlayerPrefs.GetString("command_offline_" + i) != "")
+            string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
+            if(s_data!="")
             {
-                IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + i));
+                IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
                 if (data_chat["id"].ToString() == id_chat) return true;
             }
         }
@@ -325,7 +328,7 @@ public class Command_storage : MonoBehaviour
         {
             var index_cm = i;
 
-            string s_data = PlayerPrefs.GetString("command_offline_" + i);
+            string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
             if (s_data == "") continue;
 
             IDictionary data_chat =(IDictionary) Carrot.Json.Deserialize(s_data);
@@ -371,7 +374,7 @@ public class Command_storage : MonoBehaviour
 
     private void act_delete_cm(int index)
     {
-        PlayerPrefs.DeleteKey("command_offline_" + index);
+        PlayerPrefs.DeleteKey("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + index);
     }
 
     public void download_command_offline()
@@ -384,7 +387,7 @@ public class Command_storage : MonoBehaviour
 
     public void download_command_shop()
     {
-        Query DownloadChatQuery = this.app.carrot.db.Collection("chat-" + this.app.setting.get_lang()).WhereEqualTo("sex_user", this.app.setting.get_user_sex()).WhereEqualTo("sex_character", this.app.setting.get_character_sex());
+        Query DownloadChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).WhereEqualTo("sex_user", this.app.setting.get_user_sex()).WhereEqualTo("sex_character", this.app.setting.get_character_sex());
         DownloadChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsCompleted)
@@ -459,7 +462,7 @@ public class Command_storage : MonoBehaviour
 
             item_icon.set_act(() => this.set_icon_and_emoji(Color.red, item_icon.img_icon.sprite, s_color, id_icon));
         }
-    }
+    } 
 
     private void list_category_icon()
     {
@@ -600,7 +603,7 @@ public class Command_storage : MonoBehaviour
         this.obj_button_prev_command_test.SetActive(true);
         this.is_list_command_test_play = true;
         this.index_command_test_play = index_comand;
-        this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.index_command_test_play));
+        this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play));
         this.act_test_command(this.data_chat_test);
     }
 
@@ -620,7 +623,7 @@ public class Command_storage : MonoBehaviour
     {
         this.index_command_test_play++;
         if (this.index_command_test_play >=this.length) this.index_command_test_play=0;
-        this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.index_command_test_play));
+        this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play));
         this.act_test_command(this.data_chat_test);
     }
 
@@ -628,7 +631,7 @@ public class Command_storage : MonoBehaviour
     {
         this.index_command_test_play--;
         if (this.index_command_test_play < 0) this.index_command_test_play=(this.length-1);
-        this.data_chat_test =(IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.index_command_test_play));
+        this.data_chat_test =(IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play));
         this.act_test_command(this.data_chat_test);
     }
     #endregion
@@ -856,8 +859,7 @@ public class Command_storage : MonoBehaviour
     {
         if (this.list_key_block == null)
         {
-            Debug.Log("Key block:" + this.app.setting.get_lang());
-            DocumentReference keyblockRef = this.app.carrot.db.Collection("block").Document(this.app.setting.get_lang());
+            DocumentReference keyblockRef = this.app.carrot.db.Collection("block").Document(this.app.carrot.lang.get_key_lang());
             keyblockRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
             {
                 if (task.IsCompleted)
@@ -950,7 +952,7 @@ public class Command_storage : MonoBehaviour
             this.app.carrot.hide_loading();
             if (this.app.carrot.is_online())
             {
-                CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.setting.get_lang());
+                CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
                 DocumentReference chatRef = chatDbRef.Document("chat"+this.app.carrot.generateID());
                 chatRef.SetAsync(c);
             }

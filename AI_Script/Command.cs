@@ -301,7 +301,7 @@ public class Command : MonoBehaviour
 
     public void play_text_audio(string s_chat)
     {
-        StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.setting.get_lang()));
+        StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.get_key_lang()));
     }
 
     public IEnumerator get_audio_chat_form_txt(string txt_chat, string s_lang)
