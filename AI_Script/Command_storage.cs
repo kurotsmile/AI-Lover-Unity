@@ -147,7 +147,7 @@ public class Command_storage : MonoBehaviour
         this.s_pater_msg = s_chat;
         this.s_pater_id = pater;
         this.index_cm_update = -1;
-        this.show_add();
+        this.show_edit_by_data(null);
     }
 
     public void show_add_command_new()
@@ -156,16 +156,18 @@ public class Command_storage : MonoBehaviour
             this.type_act = Command_Type_Act.add_command;
         else
             this.type_act = Command_Type_Act.add_command_dev;
+
         this.s_pater_msg = "";
         this.s_pater_id = "";
         this.index_cm_update = -1;
-        this.show_add();
+        IDictionary data_new_chat = (IDictionary) Carrot.Json.Deserialize("{}");
+        this.show_edit_by_data(data_new_chat);
     }
 
     public void show_new_command(string s_new_keyword)
     {
         this.type_act = Command_Type_Act.add_command;
-        this.show_add();
+        this.show_edit_by_data(null);
         this.item_keyword.set_val(s_new_keyword);
     }
 
@@ -178,13 +180,202 @@ public class Command_storage : MonoBehaviour
     public void show_edit(int index)
     {
         this.index_cm_update = index;
-        this.show_add();
-
         string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + index);
         IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
+        this.show_edit_by_data(data_chat);
+    }
+
+    public void show_edit_dev(IDictionary data_chat)
+    {
+        this.type_act= Command_Type_Act.add_command;
+        this.show_edit_by_data(data_chat);
+    }
+
+    private void show_edit_by_data(IDictionary data_chat)
+    {
+        this.s_id_icon = "";
+        this.s_color = "#FFFFFF";
 
         if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
-        if(data_chat["link"]!=null) this.item_run_cmd.set_val(data_chat["link"].ToString());
+
+        this.get_list_key_block();
+        if (this.box_add_chat != null) this.box_add_chat.close();
+
+        this.box_add_chat = this.GetComponent<App>().carrot.Create_Box("command_add");
+
+        if (this.type_act == Command_Type_Act.add_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_add", "Add the command"));
+        if (this.type_act == Command_Type_Act.add_command_dev) box_add_chat.set_title("Add the Dev Command");
+        if (this.type_act == Command_Type_Act.edit_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_update", "Update command"));
+        if (this.type_act == Command_Type_Act.edit_pass) box_add_chat.set_title("Update Pass Command");
+
+        box_add_chat.set_icon(this.sp_icon_add_chat);
+
+        this.btn_model_nomal = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_nomal);
+        btn_model_nomal.set_act(() => this.act_box_add_model_nomal());
+        if (this.is_cm_mode_nomal == true) btn_model_nomal.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        this.btn_model_advanced = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_advanced);
+        btn_model_advanced.set_act(() => this.act_box_add_model_advanced());
+        if (this.is_cm_mode_nomal == false) btn_model_advanced.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.setting.sp_icon_chat_limit);
+        btn_list_key_block.set_act(() => this.show_list_block_key_chat());
+
+        this.item_patert = box_add_chat.create_item("item_patert");
+        item_patert.set_type(Carrot.Box_Item_Type.box_value_txt);
+        item_patert.set_icon(this.sp_icon_patert);
+        item_patert.set_title("Add a reply to this chat");
+        item_patert.set_tip("Add an answer to this conversation");
+        item_patert.set_lang_data("brain_add", "cm_pater");
+        item_patert.set_val(this.s_pater_msg);
+        item_patert.load_lang_data();
+
+        Carrot.Carrot_Box_Btn_Item btn_del_patert = item_patert.create_item();
+        btn_del_patert.set_icon(this.GetComponent<App>().carrot.sp_icon_del_data);
+        btn_del_patert.set_color(this.GetComponent<App>().carrot.color_highlight);
+        btn_del_patert.set_act(() => act_del_patert_chat());
+        if (this.s_pater_id == "") this.item_patert.gameObject.SetActive(false);
+
+        this.item_keyword = box_add_chat.create_item("item_keyword");
+        item_keyword.set_type(Carrot.Box_Item_Type.box_value_input);
+        item_keyword.check_type();
+        item_keyword.set_icon(this.sp_icon_key);
+        item_keyword.set_title("key word");
+        item_keyword.set_tip("keywords to execute the command");
+        item_keyword.set_lang_data("cm_keyword", "cm_keyword_tip");
+        item_keyword.load_lang_data();
+
+        this.item_msg = box_add_chat.create_item("item_msg");
+        item_msg.set_type(Carrot.Box_Item_Type.box_value_input);
+        item_msg.check_type();
+        item_msg.set_icon(this.sp_icon_msg);
+        item_msg.set_title("Responsive text content");
+        item_msg.set_tip("Character response text when replying to the keyword");
+        item_msg.set_lang_data("cm_msg", "cm_msg_tip");
+        item_msg.load_lang_data();
+
+        Carrot.Carrot_Box_Btn_Item btn_parameter_tag = this.item_msg.create_item();
+        btn_parameter_tag.set_icon(this.sp_icon_parameter_tag);
+        btn_parameter_tag.set_color(this.GetComponent<App>().carrot.color_highlight);
+        btn_parameter_tag.set_act(() => this.show_list_parameter_tag());
+
+        this.item_action = box_add_chat.create_item("item_action");
+        item_action.set_type(Carrot.Box_Item_Type.box_value_dropdown);
+        item_action.check_type();
+        item_action.set_icon(this.sp_icon_action);
+        item_action.set_title("Act");
+        item_action.set_tip("The character's actions follow the response text");
+        item_action.set_lang_data("act", "act_tip");
+        item_action.load_lang_data();
+        item_action.dropdown_val.ClearOptions();
+        for (int i = 0; i <= 41; i++)
+        {
+            string s_name_action = PlayerPrefs.GetString("act", "Action") + " " + (i + 1);
+            item_action.dropdown_val.options.Add(new Dropdown.OptionData(s_name_action));
+        }
+
+        this.item_face = box_add_chat.create_item("item_face");
+        item_face.set_type(Carrot.Box_Item_Type.box_value_dropdown);
+        item_face.check_type();
+        item_face.set_icon(this.sp_icon_face);
+        item_face.set_title("Emotional face");
+        item_face.set_tip("Show the character's facial expression when saying this command");
+        item_face.set_lang_data("face", "face_tip");
+        item_face.load_lang_data();
+        item_face.dropdown_val.ClearOptions();
+        for (int i = 0; i <= 18; i++)
+        {
+            string s_name_face = PlayerPrefs.GetString("face", "Face") + " " + (i + 1);
+            item_face.dropdown_val.options.Add(new Dropdown.OptionData(s_name_face));
+        }
+
+        this.item_run_cmd = box_add_chat.create_item("item_run_cmd");
+        item_run_cmd.set_type(Carrot.Box_Item_Type.box_value_input);
+        item_run_cmd.check_type();
+        item_run_cmd.set_icon(this.sp_icon_run);
+        item_run_cmd.set_title("Open websites and apps");
+        item_run_cmd.set_tip("Please enter the web address or the URL Schema Name of the app, to open a website or app.");
+        item_run_cmd.set_lang_data("cm_func_1", "cm_func_1_tip");
+        item_run_cmd.load_lang_data();
+        if (this.is_cm_mode_nomal)
+            this.item_run_cmd.gameObject.SetActive(false);
+        else
+            this.item_run_cmd.gameObject.SetActive(true);
+
+        this.item_run_control = box_add_chat.create_item("item_run_control");
+        item_run_control.set_type(Carrot.Box_Item_Type.box_value_dropdown);
+        item_run_control.check_type();
+        item_run_control.set_icon(this.sp_icon_run_control);
+        item_run_control.set_title("Program control");
+        item_run_control.set_tip("Select a function you want to control");
+        item_run_control.set_lang_data("cm_func_2", "cm_func_2_tip");
+        item_run_control.load_lang_data();
+        if (this.is_cm_mode_nomal)
+            this.item_run_control.gameObject.SetActive(false);
+        else
+            this.item_run_control.gameObject.SetActive(true);
+        this.item_run_control.dropdown_val.ClearOptions();
+        item_run_control.dropdown_val.ClearOptions();
+        foreach (string option in this.func_app_name) item_run_control.dropdown_val.options.Add(new Dropdown.OptionData(option));
+
+        this.item_limit = box_add_chat.create_item("item_limit");
+        item_limit.set_type(Carrot.Box_Item_Type.box_value_slider);
+        item_limit.set_icon(this.sp_icon_limit);
+        item_limit.set_title("Limit vulgarity and sex");
+        item_limit.set_tip("Set limits for children");
+        item_limit.set_lang_data("report_limit_chat", "chat_limit_tip");
+        item_limit.load_lang_data();
+        item_limit.set_fill_color(this.GetComponent<App>().carrot.color_highlight);
+        item_limit.check_type();
+        this.item_limit.slider_val.wholeNumbers = true;
+        this.item_limit.slider_val.minValue = 1;
+        this.item_limit.slider_val.maxValue = 4;
+        item_limit.set_val(this.GetComponent<App>().setting.get_limit_chat().ToString());
+        if (this.is_cm_mode_nomal)
+            this.item_limit.gameObject.SetActive(false);
+        else
+            this.item_limit.gameObject.SetActive(true);
+
+        this.item_icon = box_add_chat.create_item("item_icon");
+        item_icon.set_type(Carrot.Box_Item_Type.box_value_txt);
+        item_icon.check_type();
+        item_icon.set_icon(this.sp_icon_icons);
+        item_icon.set_title("Icons and colors");
+        item_icon.set_tip("Choose icons and colors in the system's icon store to increase the liveliness of the dialogue");
+        item_icon.set_lang_data("setting_bubble_icon", "setting_bubble_icon_tip");
+        item_icon.load_lang_data();
+        item_icon.set_act(() => this.btn_show_list_emoji_and_color());
+        item_icon.set_val("#" + this.s_color);
+        if (this.is_cm_mode_nomal)
+            this.item_icon.gameObject.SetActive(false);
+        else
+            this.item_icon.gameObject.SetActive(true);
+
+        Carrot.Carrot_Box_Btn_Item btn_color = this.item_icon.create_item();
+        btn_color.set_color(this.GetComponent<App>().carrot.color_highlight);
+        btn_color.set_icon(this.sp_icon_colo_sel);
+        Destroy(btn_color.GetComponent<Button>());
+
+        Carrot.Carrot_Box_Btn_Panel obj_panel_btn = box_add_chat.create_panel_btn();
+
+
+            Carrot.Carrot_Button_Item obj_btn_done = obj_panel_btn.create_btn("btn_done");
+            obj_btn_done.set_act_click(act_done_submit_command);
+            obj_btn_done.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
+            obj_btn_done.set_label_color(Color.white);
+            obj_btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
+            obj_btn_done.set_icon(this.sp_icon_add_chat);
+
+        obj_btn_test = obj_panel_btn.create_btn("btn_test");
+        obj_btn_test.set_act_click(btn_test_command);
+        obj_btn_test.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
+
+        obj_btn_test.set_label_color(Color.white);
+        obj_btn_test.set_label(PlayerPrefs.GetString("cm_test", "Test"));
+        obj_btn_test.set_icon(this.GetComponent<App>().carrot.game.icon_play_music_game);
+
+        box_add_chat.set_act_before_closing(act_close_box);
+
+        if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
+        if (data_chat["link"] != null) this.item_run_cmd.set_val(data_chat["link"].ToString());
 
         if (data_chat["func"] != null)
         {
@@ -195,11 +386,11 @@ public class Command_storage : MonoBehaviour
             }
         }
 
-        if(data_chat["key"]!=null) this.item_keyword.set_val(data_chat["key"].ToString());
-        if(data_chat["msg"]!=null)this.item_msg.set_val(data_chat["msg"].ToString());
-        if(data_chat["limit"]!=null) this.item_limit.set_val(data_chat["limit"].ToString());
-        if(data_chat["face"]!=null) this.item_face.set_val(data_chat["face"].ToString());
-        if(data_chat["action"]!= null) this.item_action.set_val(data_chat["action"].ToString());
+        if (data_chat["key"] != null) this.item_keyword.set_val(data_chat["key"].ToString());
+        if (data_chat["msg"] != null) this.item_msg.set_val(data_chat["msg"].ToString());
+        if (data_chat["limit"] != null) this.item_limit.set_val(data_chat["limit"].ToString());
+        if (data_chat["face"] != null) this.item_face.set_val(data_chat["face"].ToString());
+        if (data_chat["action"] != null) this.item_action.set_val(data_chat["action"].ToString());
 
         if (data_chat["color"] != null)
         {
@@ -216,7 +407,7 @@ public class Command_storage : MonoBehaviour
             this.item_icon.set_val(this.s_id_icon);
 
             Sprite sp_icon = this.app.carrot.get_tool().get_sprite_to_playerPrefs(this.s_id_icon);
-            if (sp_icon!=null) this.item_icon.set_icon_white(sp_icon);
+            if (sp_icon != null) this.item_icon.set_icon_white(sp_icon);
         }
 
         this.check_show_btn_test_command();
@@ -636,187 +827,7 @@ public class Command_storage : MonoBehaviour
     }
     #endregion
 
-    [ContextMenu("show_add")]
-    public void show_add()
-    {
-        this.s_id_icon = "";
-        this.s_color = "#FFFFFF";
 
-        this.get_list_key_block();
-        if (this.box_add_chat != null) this.box_add_chat.close();
-
-        this.box_add_chat = this.GetComponent<App>().carrot.Create_Box("command_add");
-
-        if(this.type_act == Command_Type_Act.add_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_add", "Add the command"));
-        if(this.type_act == Command_Type_Act.add_command_dev) box_add_chat.set_title("Add the Dev Command");
-        if(this.type_act==Command_Type_Act.edit_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_update", "Update command"));
-        if(this.type_act==Command_Type_Act.edit_pass) box_add_chat.set_title("Update Pass Command");
-
-        box_add_chat.set_icon(this.sp_icon_add_chat);
-
-        this.btn_model_nomal = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_nomal);
-        btn_model_nomal.set_act(() => this.act_box_add_model_nomal());
-        if (this.is_cm_mode_nomal == true) btn_model_nomal.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
-        this.btn_model_advanced = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_advanced);
-        btn_model_advanced.set_act(() => this.act_box_add_model_advanced());
-        if (this.is_cm_mode_nomal == false) btn_model_advanced.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
-        Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.setting.sp_icon_chat_limit);
-        btn_list_key_block.set_act(()=>this.show_list_block_key_chat());
-
-        this.item_patert = box_add_chat.create_item("item_patert");
-        item_patert.set_type(Carrot.Box_Item_Type.box_value_txt);
-        item_patert.set_icon(this.sp_icon_patert);
-        item_patert.set_title("Add a reply to this chat");
-        item_patert.set_tip("Add an answer to this conversation");
-        item_patert.set_lang_data("brain_add", "cm_pater");
-        item_patert.set_val(this.s_pater_msg);
-        item_patert.load_lang_data();
-
-        Carrot.Carrot_Box_Btn_Item btn_del_patert = item_patert.create_item();
-        btn_del_patert.set_icon(this.GetComponent<App>().carrot.sp_icon_del_data);
-        btn_del_patert.set_color(this.GetComponent<App>().carrot.color_highlight);
-        btn_del_patert.set_act(() => act_del_patert_chat());
-        if (this.s_pater_id == "") this.item_patert.gameObject.SetActive(false);
-
-        this.item_keyword = box_add_chat.create_item("item_keyword");
-        item_keyword.set_type(Carrot.Box_Item_Type.box_value_input);
-        item_keyword.check_type();
-        item_keyword.set_icon(this.sp_icon_key);
-        item_keyword.set_title("key word");
-        item_keyword.set_tip("keywords to execute the command");
-        item_keyword.set_lang_data("cm_keyword", "cm_keyword_tip");
-        item_keyword.load_lang_data();
-
-        this.item_msg = box_add_chat.create_item("item_msg");
-        item_msg.set_type(Carrot.Box_Item_Type.box_value_input);
-        item_msg.check_type();
-        item_msg.set_icon(this.sp_icon_msg);
-        item_msg.set_title("Responsive text content");
-        item_msg.set_tip("Character response text when replying to the keyword");
-        item_msg.set_lang_data("cm_msg", "cm_msg_tip");
-        item_msg.load_lang_data();
-
-        Carrot.Carrot_Box_Btn_Item btn_parameter_tag = this.item_msg.create_item();
-        btn_parameter_tag.set_icon(this.sp_icon_parameter_tag);
-        btn_parameter_tag.set_color(this.GetComponent<App>().carrot.color_highlight);
-        btn_parameter_tag.set_act(() => this.show_list_parameter_tag());
-
-        this.item_action = box_add_chat.create_item("item_action");
-        item_action.set_type(Carrot.Box_Item_Type.box_value_dropdown);
-        item_action.check_type();
-        item_action.set_icon(this.sp_icon_action);
-        item_action.set_title("Act");
-        item_action.set_tip("The character's actions follow the response text");
-        item_action.set_lang_data("act", "act_tip");
-        item_action.load_lang_data();
-        item_action.dropdown_val.ClearOptions();
-        for (int i = 0; i <= 41; i++)
-        {
-            string s_name_action = PlayerPrefs.GetString("act", "Action") + " " + (i + 1);
-            item_action.dropdown_val.options.Add(new Dropdown.OptionData(s_name_action));
-        }
-
-        this.item_face = box_add_chat.create_item("item_face");
-        item_face.set_type(Carrot.Box_Item_Type.box_value_dropdown);
-        item_face.check_type();
-        item_face.set_icon(this.sp_icon_face);
-        item_face.set_title("Emotional face");
-        item_face.set_tip("Show the character's facial expression when saying this command");
-        item_face.set_lang_data("face", "face_tip");
-        item_face.load_lang_data();
-        item_face.dropdown_val.ClearOptions();
-        for (int i = 0; i <= 18; i++)
-        {
-            string s_name_face = PlayerPrefs.GetString("face", "Face") + " " + (i + 1);
-            item_face.dropdown_val.options.Add(new Dropdown.OptionData(s_name_face));
-        }
-
-        this.item_run_cmd = box_add_chat.create_item("item_run_cmd");
-        item_run_cmd.set_type(Carrot.Box_Item_Type.box_value_input);
-        item_run_cmd.check_type();
-        item_run_cmd.set_icon(this.sp_icon_run);
-        item_run_cmd.set_title("Open websites and apps");
-        item_run_cmd.set_tip("Please enter the web address or the URL Schema Name of the app, to open a website or app.");
-        item_run_cmd.set_lang_data("cm_func_1", "cm_func_1_tip");
-        item_run_cmd.load_lang_data();
-        if (this.is_cm_mode_nomal)
-            this.item_run_cmd.gameObject.SetActive(false);
-        else
-            this.item_run_cmd.gameObject.SetActive(true);
-
-        this.item_run_control = box_add_chat.create_item("item_run_control");
-        item_run_control.set_type(Carrot.Box_Item_Type.box_value_dropdown);
-        item_run_control.check_type();
-        item_run_control.set_icon(this.sp_icon_run_control);
-        item_run_control.set_title("Program control");
-        item_run_control.set_tip("Select a function you want to control");
-        item_run_control.set_lang_data("cm_func_2", "cm_func_2_tip");
-        item_run_control.load_lang_data();
-        if (this.is_cm_mode_nomal)
-            this.item_run_control.gameObject.SetActive(false);
-        else
-            this.item_run_control.gameObject.SetActive(true);
-        this.item_run_control.dropdown_val.ClearOptions();
-        item_run_control.dropdown_val.ClearOptions();
-        foreach (string option in this.func_app_name) item_run_control.dropdown_val.options.Add(new Dropdown.OptionData(option));
-
-        this.item_limit = box_add_chat.create_item("item_limit");
-        item_limit.set_type(Carrot.Box_Item_Type.box_value_slider);
-        item_limit.set_icon(this.sp_icon_limit);
-        item_limit.set_title("Limit vulgarity and sex");
-        item_limit.set_tip("Set limits for children");
-        item_limit.set_lang_data("report_limit_chat", "chat_limit_tip");
-        item_limit.load_lang_data();
-        item_limit.set_fill_color(this.GetComponent<App>().carrot.color_highlight);
-        item_limit.check_type();
-        this.item_limit.slider_val.wholeNumbers = true;
-        this.item_limit.slider_val.minValue = 1;
-        this.item_limit.slider_val.maxValue = 4;
-        item_limit.set_val(this.GetComponent<App>().setting.get_limit_chat().ToString());
-        if (this.is_cm_mode_nomal)
-            this.item_limit.gameObject.SetActive(false);
-        else
-            this.item_limit.gameObject.SetActive(true);
-
-        this.item_icon = box_add_chat.create_item("item_icon");
-        item_icon.set_type(Carrot.Box_Item_Type.box_value_txt);
-        item_icon.check_type();
-        item_icon.set_icon(this.sp_icon_icons);
-        item_icon.set_title("Icons and colors");
-        item_icon.set_tip("Choose icons and colors in the system's icon store to increase the liveliness of the dialogue");
-        item_icon.set_lang_data("setting_bubble_icon", "setting_bubble_icon_tip");
-        item_icon.load_lang_data();
-        item_icon.set_act(() => this.btn_show_list_emoji_and_color());
-        item_icon.set_val("#" + this.s_color);
-        if (this.is_cm_mode_nomal)
-            this.item_icon.gameObject.SetActive(false);
-        else
-            this.item_icon.gameObject.SetActive(true);
-
-        Carrot.Carrot_Box_Btn_Item btn_color = this.item_icon.create_item();
-        btn_color.set_color(this.GetComponent<App>().carrot.color_highlight);
-        btn_color.set_icon(this.sp_icon_colo_sel);
-        Destroy(btn_color.GetComponent<Button>());
-
-        Carrot.Carrot_Box_Btn_Panel obj_panel_btn = box_add_chat.create_panel_btn();
-
-        Carrot.Carrot_Button_Item obj_btn_done = obj_panel_btn.create_btn("btn_done");
-        obj_btn_done.set_act_click(act_done_submit_command);
-        obj_btn_done.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
-        obj_btn_done.set_label_color(Color.white);
-        obj_btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
-        obj_btn_done.set_icon(this.sp_icon_add_chat);
-
-        obj_btn_test = obj_panel_btn.create_btn("btn_test");
-        obj_btn_test.set_act_click(btn_test_command);
-        obj_btn_test.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
-
-        obj_btn_test.set_label_color(Color.white);
-        obj_btn_test.set_label(PlayerPrefs.GetString("cm_test", "Test"));
-        obj_btn_test.set_icon(this.GetComponent<App>().carrot.game.icon_play_music_game);
-
-        box_add_chat.set_act_before_closing(act_close_box);
-    }
 
     private void act_box_add_model_nomal()
     {
@@ -954,6 +965,11 @@ public class Command_storage : MonoBehaviour
             {
                 CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
                 DocumentReference chatRef = chatDbRef.Document("chat"+this.app.carrot.generateID());
+                if (this.app.carrot.model_app == ModelApp.Develope)
+                {
+                    c.id = this.s_id;
+                    c.status = "passed";
+                }
                 chatRef.SetAsync(c);
             }
             else
@@ -965,7 +981,11 @@ public class Command_storage : MonoBehaviour
 
             if (this.box_list != null) this.box_list.close();
             if (this.box_add_chat != null) this.box_add_chat.close();
-            this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("brain_add_success", "Your chat has been published successfully!"));
+
+            if(this.app.carrot.model_app==ModelApp.Publish)
+                this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("brain_add_success", "Your chat has been published successfully!"));
+            else
+                this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "The chat has been published successfully! (Dev)");
         }
 
         if (this.type_act == Command_Type_Act.edit_command)

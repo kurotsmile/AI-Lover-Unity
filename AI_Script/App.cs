@@ -13,6 +13,7 @@ public class App : MonoBehaviour
     public Report report;
     public Environment view;
     public Command_storage command_storage;
+    public Command_Dev command_dev;
     public Command command;
 
     [Header("App obj")]
@@ -136,6 +137,7 @@ public class App : MonoBehaviour
         
         this.command_storage.check_load_command_storage();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
+        this.command_dev.check();
     }
 
     public void load_app_where_online()

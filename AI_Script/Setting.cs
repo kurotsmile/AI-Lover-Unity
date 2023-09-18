@@ -490,6 +490,7 @@ public class Setting : MonoBehaviour
     private void act_close_setting()
     {
         this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
+        this.app.command_dev.check();
     }
 
     private void act_show_box_edit_weather_pin()
