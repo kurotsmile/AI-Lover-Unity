@@ -567,6 +567,7 @@ public class App : MonoBehaviour
     {
         string s_name_user = this.carrot.user.get_data_user_login("name");
         PlayerPrefs.SetString("ten_user", s_name_user);
+        this.command_dev.check();
     }
 
     public void btn_show_list_lang()

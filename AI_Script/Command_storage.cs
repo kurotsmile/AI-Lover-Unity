@@ -621,7 +621,7 @@ public class Command_storage : MonoBehaviour
             IconQuery = IconQuery.Limit(50);
             IconQuery.GetSnapshotAsync().ContinueWithOnMainThread(task =>
             {
-                this.IconQuerySnapshot = task.Result;
+                this.IconQuerySnapshot = task.Result; 
                 this.act_load_icon_and_emoji(this.IconQuerySnapshot);
             });
         }
