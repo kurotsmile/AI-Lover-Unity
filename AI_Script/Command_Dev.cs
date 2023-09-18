@@ -39,7 +39,7 @@ public class Command_Dev : MonoBehaviour
 
                 if (capitalQuerySnapshot.Count > 0)
                 {
-                    this.box=this.app.carrot.Create_Box("Chat Pending");
+                    this.box=this.app.carrot.Create_Box("Chat Pending (Dev)");
                     this.box.set_icon(this.app.command.icon_info_chat);
                     List<IDictionary> list_chat = new List<IDictionary>();
                     foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
@@ -53,7 +53,12 @@ public class Command_Dev : MonoBehaviour
                         item_chat.set_title(c["key"].ToString());
                         item_chat.set_tip(c["msg"].ToString());
                         item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
-                        
+
+                        Carrot_Box_Btn_Item btn_same = item_chat.create_item();
+                        btn_same.set_icon(this.app.command.sp_icon_info_report_chat);
+                        btn_same.set_color(this.app.carrot.color_highlight);
+                        btn_same.set_act(() => this.delete(id_chat, item_chat.gameObject));
+
                         Carrot_Box_Btn_Item btn_del=item_chat.create_item();
                         btn_del.set_icon(this.app.carrot.sp_icon_del_data);
                         btn_del.set_color(Color.red);
@@ -74,5 +79,15 @@ public class Command_Dev : MonoBehaviour
         chatRef.DeleteAsync();
         this.app.carrot.show_msg("Chat", "Delete Success", Msg_Icon.Success);
         Destroy(obj_item_chat);
+    }
+
+    public void show_chat_key_same(string s_key_chat)
+    {
+
+    }
+
+    public Carrot_Box get_box_list()
+    {
+        return this.box;
     }
 }

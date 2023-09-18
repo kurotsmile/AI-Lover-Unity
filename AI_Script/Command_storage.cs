@@ -409,8 +409,6 @@ public class Command_storage : MonoBehaviour
             Sprite sp_icon = this.app.carrot.get_tool().get_sprite_to_playerPrefs(this.s_id_icon);
             if (sp_icon != null) this.item_icon.set_icon_white(sp_icon);
         }
-
-        this.check_show_btn_test_command();
     }
 
     public void add_command_offline(IDictionary data_chat)
@@ -739,6 +737,8 @@ public class Command_storage : MonoBehaviour
         }
 
         if (this.box_list != null) this.box_list.close();
+        if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
+
         this.box_add_chat.gameObject.SetActive(false);
         this.is_list_command_test_play = false;
         this.obj_button_next_command_test.SetActive(false);
@@ -777,14 +777,6 @@ public class Command_storage : MonoBehaviour
             this.GetComponent<Command>().act_chat(data_chat_test, true);
             this.app.panel_inp_func.SetActive(false);
         }
-    }
-
-    public void check_show_btn_test_command()
-    {
-        if (this.item_msg.get_val().Trim() != "")
-            this.obj_btn_test.gameObject.SetActive(true);
-        else
-            this.obj_btn_test.gameObject.SetActive(false);
     }
 
     public void play_test_command(int index_comand)
@@ -964,13 +956,19 @@ public class Command_storage : MonoBehaviour
             if (this.app.carrot.is_online())
             {
                 CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-                DocumentReference chatRef = chatDbRef.Document("chat"+this.app.carrot.generateID());
-                if (this.app.carrot.model_app == ModelApp.Develope)
+                if (this.app.carrot.model_app == ModelApp.Publish)
                 {
+                    DocumentReference chatRef = chatDbRef.Document("chat" + this.app.carrot.generateID());
+                    chatRef.SetAsync(c);
+                }
+                else
+                {
+                    DocumentReference chatRef = chatDbRef.Document(this.s_id);
                     c.id = this.s_id;
                     c.status = "passed";
+                    chatRef.SetAsync(c);
                 }
-                chatRef.SetAsync(c);
+                
             }
             else
             {
