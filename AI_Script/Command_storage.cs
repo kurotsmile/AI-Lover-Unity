@@ -11,7 +11,6 @@ using UnityEngine.UI;
 
 public enum Command_Type_Act {
     add_command,
-    add_command_dev,
     edit_command,
     edit_pass,
     list_command,
@@ -153,11 +152,7 @@ public class Command_storage : MonoBehaviour
 
     public void show_add_command_new()
     {
-        if (this.GetComponent<App>().carrot.model_app == Carrot.ModelApp.Publish)
-            this.type_act = Command_Type_Act.add_command;
-        else
-            this.type_act = Command_Type_Act.add_command_dev;
-
+        this.type_act = Command_Type_Act.add_command;
         this.s_pater_msg = "";
         this.s_pater_id = "";
         this.index_cm_update = -1;
@@ -205,7 +200,6 @@ public class Command_storage : MonoBehaviour
         this.box_add_chat = this.GetComponent<App>().carrot.Create_Box("command_add");
 
         if (this.type_act == Command_Type_Act.add_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_add", "Add the command"));
-        if (this.type_act == Command_Type_Act.add_command_dev) box_add_chat.set_title("Add the Dev Command");
         if (this.type_act == Command_Type_Act.edit_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_update", "Update command"));
         if (this.type_act == Command_Type_Act.edit_pass) box_add_chat.set_title("Update Pass Command");
 
@@ -991,15 +985,27 @@ public class Command_storage : MonoBehaviour
                     DocumentReference chatRef = chatDbRef.Document("chat" + this.app.carrot.generateID());
                     chatRef.SetAsync(c);
                 }
-                else
+
+                if (this.app.carrot.model_app == ModelApp.Develope)
                 {
-                    DocumentReference chatRef = chatDbRef.Document(this.s_id);
-                    c.id = this.s_id;
-                    c.status = "passed";
-                    chatRef.SetAsync(c);
+                    if (this.s_id.Trim() == "")
+                    {
+                        string s_new_id= "chat" + this.app.carrot.generateID();
+                        DocumentReference chatRef = chatDbRef.Document(s_new_id);
+                        c.id = s_new_id;
+                        c.status = "passed";
+                        chatRef.SetAsync(c);
+                    }
+                    else
+                    {
+                        DocumentReference chatRef = chatDbRef.Document(this.s_id);
+                        c.id = this.s_id;
+                        c.status = "passed";
+                        chatRef.SetAsync(c);
+                    }
+
                     if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
                 }
-                
             }
             else
             {
@@ -1007,6 +1013,7 @@ public class Command_storage : MonoBehaviour
                 IDictionary chat_data= (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
                 this.add_command_offline(chat_data);
             }
+
 
             if (this.box_list != null) this.box_list.close();
             if (this.box_add_chat != null) this.box_add_chat.close();
