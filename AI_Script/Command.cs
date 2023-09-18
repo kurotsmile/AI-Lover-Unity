@@ -35,6 +35,7 @@ public class Command : MonoBehaviour
     public GameObject panel_show_msg_chat;
     public GameObject panel_show_log_chat;
     public GameObject obj_btn_info_chat;
+    public GameObject obj_btn_report_chat;
     private float count_timer_show_text = 0;
     private float count_timer_hide_text = 0;
     private bool is_show_text = false;
@@ -129,6 +130,8 @@ public class Command : MonoBehaviour
                     {
                         this.id_cur_chat = "";
                         this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
+                        this.obj_btn_info_chat.SetActive(false);
+                        this.obj_btn_report_chat.SetActive(false);
                         this.set_color(Color.red);
                     }
                 }
@@ -185,7 +188,16 @@ public class Command : MonoBehaviour
         this.data_chat_cur = data_chat;
         this.app.panel_main.SetActive(true);
         this.is_test_command = is_test;
-        if (is_test) this.obj_btn_info_chat.SetActive(false); else this.obj_btn_info_chat.SetActive(true);
+        if (is_test)
+        {
+            this.obj_btn_info_chat.SetActive(false);
+            this.obj_btn_report_chat.SetActive(false);
+        }
+        else
+        {
+            this.obj_btn_info_chat.SetActive(true);
+            this.obj_btn_report_chat.SetActive(true);
+        }
 
         string s_msg_chat = "";
         if (data_chat["msg"] != null)

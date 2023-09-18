@@ -33531,6 +33531,7 @@ MonoBehaviour:
   panel_show_msg_chat: {fileID: 2755477472353399001}
   panel_show_log_chat: {fileID: 2755477471323344122}
   obj_btn_info_chat: {fileID: 4049599128178336827}
+  obj_btn_report_chat: {fileID: 2755477471912186824}
 --- !u!114 &2755477471257207459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34033,7 +34034,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
-  icon: {fileID: 21300000, guid: b3f0ba7f6248f0e43827c291096a4260, type: 3}
+  sp_icon_key_same: {fileID: 21300000, guid: 53fb6b28651d44a4082693907e7077d0, type: 3}
+  sp_icon_translate: {fileID: 21300000, guid: d8790ddbdd3bfaa48b6729f28415a4f8, type: 3}
   btn_chat_dev: {fileID: 2016827399986293312}
 --- !u!1 &2755477472104608252
 GameObject:

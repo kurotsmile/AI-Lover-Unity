@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public enum Command_Type_Act {
@@ -243,6 +244,14 @@ public class Command_storage : MonoBehaviour
         item_keyword.set_lang_data("cm_keyword", "cm_keyword_tip");
         item_keyword.load_lang_data();
 
+        if (this.app.carrot.model_app == ModelApp.Develope)
+        {
+            Carrot.Carrot_Box_Btn_Item btn_translate = this.item_keyword.create_item();
+            btn_translate.set_color(this.app.carrot.color_highlight);
+            btn_translate.set_icon(this.app.command_dev.sp_icon_translate);
+            btn_translate.set_act(() =>this.act_translate(this.item_keyword.get_val()));
+        }
+
         this.item_msg = box_add_chat.create_item("item_msg");
         item_msg.set_type(Carrot.Box_Item_Type.box_value_input);
         item_msg.check_type();
@@ -251,6 +260,14 @@ public class Command_storage : MonoBehaviour
         item_msg.set_tip("Character response text when replying to the keyword");
         item_msg.set_lang_data("cm_msg", "cm_msg_tip");
         item_msg.load_lang_data();
+
+        if (this.app.carrot.model_app == ModelApp.Develope)
+        {
+            Carrot.Carrot_Box_Btn_Item btn_translate = this.item_msg.create_item();
+            btn_translate.set_color(this.app.carrot.color_highlight);
+            btn_translate.set_icon(this.app.command_dev.sp_icon_translate);
+            btn_translate.set_act(() => this.act_translate(this.item_msg.get_val()));
+        }
 
         Carrot.Carrot_Box_Btn_Item btn_parameter_tag = this.item_msg.create_item();
         btn_parameter_tag.set_icon(this.sp_icon_parameter_tag);
@@ -352,17 +369,16 @@ public class Command_storage : MonoBehaviour
         Carrot.Carrot_Box_Btn_Item btn_color = this.item_icon.create_item();
         btn_color.set_color(this.GetComponent<App>().carrot.color_highlight);
         btn_color.set_icon(this.sp_icon_colo_sel);
-        Destroy(btn_color.GetComponent<Button>());
+        Destroy(btn_color.GetComponent<UnityEngine.UI.Button>());
 
         Carrot.Carrot_Box_Btn_Panel obj_panel_btn = box_add_chat.create_panel_btn();
 
-
-            Carrot.Carrot_Button_Item obj_btn_done = obj_panel_btn.create_btn("btn_done");
-            obj_btn_done.set_act_click(act_done_submit_command);
-            obj_btn_done.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
-            obj_btn_done.set_label_color(Color.white);
-            obj_btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
-            obj_btn_done.set_icon(this.sp_icon_add_chat);
+        Carrot.Carrot_Button_Item obj_btn_done = obj_panel_btn.create_btn("btn_done");
+        obj_btn_done.set_act_click(act_done_submit_command);
+        obj_btn_done.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
+        obj_btn_done.set_label_color(Color.white);
+        obj_btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
+        obj_btn_done.set_icon(this.sp_icon_add_chat);
 
         obj_btn_test = obj_panel_btn.create_btn("btn_test");
         obj_btn_test.set_act_click(btn_test_command);
@@ -738,6 +754,7 @@ public class Command_storage : MonoBehaviour
 
         if (this.box_list != null) this.box_list.close();
         if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
+        if (this.app.command_dev.get_box_list_same() != null) this.app.command_dev.get_box_list_same().close();
 
         this.box_add_chat.gameObject.SetActive(false);
         this.is_list_command_test_play = false;
@@ -818,8 +835,6 @@ public class Command_storage : MonoBehaviour
         this.act_test_command(this.data_chat_test);
     }
     #endregion
-
-
 
     private void act_box_add_model_nomal()
     {
@@ -967,6 +982,7 @@ public class Command_storage : MonoBehaviour
                     c.id = this.s_id;
                     c.status = "passed";
                     chatRef.SetAsync(c);
+                    if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
                 }
                 
             }
@@ -1030,7 +1046,7 @@ public class Command_storage : MonoBehaviour
             Carrot.Carrot_Box_Btn_Item btn_add_tag =item_tag.create_item();
             btn_add_tag.set_icon(this.sp_icon_add_chat);
             btn_add_tag.set_color(this.GetComponent<App>().carrot.color_highlight);
-            Destroy(btn_add_tag.GetComponent<Button>());
+            Destroy(btn_add_tag.GetComponent<UnityEngine.UI.Button>());
         }
     }
 
@@ -1052,5 +1068,12 @@ public class Command_storage : MonoBehaviour
             item_key.set_title(this.list_key_block[i].ToString());
             item_key.set_tip(this.list_key_block[i].ToString());
         } 
+    }
+
+    private void act_translate(string s_txt)
+    {
+        s_txt=UnityWebRequest.EscapeURL(s_txt);
+        string s_tr = "https://translate.google.com/?sl="+this.app.carrot.lang.get_key_lang()+"&tl=vi&text="+s_txt+"&op=translate";
+        Application.OpenURL(s_tr);
     }
 }

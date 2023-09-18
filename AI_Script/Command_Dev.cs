@@ -8,10 +8,12 @@ using UnityEngine;
 public class Command_Dev : MonoBehaviour
 {
     public App app;
-    public Sprite icon;
+    public Sprite sp_icon_key_same;
+    public Sprite sp_icon_translate;
     public GameObject btn_chat_dev;
 
     private Carrot_Box box;
+    private Carrot_Box box_list_same;
 
     public void check()
     {
@@ -44,8 +46,11 @@ public class Command_Dev : MonoBehaviour
                     List<IDictionary> list_chat = new List<IDictionary>();
                     foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
                     {
-                        string id_chat=documentSnapshot.Id;
                         IDictionary c = documentSnapshot.ToDictionary();
+
+                        string id_chat=documentSnapshot.Id;
+                        string key_chat = c["key"].ToString();
+                        
                         c["id"] = id_chat;
                         Carrot_Box_Item item_chat = this.box.create_item("item_chat");
 
@@ -55,9 +60,9 @@ public class Command_Dev : MonoBehaviour
                         item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
 
                         Carrot_Box_Btn_Item btn_same = item_chat.create_item();
-                        btn_same.set_icon(this.app.command.sp_icon_info_report_chat);
+                        btn_same.set_icon(this.sp_icon_key_same);
                         btn_same.set_color(this.app.carrot.color_highlight);
-                        btn_same.set_act(() => this.delete(id_chat, item_chat.gameObject));
+                        btn_same.set_act(() => show_chat_key_same(key_chat));
 
                         Carrot_Box_Btn_Item btn_del=item_chat.create_item();
                         btn_del.set_icon(this.app.carrot.sp_icon_del_data);
@@ -83,11 +88,65 @@ public class Command_Dev : MonoBehaviour
 
     public void show_chat_key_same(string s_key_chat)
     {
+        this.app.carrot.play_sound_click();
 
+
+        this.app.carrot.show_loading();
+        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
+        ChatQuery = ChatQuery.WhereEqualTo("key", s_key_chat);
+        ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
+            QuerySnapshot capitalQuerySnapshot = task.Result;
+            if (task.IsFaulted)
+            {
+                this.app.carrot.hide_loading();
+            }
+
+            if (task.IsCompleted)
+            {
+                this.app.carrot.hide_loading();
+
+                if (capitalQuerySnapshot.Count > 0)
+                {
+                    this.box_list_same = this.app.carrot.Create_Box("chat_key_same");
+                    this.box_list_same.set_title(s_key_chat);
+                    this.box_list_same.set_icon(this.sp_icon_key_same);
+                    List<IDictionary> list_chat = new List<IDictionary>();
+                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
+                    {
+                        IDictionary c = documentSnapshot.ToDictionary();
+
+                        string id_chat = documentSnapshot.Id;
+                        string key_chat = c["key"].ToString();
+
+                        c["id"] = id_chat;
+                        Carrot_Box_Item item_chat = this.box_list_same.create_item("item_chat");
+
+                        item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
+                        item_chat.set_title(c["key"].ToString());
+                        item_chat.set_tip(c["msg"].ToString());
+                        item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
+
+                        Carrot_Box_Btn_Item btn_del = item_chat.create_item();
+                        btn_del.set_icon(this.app.carrot.sp_icon_del_data);
+                        btn_del.set_color(Color.red);
+                        btn_del.set_act(() => this.delete(id_chat, item_chat.gameObject));
+                    }
+                }
+                else
+                {
+                    this.app.carrot.hide_loading();
+                }
+            }
+        });
     }
 
     public Carrot_Box get_box_list()
     {
         return this.box;
+    }
+
+    public Carrot_Box get_box_list_same()
+    {
+        return this.box_list_same;
     }
 }
