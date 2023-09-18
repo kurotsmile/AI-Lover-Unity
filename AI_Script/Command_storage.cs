@@ -823,16 +823,31 @@ public class Command_storage : MonoBehaviour
     {
         this.index_command_test_play++;
         if (this.index_command_test_play >=this.length) this.index_command_test_play=0;
-        this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play));
-        this.act_test_command(this.data_chat_test);
+        string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play);
+        if (s_data != "") {
+            this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(s_data);
+            this.act_test_command(this.data_chat_test);
+        }
+        else
+        {
+            this.btn_play_next_command_test();
+        }
     }
 
     public void btn_play_prev_command_test()
     {
         this.index_command_test_play--;
         if (this.index_command_test_play < 0) this.index_command_test_play=(this.length-1);
-        this.data_chat_test =(IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play));
-        this.act_test_command(this.data_chat_test);
+        string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play);
+        if (s_data != "")
+        {
+            this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(s_data);
+            this.act_test_command(this.data_chat_test);
+        }
+        else
+        {
+            this.btn_play_prev_command_test();
+        }
     }
     #endregion
 
