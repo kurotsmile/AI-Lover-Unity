@@ -759,6 +759,19 @@ public class Command_storage : MonoBehaviour
         this.act_test_command(this.data_chat_test);
     }
 
+    public void play_one_test_command(IDictionary data_chat)
+    {
+        this.data_chat_test = data_chat;
+        if (this.box_list != null) this.box_list.close();
+        if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
+        if (this.app.command_dev.get_box_list_same() != null) this.app.command_dev.get_box_list_same().close();
+
+        this.is_list_command_test_play = false;
+        this.obj_button_next_command_test.SetActive(false);
+        this.obj_button_prev_command_test.SetActive(false);
+        this.act_test_command(data_chat);
+    }
+
     public void btn_close_test_command()
     {
         if (this.box_add_chat != null) this.box_add_chat.gameObject.SetActive(true);
@@ -1078,11 +1091,11 @@ public class Command_storage : MonoBehaviour
     {
         if (this.list_key_block == null)
         {
-            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "No list block key"); return;
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!")); return;
         }
 
         Carrot.Carrot_Box box_list_key = this.app.carrot.Create_Box("key_block");
-        box_list_key.set_title("List Key Block");
+        box_list_key.set_title(PlayerPrefs.GetString("list_banned_keywords","List of prohibited keywords"));
         box_list_key.set_icon(this.app.setting.sp_icon_chat_limit);
 
         for(int i = 0; i < this.list_key_block.Count; i++)
