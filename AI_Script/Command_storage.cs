@@ -1034,6 +1034,8 @@ public class Command_storage : MonoBehaviour
             if (this.box_add_chat != null) this.box_add_chat.close();
             this.show_list_cm(this.s_type_view_list);
         }
+
+        this.app.carrot.ads.show_ads_Interstitial();
     }
 
     private void act_del_patert_chat()
