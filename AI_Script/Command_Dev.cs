@@ -127,6 +127,25 @@ public class Command_Dev : MonoBehaviour
                         c["id"] = id_chat;
                         Carrot_Box_Item item_chat = this.box_list_same.create_item("item_chat");
 
+                        if (c["status"] != null)
+                        {
+                            string s_status = c["status"].ToString();
+                            if (s_status == "passed")
+                            {
+                                item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
+                                item_chat.img_icon.color = Color.green;
+                            }
+                            else
+                            {
+                                item_chat.set_icon(this.sp_icon_chat_pending);
+                                item_chat.img_icon.color = this.app.carrot.color_highlight;
+                            }
+                        }
+                        else
+                        {
+                            item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
+                        }
+
                         item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
                         item_chat.set_title(c["key"].ToString());
                         item_chat.set_tip(c["msg"].ToString());

@@ -304,7 +304,7 @@ public class Command_storage : MonoBehaviour
         item_run_cmd.set_icon(this.sp_icon_run);
         item_run_cmd.set_title("Open websites and apps");
         item_run_cmd.set_tip("Please enter the web address or the URL Schema Name of the app, to open a website or app.");
-        item_run_cmd.set_lang_data("cm_func_1", "cm_func_1_tip");
+        item_run_cmd.set_lang_data("cm_func_web", "cm_func_web_tip");
         item_run_cmd.load_lang_data();
         if (this.is_cm_mode_nomal)
             this.item_run_cmd.gameObject.SetActive(false);
@@ -317,7 +317,7 @@ public class Command_storage : MonoBehaviour
         item_run_control.set_icon(this.sp_icon_run_control);
         item_run_control.set_title("Program control");
         item_run_control.set_tip("Select a function you want to control");
-        item_run_control.set_lang_data("cm_func_2", "cm_func_2_tip");
+        item_run_control.set_lang_data("cm_func_app", "cm_func_app_tip");
         item_run_control.load_lang_data();
         if (this.is_cm_mode_nomal)
             this.item_run_control.gameObject.SetActive(false);
@@ -364,6 +364,31 @@ public class Command_storage : MonoBehaviour
         btn_color.set_color(this.GetComponent<App>().carrot.color_highlight);
         btn_color.set_icon(this.sp_icon_colo_sel);
         Destroy(btn_color.GetComponent<UnityEngine.UI.Button>());
+
+        if (this.app.carrot.model_app == ModelApp.Develope)
+        {
+            Carrot_Box_Item item_user_sex = box_add_chat.create_item("item_user_sex");
+            item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
+            item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
+            if (data_chat["sex_user"] != null)
+            {
+                if (data_chat["sex_user"].ToString() == "0")
+                    item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
+                else
+                    item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
+            }
+
+            Carrot_Box_Item item_npc_sex = box_add_chat.create_item("item_npc_sex");
+            item_npc_sex.set_icon(this.app.setting.sp_icon_sex_character);
+            item_npc_sex.set_title(PlayerPrefs.GetString("setting_char_sex", "Character gender"));
+            if (data_chat["sex_character"] != null)
+            {
+                if (data_chat["sex_character"].ToString() == "0")
+                    item_npc_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
+                else
+                    item_npc_sex.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
+            }
+        }
 
         Carrot.Carrot_Box_Btn_Panel obj_panel_btn = box_add_chat.create_panel_btn();
 
