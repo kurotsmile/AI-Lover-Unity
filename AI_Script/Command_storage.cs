@@ -147,7 +147,8 @@ public class Command_storage : MonoBehaviour
         this.s_pater_msg = s_chat;
         this.s_pater_id = pater;
         this.index_cm_update = -1;
-        this.show_edit_by_data(null);
+        IDictionary data_new_chat = (IDictionary)Carrot.Json.Deserialize("{}");
+        this.show_edit_by_data(data_new_chat);
     }
 
     public void show_add_command_new()
@@ -163,7 +164,8 @@ public class Command_storage : MonoBehaviour
     public void show_new_command(string s_new_keyword)
     {
         this.type_act = Command_Type_Act.add_command;
-        this.show_edit_by_data(null);
+        IDictionary data_new_chat = (IDictionary)Carrot.Json.Deserialize("{}");
+        this.show_edit_by_data(data_new_chat);
         this.item_keyword.set_val(s_new_keyword);
     }
 

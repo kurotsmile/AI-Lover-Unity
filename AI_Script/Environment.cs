@@ -159,7 +159,7 @@ public class Environment : MonoBehaviour
         this.app.carrot.hide_loading();
         if (this.box_list != null) this.box_list.close();
         this.box_list = this.app.carrot.show_grid(this.icon_list_background);
-        this.box_list.set_title("List Background");
+        this.box_list.set_title(PlayerPrefs.GetString("background_list", "List of background images"));
 
         Carrot.Carrot_Box_Btn_Item btn_freshen = this.box_list.create_btn_menu_header(this.app.carrot.sp_icon_restore);
         btn_freshen.set_act(() => show_list_background_image());

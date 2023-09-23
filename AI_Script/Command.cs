@@ -70,6 +70,7 @@ public class Command : MonoBehaviour
         }
         else
         {
+            Debug.Log("Chat online");
             this.play_chat(s_key);
         }
     }
@@ -79,8 +80,6 @@ public class Command : MonoBehaviour
         Debug.Log("play_chat:" + s_key+" "+ this.app.carrot.lang.get_key_lang());
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
         ChatQuery=ChatQuery.WhereEqualTo("key", s_key);
-        //ChatQuery=ChatQuery.WhereEqualTo("sex_user", this.app.setting.get_user_sex());
-        //ChatQuery=ChatQuery.WhereEqualTo("sex_character", this.app.setting.get_character_sex());
 
         if (this.id_cur_chat.ToString() != "") ChatQuery=ChatQuery.WhereEqualTo("pater", this.id_cur_chat);
         ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
@@ -102,22 +101,30 @@ public class Command : MonoBehaviour
                         this.id_cur_chat = documentSnapshot.Id;
                         IDictionary c = documentSnapshot.ToDictionary();
                         c["id"] = this.id_cur_chat;
-                        if(c["sex_user"].ToString()== this.app.setting.get_user_sex()&&c["sex_character"].ToString() == this.app.setting.get_character_sex())
+                        if(c["sex_user"].ToString()==this.app.setting.get_user_sex()&&c["sex_character"].ToString() == this.app.setting.get_character_sex())
                         {
                             list_chat.Add(c);
                             this.app.command_storage.add_command_offline(c);
                         }
                     };
 
-                    if (list_chat.Count > 1)
+                    if (list_chat.Count == 0)
                     {
-                        int index_random = Random.Range(0, list_chat.Count);
-                        this.act_chat(list_chat[index_random], false);
+                        this.show_msg_no_chat();
                     }
                     else
                     {
-                        this.act_chat(list_chat[0], false);
+                        if (list_chat.Count > 1)
+                        {
+                            int index_random = Random.Range(0, list_chat.Count);
+                            this.act_chat(list_chat[index_random], false);
+                        }
+                        else
+                        {
+                            this.act_chat(list_chat[0], false);
+                        }
                     }
+
                 }
                 else
                 {
@@ -128,15 +135,20 @@ public class Command : MonoBehaviour
                     }
                     else
                     {
-                        this.id_cur_chat = "";
-                        this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
-                        this.obj_btn_info_chat.SetActive(false);
-                        this.obj_btn_report_chat.SetActive(false);
-                        this.set_color(Color.red);
+                        this.show_msg_no_chat();
                     }
                 }
             }
         });
+    }
+
+    private void show_msg_no_chat()
+    {
+        this.id_cur_chat = "";
+        this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
+        this.obj_btn_info_chat.SetActive(false);
+        this.obj_btn_report_chat.SetActive(false);
+        this.set_color(Color.red);
     }
 
     public void send_command_by_text(string s_text)
@@ -158,6 +170,7 @@ public class Command : MonoBehaviour
         item_command_chat.GetComponent<Item_command_chat>().btn_add_app.GetComponent<Image>().color=this.GetComponent<App>().carrot.color_highlight;
         if(this.GetComponent<App>().carrot.model_app==Carrot.ModelApp.Develope) item_command_chat.GetComponent<Item_command_chat>().btn_add_web.SetActive(true);
         else item_command_chat.GetComponent<Item_command_chat>().btn_add_web.SetActive(false);
+        this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
     }
 
     public void add_item_pc_chat(string s_txt_show,Sprite icon,bool is_music=false, IDictionary i_data_chat=null)
@@ -174,7 +187,7 @@ public class Command : MonoBehaviour
         if(i_data_chat!=null) item_command_chat.GetComponent<Item_command_chat>().idata_chat = i_data_chat;
         if (this.is_test_command) item_command_chat.GetComponent<Item_command_chat>().btn_add_app.SetActive(false);
         this.GetComponent<App>().set_item_cur_log_chat(item_command_chat.GetComponent<Item_command_chat>());
-        this.ScrollRect_log_command.horizontalNormalizedPosition = 1f;
+        this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
         Canvas.ForceUpdateCanvases();
     }
 
