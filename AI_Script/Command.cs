@@ -19,7 +19,7 @@ public class Command : MonoBehaviour
 
     public Transform area_body_log_command;
     public ScrollRect ScrollRect_log_command;
-    public AudioSource sound_command;
+    public AudioSource sound_command; 
     public string chat_pater="";
     private bool is_test_command = false;
 
@@ -438,22 +438,28 @@ public class Command : MonoBehaviour
             {
                 if (key.ToString()== "user")
                 {
-                    IDictionary data_user = (IDictionary) this.data_chat_cur[key];
-                    string user_id = data_user["id"].ToString();
-                    string user_lang = data_user["lang"].ToString();
-                    Carrot.Carrot_Box_Item item_user = this.box_list.create_item("item_" + key.ToString());
-                    item_user.set_title(PlayerPrefs.GetString("chat_creator","Creator"));
-                    item_user.set_icon(this.icon_info_chat);
-                    item_user.set_tip(data_user["name"].ToString());
-
-                    if (data_user["avatar"] != null)
+                    if (this.data_chat_cur["user"] != null)
                     {
-                        Sprite sp_avatar = this.app.carrot.get_tool().get_sprite_to_playerPrefs("avatar_user_" + data_user["id"]);
-                        if (sp_avatar != null) item_user.set_icon_white(sp_avatar);
-                        else this.app.carrot.get_img_and_save_playerPrefs(data_user["avatar"].ToString(),item_user.img_icon, "avatar_user_" + data_user["id"]);
-                    }
+                        if (this.data_chat_cur["user"].ToString().Trim()!= "")
+                        {
+                            IDictionary data_user = (IDictionary)this.data_chat_cur[key];
+                            string user_id = data_user["id"].ToString();
+                            string user_lang = data_user["lang"].ToString();
+                            Carrot.Carrot_Box_Item item_user = this.box_list.create_item("item_" + key.ToString());
+                            item_user.set_title(PlayerPrefs.GetString("chat_creator", "Creator"));
+                            item_user.set_icon(this.icon_info_chat);
+                            item_user.set_tip(data_user["name"].ToString());
 
-                    item_user.set_act(()=>this.app.carrot.user.show_user_by_id(user_id,user_lang));
+                            if (data_user["avatar"] != null)
+                            {
+                                Sprite sp_avatar = this.app.carrot.get_tool().get_sprite_to_playerPrefs("avatar_user_" + data_user["id"]);
+                                if (sp_avatar != null) item_user.set_icon_white(sp_avatar);
+                                else this.app.carrot.get_img_and_save_playerPrefs(data_user["avatar"].ToString(), item_user.img_icon, "avatar_user_" + data_user["id"]);
+                            }
+
+                            item_user.set_act(() => this.app.carrot.user.show_user_by_id(user_id, user_lang));
+                        }
+                    }
                 }
                 else
                 {
