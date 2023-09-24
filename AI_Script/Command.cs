@@ -246,6 +246,11 @@ public class Command : MonoBehaviour
             if (index_func == "2") this.app.sel_menu_with_sound(0);
             if (index_func == "3") this.app.sel_menu_with_sound(3);
             if (index_func == "4") this.app.command_storage.show_add_command_new();
+            if (index_func == "5") this.app.player_music.play_new_song();
+            if (index_func == "6") this.app.player_music.btn_stop();
+            if (index_func == "7") this.app.player_music.playlist.show_playlist();
+            if (index_func == "8") this.app.player_music.playlist.show_list_music_online();
+            if (index_func == "9") this.app.player_music.playlist.show_list_radio();
         }
         if (data_chat["icon"]!= null)
         {
