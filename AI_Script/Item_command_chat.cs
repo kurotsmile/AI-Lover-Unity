@@ -48,7 +48,17 @@ public class Item_command_chat : MonoBehaviour
 
     public void btn_view_chat_log()
     {
-        GameObject.Find("app").GetComponent<Command>().act_chat(this.idata_chat);
+        if (this.idata_chat != null)
+        {
+            if (idata_chat["msg"] != null)
+                GameObject.Find("app").GetComponent<Command>().act_chat(this.idata_chat);
+            else
+                GameObject.Find("app").GetComponent<App>().player_music.act_play_data(this.idata_chat, true);
+        }
+        else
+        {
+            GameObject.Find("app").GetComponent<Command>().act_chat(this.idata_chat);
+        }
     }
 
 }

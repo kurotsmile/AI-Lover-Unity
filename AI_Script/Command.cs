@@ -36,6 +36,8 @@ public class Command : MonoBehaviour
     public GameObject panel_show_log_chat;
     public GameObject obj_btn_info_chat;
     public GameObject obj_btn_report_chat;
+    public GameObject obj_btn_new_chat;
+    public GameObject obj_btn_add_chat_whith_father;
     private float count_timer_show_text = 0;
     private float count_timer_hide_text = 0;
     private bool is_show_text = false;
@@ -148,6 +150,8 @@ public class Command : MonoBehaviour
         this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
         this.obj_btn_info_chat.SetActive(false);
         this.obj_btn_report_chat.SetActive(false);
+        this.obj_btn_add_chat_whith_father.SetActive(false);
+        this.obj_btn_new_chat.SetActive(true);
         this.set_color(Color.red);
     }
 
@@ -185,7 +189,14 @@ public class Command : MonoBehaviour
         item_command_chat.GetComponent<Item_command_chat>().is_music = is_music;
         item_command_chat.GetComponent<Item_command_chat>().btn_add_app.GetComponent<Image>().color=this.GetComponent<App>().carrot.color_highlight;
         if(i_data_chat!=null) item_command_chat.GetComponent<Item_command_chat>().idata_chat = i_data_chat;
-        if (this.is_test_command) item_command_chat.GetComponent<Item_command_chat>().btn_add_app.SetActive(false);
+        if (this.is_test_command)
+        {
+            item_command_chat.GetComponent<Item_command_chat>().btn_add_app.SetActive(false);
+        }
+        else
+        {
+            if(is_music) item_command_chat.GetComponent<Item_command_chat>().btn_add_app.SetActive(false);
+        }
         this.GetComponent<App>().set_item_cur_log_chat(item_command_chat.GetComponent<Item_command_chat>());
         this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
         Canvas.ForceUpdateCanvases();
@@ -198,18 +209,20 @@ public class Command : MonoBehaviour
 
     public void act_chat(IDictionary data_chat,bool is_test=false)
     {
+        this.obj_btn_info_chat.SetActive(false);
+        this.obj_btn_new_chat.SetActive(false);
+        this.obj_btn_report_chat.SetActive(false);
+        this.obj_btn_add_chat_whith_father.SetActive(false);
+
         this.data_chat_cur = data_chat;
         this.app.panel_main.SetActive(true);
         this.is_test_command = is_test;
-        if (is_test)
+
+        if(!is_test)
         {
             this.obj_btn_info_chat.SetActive(false);
             this.obj_btn_report_chat.SetActive(false);
-        }
-        else
-        {
-            this.obj_btn_info_chat.SetActive(true);
-            this.obj_btn_report_chat.SetActive(true);
+            this.obj_btn_add_chat_whith_father.SetActive(true);
         }
 
         string s_msg_chat = "";
@@ -507,5 +520,15 @@ public class Command : MonoBehaviour
 
             }
         }
+    }
+
+    public void btn_new_chat_with_fater()
+    {
+        this.app.command_storage.show_add_command_with_pater(this.txt_show_chat.text, this.id_cur_chat);
+    }
+
+    public void btn_new_chat()
+    {
+        this.app.command_storage.show_new_command(this.s_command_chat_last);
     }
 }

@@ -369,22 +369,24 @@ public class Command_storage : MonoBehaviour
 
         if (this.app.carrot.model_app == ModelApp.Develope)
         {
-            Carrot_Box_Item item_user_sex = box_add_chat.create_item("item_user_sex");
-            item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
-            item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
             if (data_chat["sex_user"] != null)
             {
+                Carrot_Box_Item item_user_sex = box_add_chat.create_item("item_user_sex");
+                item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
+                item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
+
                 if (data_chat["sex_user"].ToString() == "0")
                     item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
                 else
                     item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
             }
 
-            Carrot_Box_Item item_npc_sex = box_add_chat.create_item("item_npc_sex");
-            item_npc_sex.set_icon(this.app.setting.sp_icon_sex_character);
-            item_npc_sex.set_title(PlayerPrefs.GetString("setting_char_sex", "Character gender"));
             if (data_chat["sex_character"] != null)
             {
+                Carrot_Box_Item item_npc_sex = box_add_chat.create_item("item_npc_sex");
+                item_npc_sex.set_icon(this.app.setting.sp_icon_sex_character);
+                item_npc_sex.set_title(PlayerPrefs.GetString("setting_char_sex", "Character gender"));
+
                 if (data_chat["sex_character"].ToString() == "0")
                     item_npc_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
                 else
@@ -1068,7 +1070,7 @@ public class Command_storage : MonoBehaviour
         {
             c.id = this.s_id;
             string s_chat_data = JsonConvert.SerializeObject(c);
-            PlayerPrefs.SetString("command_offline_"+this.index_cm_update, s_chat_data);
+            PlayerPrefs.SetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_cm_update, s_chat_data);
             this.app.carrot.hide_loading();
             if (this.box_list != null) this.box_list.close();
             if (this.box_add_chat != null) this.box_add_chat.close();

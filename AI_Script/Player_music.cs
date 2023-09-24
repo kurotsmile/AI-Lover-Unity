@@ -75,7 +75,6 @@ public class Player_music : MonoBehaviour
     public void act_play_data(IDictionary data_music, bool is_music_online)
     {
         this.data_song = Carrot.Json.Serialize(data_music);
-        Debug.Log(Carrot.Json.Serialize(data_music));
         this.is_radio = false;
         this.hide_all_info();
         this.sound_music.Stop();
