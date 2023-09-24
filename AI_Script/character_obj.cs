@@ -11,6 +11,7 @@ public class character_obj : MonoBehaviour
     public SkinnedMeshRenderer skinned_head;
     public string s_type_costumes;
     public string s_type_head;
+
     public void OnCallMusicPlay()
     {
 
@@ -19,7 +20,10 @@ public class character_obj : MonoBehaviour
     public void set_skinned_costumes(Texture2D data_img)
     {
         if(is_materials_1) this.skinned_costumes.materials[0].mainTexture = data_img;
-        if (is_materials_2) this.skinned_costumes.materials[1].mainTexture = data_img;
+        if (is_materials_2)
+        {
+            if(this.skinned_costumes.materials.Length>1) this.skinned_costumes.materials[1].mainTexture = data_img;
+        }
         if (skinned_costumes2!=null) this.skinned_costumes2.materials[0].mainTexture = data_img;
     }
 
