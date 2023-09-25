@@ -226,6 +226,10 @@ public class Command : MonoBehaviour
             this.obj_btn_add_chat_whith_father.SetActive(true);
         }
 
+        if (data_chat["id"] != null)
+        {
+            this.id_cur_chat = data_chat["id"].ToString();
+        }
 
         string s_msg_chat = "";
         if (data_chat["msg"] != null)
@@ -452,29 +456,36 @@ public class Command : MonoBehaviour
 
     public void show_info_chat_by_id(string s_id)
     {
-        DocumentReference docDef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).Document(s_id);
-
-        docDef.GetSnapshotAsync().ContinueWithOnMainThread(task => {
-            DocumentSnapshot docData = task.Result;
-            if (task.IsFaulted)
-            {
-                this.app.carrot.show_msg("Chat Info", "The data retrieval process encountered a problem!", Carrot.Msg_Icon.Error);
-            }
-
-            if (task.IsCompleted)
-            {
-                if (docData.Exists)
+        IDictionary data_chat_info = this.app.command_storage.get_cm_by_id(s_id);
+        if (data_chat_cur == null)
+        {
+            DocumentReference docDef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).Document(s_id);
+            docDef.GetSnapshotAsync().ContinueWithOnMainThread(task => {
+                DocumentSnapshot docData = task.Result;
+                if (task.IsFaulted)
                 {
-                    IDictionary data_info = docData.ToDictionary();
-                    data_info["id"] = s_id;
-                    this.box_info_chat(data_info);
+                    this.app.carrot.show_msg("Chat Info", "The data retrieval process encountered a problem!", Carrot.Msg_Icon.Error);
                 }
-                else
+
+                if (task.IsCompleted)
                 {
-                    this.app.carrot.show_msg("Chat Info", "Get No Data "+s_id, Carrot.Msg_Icon.Error);
+                    if (docData.Exists)
+                    {
+                        IDictionary data_info = docData.ToDictionary();
+                        data_info["id"] = s_id;
+                        this.box_info_chat(data_info);
+                    }
+                    else
+                    {
+                        this.app.carrot.show_msg("Chat Info", PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
+                    }
                 }
-            }
-        });
+            });
+        }
+        else
+        {
+            this.box_info_chat(data_chat_info);
+        }
     }
 
     private void box_info_chat(IDictionary data_chat)
@@ -495,21 +506,24 @@ public class Command : MonoBehaviour
                         if (data_chat["user"].ToString().Trim() != "")
                         {
                             IDictionary data_user = (IDictionary)data_chat[key];
-                            string user_id = data_user["id"].ToString();
-                            string user_lang = data_user["lang"].ToString();
-                            Carrot.Carrot_Box_Item item_user = this.box_list.create_item("item_" + key.ToString());
-                            item_user.set_title(PlayerPrefs.GetString("chat_creator", "Creator"));
-                            item_user.set_icon(this.icon_info_chat);
-                            item_user.set_tip(data_user["name"].ToString());
-
-                            if (data_user["avatar"] != null)
+                            if (data_user["id"] != null)
                             {
-                                Sprite sp_avatar = this.app.carrot.get_tool().get_sprite_to_playerPrefs("avatar_user_" + data_user["id"]);
-                                if (sp_avatar != null) item_user.set_icon_white(sp_avatar);
-                                else this.app.carrot.get_img_and_save_playerPrefs(data_user["avatar"].ToString(), item_user.img_icon, "avatar_user_" + data_user["id"]);
-                            }
+                                string user_id = data_user["id"].ToString();
+                                string user_lang = data_user["lang"].ToString();
+                                Carrot.Carrot_Box_Item item_user = this.box_list.create_item("item_" + key.ToString());
+                                item_user.set_title(PlayerPrefs.GetString("chat_creator", "Creator"));
+                                item_user.set_icon(this.icon_info_chat);
+                                item_user.set_tip(data_user["name"].ToString());
 
-                            item_user.set_act(() => this.app.carrot.user.show_user_by_id(user_id, user_lang));
+                                if (data_user["avatar"] != null)
+                                {
+                                    Sprite sp_avatar = this.app.carrot.get_tool().get_sprite_to_playerPrefs("avatar_user_" + data_user["id"]);
+                                    if (sp_avatar != null) item_user.set_icon_white(sp_avatar);
+                                    else this.app.carrot.get_img_and_save_playerPrefs(data_user["avatar"].ToString(), item_user.img_icon, "avatar_user_" + data_user["id"]);
+                                }
+
+                                item_user.set_act(() => this.app.carrot.user.show_user_by_id(user_id, user_lang));
+                            }
                         }
                     }
                 }
@@ -549,6 +563,29 @@ public class Command : MonoBehaviour
                             s_field_title = PlayerPrefs.GetString("act", "Action");
                             s_field_val = PlayerPrefs.GetString("act", "Action") + " " + s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_action);
+                        }
+                        else if (s_key == "msg")
+                        {
+                            s_field_title = PlayerPrefs.GetString("cm_msg", "Feedback message");
+                            s_field_val =s_data_val;
+                            item_field.set_icon(this.app.command_storage.sp_icon_msg);
+                        }
+                        else if (s_key == "key")
+                        {
+                            s_field_title = PlayerPrefs.GetString("cm_keyword", "Keywords");
+                            s_field_val = s_data_val;
+                            item_field.set_icon(this.app.command_storage.sp_icon_key);
+                        }
+                        else if (s_key == "color")
+                        {
+                            s_field_title = PlayerPrefs.GetString("bk_color", "Color");
+                            s_field_val = s_data_val;
+                            item_field.set_icon(this.app.setting.sp_icon_select_color);
+                            if (s_field_val.ToLower() != "#ffffff")
+                            {
+                                Color newCol;
+                                if (ColorUtility.TryParseHtmlString(s_data_val, out newCol)) item_field.img_icon.color = newCol;
+                            }
                         }
                         else
                         {

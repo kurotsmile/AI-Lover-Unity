@@ -33828,6 +33828,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38688f9eaa5c7f7419346e6b55c37593, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  app: {fileID: 2755477471257207454}
   listener: {fileID: 3156866069893448063}
   img_mic_inp_home: {fileID: 2755477472440120049}
   img_mic_voice_command: {fileID: 2755477470390676765}
@@ -33961,7 +33962,6 @@ MonoBehaviour:
   - {fileID: 2755477471294359722}
   - {fileID: 4054894556816236520}
   - {fileID: 2755477471243821712}
-  - {fileID: 2755477472440120047}
   - {fileID: 2755477470541567023}
   - {fileID: 391381462429881460}
   - {fileID: 409195131917476574}
@@ -37928,7 +37928,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: -0.00011444092}
+  m_AnchoredPosition: {x: -3, y: 0.00024414062}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004

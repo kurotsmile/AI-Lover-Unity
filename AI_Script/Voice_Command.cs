@@ -10,6 +10,7 @@ using UnityEngine.Windows.Speech;
 public class Voice_Command : MonoBehaviour
 {
 	[Header("Obj main")]
+	public App app;
 	public SpeechRecognizerListener listener;
 
 	[Header("Voice Obj")]
@@ -31,34 +32,42 @@ public class Voice_Command : MonoBehaviour
 
     void Start()
 	{
-        Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;
-        if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Permission.RequestUserPermission(Permission.Microphone);
-        this.panel_voice_command.SetActive(false);
-		this.panel_voice_input.SetActive(true);
-		if (SpeechRecognizer.ExistsOnDevice())
+		if (this.app.carrot.is_online())
 		{
-			listener.onAuthorizationStatusFetched.AddListener(OnAuthorizationStatusFetched);
-			listener.onAvailabilityChanged.AddListener(OnAvailabilityChange);
-			listener.onErrorDuringRecording.AddListener(OnError_recoding);
-			listener.onErrorOnStartRecording.AddListener(OnError_start);
-			listener.onFinalResults.AddListener(OnFinalResult);
-			listener.onPartialResults.AddListener(OnPartialResult);
-			listener.onEndOfSpeech.AddListener(OnEndOfSpeech);
-			startRecordingButton.enabled = false;
-			SpeechRecognizer.RequestAccess();
-			this.is_suport=true;
-			this.img_mic_inp_home.sprite=this.icon_mic_suport;
-			this.img_mic_voice_command.sprite=this.icon_mic_suport;
+            Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;
+            if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Permission.RequestUserPermission(Permission.Microphone);
+            this.panel_voice_command.SetActive(false);
+            this.panel_voice_input.SetActive(true);
+            if (SpeechRecognizer.ExistsOnDevice())
+            {
+                listener.onAuthorizationStatusFetched.AddListener(OnAuthorizationStatusFetched);
+                listener.onAvailabilityChanged.AddListener(OnAvailabilityChange);
+                listener.onErrorDuringRecording.AddListener(OnError_recoding);
+                listener.onErrorOnStartRecording.AddListener(OnError_start);
+                listener.onFinalResults.AddListener(OnFinalResult);
+                listener.onPartialResults.AddListener(OnPartialResult);
+                listener.onEndOfSpeech.AddListener(OnEndOfSpeech);
+                startRecordingButton.enabled = false;
+                SpeechRecognizer.RequestAccess();
+                this.is_suport = true;
+                this.img_mic_inp_home.sprite = this.icon_mic_suport;
+                this.img_mic_voice_command.sprite = this.icon_mic_suport;
+            }
+            else
+            {
+                resultText.text = PlayerPrefs.GetString("voice_command_no_support", "Sorry, but this device doesn't support speech recognition");
+                this.txt_status.text = PlayerPrefs.GetString("voice_command_stop", "Pause to receive commands to listen to the character's response");
+                startRecordingButton.enabled = false;
+                this.is_suport = false;
+                this.img_mic_inp_home.sprite = this.icon_mic_nosuport;
+                this.img_mic_voice_command.sprite = this.icon_mic_nosuport;
+            }
 		}
 		else
 		{
-			resultText.text = PlayerPrefs.GetString("voice_command_no_support", "Sorry, but this device doesn't support speech recognition");
-			this.txt_status.text = PlayerPrefs.GetString("voice_command_stop", "Pause to receive commands to listen to the character's response");
-			startRecordingButton.enabled = false;
-			this.is_suport=false;
-			this.img_mic_inp_home.sprite=this.icon_mic_nosuport;
-			this.img_mic_voice_command.sprite=this.icon_mic_nosuport;
+			this.img_mic_inp_home.sprite = this.app.carrot.icon_carrot_write;
 		}
+
     }
 
     public void btn_start()

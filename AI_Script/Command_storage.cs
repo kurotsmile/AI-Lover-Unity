@@ -453,7 +453,7 @@ public class Command_storage : MonoBehaviour
 
     public void add_command_offline(IDictionary data_chat)
     {
-        if (!this.check_existence_cm_offline(data_chat["id"].ToString()))
+        if (this.get_cm_by_id(data_chat["id"].ToString())==null)
         {
             string s = Carrot.Json.Serialize(data_chat);
             this.add_command_offline(s);
@@ -503,7 +503,7 @@ public class Command_storage : MonoBehaviour
         return null;
     }
 
-    public bool check_existence_cm_offline(string id_chat)
+    public IDictionary get_cm_by_id(string id_chat)
     {
         for (int i = 0; i < this.length; i++)
         {
@@ -511,10 +511,10 @@ public class Command_storage : MonoBehaviour
             if(s_data!="")
             {
                 IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
-                if (data_chat["id"].ToString() == id_chat) return true;
+                if (data_chat["id"].ToString() == id_chat) return data_chat;
             }
         }
-        return false;
+        return null;
     }
 
     [ContextMenu("Delete all command")]
@@ -1166,4 +1166,5 @@ public class Command_storage : MonoBehaviour
         string s_tr = "https://translate.google.com/?sl="+this.app.carrot.lang.get_key_lang()+"&tl=vi&text="+s_txt+"&op=translate";
         Application.OpenURL(s_tr);
     }
+
 }
