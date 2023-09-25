@@ -32,35 +32,42 @@ public class Voice_Command : MonoBehaviour
 
     void Start()
 	{
-		if (this.app.carrot.is_online())
+        Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;
+        if (this.app.carrot.is_online())
 		{
-            Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;
-            if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Permission.RequestUserPermission(Permission.Microphone);
-            this.panel_voice_command.SetActive(false);
-            this.panel_voice_input.SetActive(true);
-            if (SpeechRecognizer.ExistsOnDevice())
+            if (this.app.carrot.store_public == Carrot.Store.Huawei_store)
             {
-                listener.onAuthorizationStatusFetched.AddListener(OnAuthorizationStatusFetched);
-                listener.onAvailabilityChanged.AddListener(OnAvailabilityChange);
-                listener.onErrorDuringRecording.AddListener(OnError_recoding);
-                listener.onErrorOnStartRecording.AddListener(OnError_start);
-                listener.onFinalResults.AddListener(OnFinalResult);
-                listener.onPartialResults.AddListener(OnPartialResult);
-                listener.onEndOfSpeech.AddListener(OnEndOfSpeech);
-                startRecordingButton.enabled = false;
-                SpeechRecognizer.RequestAccess();
-                this.is_suport = true;
-                this.img_mic_inp_home.sprite = this.icon_mic_suport;
-                this.img_mic_voice_command.sprite = this.icon_mic_suport;
+                this.img_mic_inp_home.sprite = this.app.carrot.icon_carrot_write;
             }
-            else
-            {
-                resultText.text = PlayerPrefs.GetString("voice_command_no_support", "Sorry, but this device doesn't support speech recognition");
-                this.txt_status.text = PlayerPrefs.GetString("voice_command_stop", "Pause to receive commands to listen to the character's response");
-                startRecordingButton.enabled = false;
-                this.is_suport = false;
-                this.img_mic_inp_home.sprite = this.icon_mic_nosuport;
-                this.img_mic_voice_command.sprite = this.icon_mic_nosuport;
+			else
+			{
+                if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Permission.RequestUserPermission(Permission.Microphone);
+                this.panel_voice_command.SetActive(false);
+                this.panel_voice_input.SetActive(true);
+                if (SpeechRecognizer.ExistsOnDevice())
+                {
+                    listener.onAuthorizationStatusFetched.AddListener(OnAuthorizationStatusFetched);
+                    listener.onAvailabilityChanged.AddListener(OnAvailabilityChange);
+                    listener.onErrorDuringRecording.AddListener(OnError_recoding);
+                    listener.onErrorOnStartRecording.AddListener(OnError_start);
+                    listener.onFinalResults.AddListener(OnFinalResult);
+                    listener.onPartialResults.AddListener(OnPartialResult);
+                    listener.onEndOfSpeech.AddListener(OnEndOfSpeech);
+                    startRecordingButton.enabled = false;
+                    SpeechRecognizer.RequestAccess();
+                    this.is_suport = true;
+                    this.img_mic_inp_home.sprite = this.icon_mic_suport;
+                    this.img_mic_voice_command.sprite = this.icon_mic_suport;
+                }
+                else
+                {
+                    resultText.text = PlayerPrefs.GetString("voice_command_no_support", "Sorry, but this device doesn't support speech recognition");
+                    this.txt_status.text = PlayerPrefs.GetString("voice_command_stop", "Pause to receive commands to listen to the character's response");
+                    startRecordingButton.enabled = false;
+                    this.is_suport = false;
+                    this.img_mic_inp_home.sprite = this.icon_mic_nosuport;
+                    this.img_mic_voice_command.sprite = this.icon_mic_nosuport;
+                }
             }
 		}
 		else
@@ -72,14 +79,31 @@ public class Voice_Command : MonoBehaviour
 
     public void btn_start()
     {
-		if(this.is_suport){
-			if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Permission.RequestUserPermission(Permission.Microphone);
-			this.On_start_voice_command();
-		}else{
-			resultText.text = PlayerPrefs.GetString("voice_command_no_support", "Sorry, but this device doesn't support speech recognition");
-			this.panel_voice_command.SetActive(true);
-        	this.panel_voice_input.SetActive(false);
+		if (this.app.carrot.is_online())
+		{
+			if (this.app.carrot.store_public == Carrot.Store.Huawei_store)
+			{
+                this.app.command.inp_command.Select();
+                return;
+			}
+
+            if (this.is_suport)
+            {
+                if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Permission.RequestUserPermission(Permission.Microphone);
+                this.On_start_voice_command();
+            }
+            else
+            {
+                resultText.text = PlayerPrefs.GetString("voice_command_no_support", "Sorry, but this device doesn't support speech recognition");
+                this.panel_voice_command.SetActive(true);
+                this.panel_voice_input.SetActive(false);
+            }
 		}
+		else
+		{
+			this.app.command.inp_command.Select();
+		}
+
     }
 
     public void btn_stop()
