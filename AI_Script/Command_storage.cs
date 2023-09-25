@@ -1076,8 +1076,8 @@ public class Command_storage : MonoBehaviour
             else
             {
                 c.id = "chat" + this.app.carrot.generateID();
-                IDictionary chat_data= (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
-                this.add_command_offline(chat_data);
+                string s_data_chat_new = JsonConvert.SerializeObject(c);
+                this.add_command_offline(s_data_chat_new);
             }
 
 
