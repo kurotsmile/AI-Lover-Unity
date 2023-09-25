@@ -33813,6 +33813,7 @@ MonoBehaviour:
   sp_icon_command_purchased: {fileID: 21300000, guid: 58edc83812032a14399057ee06a50fc3, type: 3}
   sp_icon_parameter_tag: {fileID: 21300000, guid: 66879d05effcc93469b99d23b36f8a88, type: 3}
   sp_icon_key_same: {fileID: 21300000, guid: c0ebbe56a8045914080a5f436c3eb87f, type: 3}
+  sp_icon_father: {fileID: 21300000, guid: 6772418e55753bb4caa853eda64adeca, type: 3}
   icon_command_pass: {fileID: 21300000, guid: d5c0c8535297e774bbd02d44384bc444, type: 3}
   sp_icon_translation: {fileID: 21300000, guid: 6e9141f39a1f16745ae28da56bc77fc3, type: 3}
 --- !u!114 &2755477471257207458
@@ -37927,7 +37928,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.0004119873}
+  m_AnchoredPosition: {x: -3, y: -0.00011444092}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004

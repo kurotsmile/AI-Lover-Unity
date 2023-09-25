@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Rendering.LookDev;
 using UnityEngine.UI;
 
 public class Command : MonoBehaviour
@@ -220,10 +221,11 @@ public class Command : MonoBehaviour
 
         if(!is_test)
         {
-            this.obj_btn_info_chat.SetActive(false);
-            this.obj_btn_report_chat.SetActive(false);
+            this.obj_btn_info_chat.SetActive(true);
+            this.obj_btn_report_chat.SetActive(true);
             this.obj_btn_add_chat_whith_father.SetActive(true);
         }
+
 
         string s_msg_chat = "";
         if (data_chat["msg"] != null)
@@ -525,6 +527,31 @@ public class Command : MonoBehaviour
 
             }
         }
+    }
+
+    public void show_info_chat_by_id(string s_id)
+    {
+        DocumentReference docDef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).Document(s_id);
+
+        docDef.GetSnapshotAsync().ContinueWithOnMainThread(task => {
+            DocumentSnapshot docData = task.Result;
+            if (task.IsFaulted)
+            {
+                this.app.carrot.show_msg("Chat Info", "The data retrieval process encountered a problem!", Carrot.Msg_Icon.Error);
+            }
+
+            if (task.IsCompleted)
+            {
+                if (docData.Exists)
+                {
+                    this.app.carrot.show_msg("Chat Info", "Get Data Success!", Carrot.Msg_Icon.Error);
+                }
+                else
+                {
+                    this.app.carrot.show_msg("Chat Info", "Get No Data "+s_id, Carrot.Msg_Icon.Error);
+                }
+            }
+        });
     }
 
     public void btn_new_chat_with_fater()
