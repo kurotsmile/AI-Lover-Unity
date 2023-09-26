@@ -133,23 +133,23 @@ public class Command_Dev : MonoBehaviour
                             if (s_status == "passed")
                             {
                                 item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
-                                item_chat.img_icon.color = Color.green;
+                                item_chat.img_icon.color = this.app.carrot.color_highlight;
                             }
                             else
                             {
                                 item_chat.set_icon(this.sp_icon_chat_pending);
-                                item_chat.img_icon.color = this.app.carrot.color_highlight;
+                                item_chat.img_icon.color = Color.black;
                             }
                         }
                         else
                         {
                             item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
+                            item_chat.img_icon.color = Color.black;
                         }
 
                         item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
                         item_chat.set_title(c["key"].ToString());
                         item_chat.set_tip(c["msg"].ToString());
-                        item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
 
                         Carrot_Box_Btn_Item btn_del = item_chat.create_item();
                         btn_del.set_icon(this.app.carrot.sp_icon_del_data);
@@ -230,6 +230,7 @@ public class Command_Dev : MonoBehaviour
                             item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
                         }
 
+
                         if (this.app.carrot.model_app == ModelApp.Develope)
                         {
                             item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
@@ -238,6 +239,18 @@ public class Command_Dev : MonoBehaviour
                             btn_del.set_icon(this.app.carrot.sp_icon_del_data);
                             btn_del.set_color(Color.red);
                             btn_del.set_act(() => this.delete(id_chat, item_chat.gameObject));
+                        }
+
+                        if (c["pater"] != null)
+                        {
+                            if (c["pater"].ToString() != "")
+                            {
+                                string s_id_chat_father = c["pater"].ToString();
+                                Carrot_Box_Btn_Item btn_father = item_chat.create_item();
+                                btn_father.set_color(this.app.carrot.color_highlight);
+                                btn_father.set_icon(this.app.command_storage.sp_icon_father);
+                                btn_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
+                            }
                         }
 
                         Carrot.Carrot_Box_Btn_Item btn_play= item_chat.create_item();

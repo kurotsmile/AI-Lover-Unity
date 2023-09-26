@@ -217,20 +217,36 @@ public class Command_storage : MonoBehaviour
         Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.setting.sp_icon_chat_limit);
         btn_list_key_block.set_act(() => this.show_list_block_key_chat());
 
-        this.item_patert = box_add_chat.create_item("item_patert");
-        item_patert.set_type(Carrot.Box_Item_Type.box_value_txt);
-        item_patert.set_icon(this.sp_icon_patert);
-        item_patert.set_title("Add a reply to this chat");
-        item_patert.set_tip("Add an answer to this conversation");
-        item_patert.set_lang_data("brain_add", "cm_pater");
-        item_patert.set_val(this.s_pater_msg);
-        item_patert.load_lang_data();
+        if (data_chat["pater"] != null)
+        {
+            if (data_chat["pater"].ToString() != "")
+            {
+                this.s_pater_id = data_chat["pater"].ToString();
+                this.s_pater_msg= data_chat["pater"].ToString();
+            }
+        }
 
-        Carrot.Carrot_Box_Btn_Item btn_del_patert = item_patert.create_item();
-        btn_del_patert.set_icon(this.GetComponent<App>().carrot.sp_icon_del_data);
-        btn_del_patert.set_color(this.GetComponent<App>().carrot.color_highlight);
-        btn_del_patert.set_act(() => act_del_patert_chat());
-        if (this.s_pater_id == "") this.item_patert.gameObject.SetActive(false);
+        if (this.s_pater_id != "") {
+            this.item_patert = this.box_add_chat.create_item("item_patert");
+            item_patert.set_type(Carrot.Box_Item_Type.box_value_txt);
+            item_patert.set_icon(this.sp_icon_patert);
+            item_patert.set_title("Add a reply to this chat");
+            item_patert.set_tip("Add an answer to this conversation");
+            item_patert.set_lang_data("brain_add", "cm_pater");
+            item_patert.set_val(this.s_pater_msg);
+            item_patert.load_lang_data();
+
+            Carrot.Carrot_Box_Btn_Item btn_info_patert = item_patert.create_item();
+            btn_info_patert.set_icon(this.app.command.icon_info_chat);
+            btn_info_patert.set_color(this.app.carrot.color_highlight);
+            btn_info_patert.set_act(() => this.app.command.show_info_chat_by_id(this.s_pater_id));
+
+            Carrot.Carrot_Box_Btn_Item btn_del_patert = item_patert.create_item();
+            btn_del_patert.set_icon(this.GetComponent<App>().carrot.sp_icon_del_data);
+            btn_del_patert.set_color(this.GetComponent<App>().carrot.color_highlight);
+            btn_del_patert.set_act(() => act_del_patert_chat());
+        }
+
 
         this.item_keyword = box_add_chat.create_item("item_keyword");
         item_keyword.set_type(Carrot.Box_Item_Type.box_value_input);
@@ -979,7 +995,7 @@ public class Command_storage : MonoBehaviour
     {
         chat c = new chat
         {
-            key = this.item_keyword.get_val(),
+            key = this.item_keyword.get_val().ToLower(),
             msg = this.item_msg.get_val(),
             action = this.item_action.get_val(),
             face = this.item_face.get_val(),

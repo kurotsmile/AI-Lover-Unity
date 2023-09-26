@@ -64,7 +64,7 @@ public class Command : MonoBehaviour
     {
         this.s_command_chat_last = s_key;
         if(is_log_show) add_item_log_chat(s_key);
-        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key);
+        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key,this.id_cur_chat);
         if (chat_offline != null)
         {
             this.id_cur_chat = chat_offline["id"].ToString();
