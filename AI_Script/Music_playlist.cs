@@ -1,4 +1,5 @@
-﻿using Firebase.Extensions;
+﻿using Carrot;
+using Firebase.Extensions;
 using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
@@ -205,32 +206,77 @@ public class Music_playlist : MonoBehaviour
             {
                 if (songQuerySnapshot.Count > 0)
                 {
-                    if (this.box_list != null) this.box_list.close();
-                    this.box_list = this.app.carrot.Create_Box("Search Results");
-                    this.box_list.set_icon(this.app.carrot.icon_carrot_search);
-
+                    IList list_song = (IList) Json.Deserialize("[]");
                     foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
                     {
                         string s_id_song = SongSnapshot.Id;
                         IDictionary data_music = SongSnapshot.ToDictionary();
                         data_music["id"] = s_id_song;
-                        Carrot.Carrot_Box_Item item_song=this.box_list.create_item("song_" + s_id_song);
-                        Sprite sp_avatar = this.app.player_music.get_avatar_music(s_id_song);
-                        if (sp_avatar != null)
-                            item_song.set_icon_white(sp_avatar);
-                        else
-                            item_song.set_icon(this.icon_song);
-                        item_song.set_tip(data_music["artist"].ToString());
-                        item_song.set_title(data_music["name"].ToString());
-                        item_song.set_act(() =>this.act_select_song_search_results(data_music));
-                    };
-                }
+                        list_song.Add(data_music);
+                    }
+                    this.box_list_song(list_song);
+                } 
                 else
                 {
-                    this.app.carrot.show_msg("Search Results", "No songs found!", Carrot.Msg_Icon.Alert);
+                    IList list_song = this.get_list_song_offline_by_search_key(key_search);
+                    if (list_song!=null)
+                    {
+                        this.box_list_song(list_song);
+                    }
+                    else
+                    {
+                        this.app.carrot.show_msg("Search Results", "No songs found!", Carrot.Msg_Icon.Alert);
+                    }
                 }
             }
         });
+    }
+
+    private void box_list_song(IList list_song)
+    {
+        if (list_song.Count > 0)
+        {
+            if (this.box_list != null) this.box_list.close();
+            this.box_list = this.app.carrot.Create_Box("Search Results");
+            this.box_list.set_icon(this.app.carrot.icon_carrot_search);
+
+            for (int i = 0; i < list_song.Count; i++)
+            {
+                IDictionary data_song = (IDictionary)list_song[i];
+                string s_id_song = data_song["id"].ToString();
+                Carrot.Carrot_Box_Item item_song = this.box_list.create_item("song_" + s_id_song);
+                Sprite sp_avatar = this.app.player_music.get_avatar_music(s_id_song);
+                if (sp_avatar != null)
+                    item_song.set_icon_white(sp_avatar);
+                else
+                    item_song.set_icon(this.icon_song);
+                item_song.set_tip(data_song["artist"].ToString());
+                item_song.set_title(data_song["name"].ToString());
+                item_song.set_act(() => this.act_select_song_search_results(data_song));
+            }
+        }
+        else
+        {
+            this.app.carrot.show_msg("Search Results", "No songs found!", Carrot.Msg_Icon.Alert);
+        }
+    }
+     
+    private IList get_list_song_offline_by_search_key(string s_key)
+    {
+        IList list_song = (IList) Json.Deserialize("[]");
+        for(int i = 0; i < this.list_music.Count; i++)
+        {
+            IDictionary song_data = this.list_music[i];
+            if (song_data["name"].ToString().Contains(s_key))
+            {
+                list_song.Add(song_data);
+            }
+        }
+
+        if (list_song.Count > 0)
+            return list_song;
+        else
+            return null;
     }
 
     private void act_select_song_search_results(IDictionary data_song)
