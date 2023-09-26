@@ -257,7 +257,9 @@ public class Command : MonoBehaviour
             if (index_func == "7") this.app.player_music.playlist.show_playlist();
             if (index_func == "8") this.app.player_music.playlist.show_list_music_online();
             if (index_func == "9") this.app.player_music.playlist.show_list_radio();
-        }
+            if (index_func == "10") this.app.carrot.show_rate();
+            if (index_func == "11") this.app.carrot.show_share();
+        } 
         if (data_chat["icon"]!= null)
         {
             if (data_chat["icon"].ToString() != "")

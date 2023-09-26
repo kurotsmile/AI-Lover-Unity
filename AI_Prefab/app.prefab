@@ -33792,6 +33792,8 @@ MonoBehaviour:
   - fnc_playlist_music_offline
   - fnc_playlist_music_online
   - fnc_playlist_radio
+  - fnc_rate
+  - fnc_share
   obj_button_next_command_test: {fileID: 249239798421708654}
   obj_button_prev_command_test: {fileID: 6492396854497497505}
   sp_icon_add_chat: {fileID: 21300000, guid: 9b6d1e5e13e6eec47a2253cf8923827a, type: 3}
@@ -37928,7 +37930,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.00024414062}
+  m_AnchoredPosition: {x: -3, y: 0.0001449585}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004
@@ -41727,7 +41729,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2440126133283484171}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.034895226
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
