@@ -91,7 +91,7 @@ public class Command_Dev : MonoBehaviour
         DocumentReference chatRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).Document(s_id_chat);
         chatRef.DeleteAsync();
         this.app.carrot.show_msg("Chat", "Delete Success", Msg_Icon.Success);
-        Destroy(obj_item_chat);
+        if(obj_item_chat!=null) Destroy(obj_item_chat);
     }
 
     public void show_chat_key_same(string s_key_chat)

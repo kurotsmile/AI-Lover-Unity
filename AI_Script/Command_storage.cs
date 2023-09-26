@@ -549,47 +549,115 @@ public class Command_storage : MonoBehaviour
     {
         this.s_type_view_list = s_type;
 
-        int count_command = 0;
-
         if (this.box_list != null) this.box_list.close();
         if (s_type == "0")
             this.box_list = this.GetComponent<App>().carrot.Create_Box(PlayerPrefs.GetString("brain_list", "List command"), this.icon_list_command);
         else
-            this.box_list = this.GetComponent<App>().carrot.Create_Box(PlayerPrefs.GetString("brain_list_buy", "Purchase command"), this.icon_list_command);
+            this.box_list = this.GetComponent<App>().carrot.Create_Box(PlayerPrefs.GetString("brain_list_buy", "Purchase command"), this.sp_icon_command_purchased);
 
         Carrot.Carrot_Box_Btn_Item btn_command_teach = this.box_list.create_btn_menu_header(this.sp_icon_command_teach);
         btn_command_teach.set_act(() => this.show_list_cm("0"));
-        btn_command_teach.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        if(s_type!="0") btn_command_teach.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
 
         Carrot.Carrot_Box_Btn_Item btn_command_purchased = this.box_list.create_btn_menu_header(this.sp_icon_command_purchased);
         btn_command_purchased.set_act(() => this.show_list_cm("1"));
-        btn_command_purchased.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        if(s_type != "1")  btn_command_purchased.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
 
         Carrot.Carrot_Box_Btn_Item btn_del_all = this.box_list.create_btn_menu_header(this.GetComponent<App>().carrot.sp_icon_del_data);
         btn_del_all.set_act(() => this.delete_all_cm());
-        btn_del_all.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        btn_del_all.set_icon_color(Color.red);
 
+        if(s_type=="0")
+            this.table_box_tata(this.get_list_all_cm());
+        else
+            this.table_box_tata(this.get_list_buy_cm());
+    }
+
+    private IList get_list_all_cm()
+    {
+        IList list_cm = (IList)Json.Deserialize("[]");
         for (int i = this.length; i >= 0; i--)
         {
-            var index_cm = i;
-
             string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
             if (s_data == "") continue;
 
-            IDictionary data_chat =(IDictionary) Carrot.Json.Deserialize(s_data);
+            IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
+            data_chat["index_cm"] = i;
+            list_cm.Add(data_chat);
+        }
+        return list_cm;
+    }
+
+    private IList get_list_buy_cm()
+    {
+        IList list_cm = (IList)Json.Deserialize("[]");
+        for (int i = this.length; i >= 0; i--)
+        {
+            string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
+            if (s_data == "") continue;
+
+            IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
+            if (data_chat["status"] != null)
+            {
+                if (data_chat["status"].ToString()=="buy")
+                {
+                    data_chat["index_cm"] = i;
+                    list_cm.Add(data_chat);
+                }
+            }
+        }
+        return list_cm;
+    }
+
+
+    private void table_box_tata(IList list_data)
+    {
+        Debug.Log(list_data.Count);
+        if (list_data.Count == 0)
+        {
+            if (this.box_list != null) this.box_list.close();
+            this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+            return;
+        }
+
+        for (int i = list_data.Count-1; i >= 0; i--)
+        {
+            IDictionary data_chat = (IDictionary)list_data[i];
             Carrot.Carrot_Box_Item item_cm = this.box_list.create_item("cm_item_" + i);
             item_cm.set_title(data_chat["key"].ToString());
 
             item_cm.set_tip(data_chat["msg"].ToString());
             item_cm.set_icon(this.sp_icon_msg);
             item_cm.set_title(data_chat["key"].ToString());
-            item_cm.set_act(() => this.show_edit_command(index_cm));
+
+            int index_cm = i;
+            string s_status = "";
+
+            if (data_chat["index_cm"] != null)
+            {
+                if (data_chat["index_cm"].ToString() != "")
+                {
+                    index_cm = int.Parse(data_chat["index_cm"].ToString());
+                    item_cm.set_act(() => this.show_edit_command(index_cm));
+                }
+            }
 
             if (data_chat["status"] != null)
             {
-                string s_status = data_chat["status"].ToString();
-                if (s_status == "passed") item_cm.img_icon.color = this.app.carrot.color_highlight;
-                else item_cm.img_icon.color = Color.black;
+                s_status = data_chat["status"].ToString();
+                if (s_status == "passed")
+                {
+                    item_cm.img_icon.color = this.app.carrot.color_highlight;
+                }
+                else if (s_status == "buy")
+                {
+                    item_cm.img_icon.sprite = this.sp_icon_command_purchased;
+                    item_cm.img_icon.color = this.app.carrot.color_highlight;
+                }
+                else
+                {
+                    item_cm.img_icon.color = Color.black;
+                }
             }
 
             Carrot.Carrot_Box_Btn_Item btn_add = item_cm.create_item();
@@ -619,13 +687,16 @@ public class Command_storage : MonoBehaviour
             btn_del.set_icon(this.sp_icon_delete);
             btn_del.set_act(() => this.delete_cm(index_cm));
 
-            count_command++;
-        }
-
-        if (count_command==0)
-        {
-            if (this.box_list != null) this.box_list.close();
-            this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+            if (s_status == "passed")
+            {
+                if (this.app.carrot.model_app == ModelApp.Develope)
+                {
+                    Carrot_Box_Btn_Item btn_del_dev = item_cm.create_item();
+                    btn_del_dev.set_icon(this.app.carrot.sp_icon_del_data);
+                    btn_del_dev.set_color(Color.red);
+                    btn_del_dev.set_act(() => this.app.command_dev.delete(data_chat["id"].ToString(), item_cm.gameObject));
+                }
+            }
         }
     }
 
@@ -652,7 +723,7 @@ public class Command_storage : MonoBehaviour
     public void download_command_shop()
     {
         Query DownloadChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).WhereEqualTo("sex_user", this.app.setting.get_user_sex()).WhereEqualTo("sex_character", this.app.setting.get_character_sex());
-        DownloadChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
+        DownloadChatQuery.Limit(50).GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsCompleted)
             {
@@ -663,6 +734,7 @@ public class Command_storage : MonoBehaviour
                     {
                         IDictionary c = documentSnapshot.ToDictionary();
                         c["id"] = documentSnapshot.Id;
+                        c["status"] = "buy";
                         this.app.command_storage.add_command_offline(c);
                     };
                     this.app.carrot.show_msg(PlayerPrefs.GetString("brain_download", "Download commands"), PlayerPrefs.GetString("shop_buy_success", "Purchase successful! the function you purchased has been activated. Please restart the application to use it"), Carrot.Msg_Icon.Success);
@@ -1117,7 +1189,7 @@ public class Command_storage : MonoBehaviour
             this.show_list_cm(this.s_type_view_list);
         }
 
-        this.app.carrot.ads.show_ads_Interstitial();
+        if(this.app.carrot.model_app==ModelApp.Publish) this.app.carrot.ads.show_ads_Interstitial();
     }
 
     private void act_del_patert_chat()
