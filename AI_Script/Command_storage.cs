@@ -612,7 +612,6 @@ public class Command_storage : MonoBehaviour
 
     private void table_box_tata(IList list_data)
     {
-        Debug.Log(list_data.Count);
         if (list_data.Count == 0)
         {
             if (this.box_list != null) this.box_list.close();

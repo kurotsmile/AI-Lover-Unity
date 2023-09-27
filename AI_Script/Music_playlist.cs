@@ -218,7 +218,7 @@ public class Music_playlist : MonoBehaviour
                 } 
                 else
                 {
-                    IList list_song = this.get_list_song_offline_by_search_key(key_search);
+                    IList list_song = this.get_list_song_online_by_search_key(key_search);
                     if (list_song!=null)
                     {
                         this.box_list_song(list_song);
@@ -261,7 +261,7 @@ public class Music_playlist : MonoBehaviour
         }
     }
      
-    private IList get_list_song_offline_by_search_key(string s_key)
+    private IList get_list_song_online_by_search_key(string s_key)
     {
         IList list_song = (IList) Json.Deserialize("[]");
         for(int i = 0; i < this.list_music.Count; i++)
@@ -270,6 +270,26 @@ public class Music_playlist : MonoBehaviour
             if (song_data["name"].ToString().Contains(s_key))
             {
                 list_song.Add(song_data);
+            }
+        }
+
+        if (list_song.Count > 0)
+            return list_song;
+        else
+            return null;
+    }
+
+    private IList get_list_song_offline_by_search_key(string s_key)
+    {
+        IList list_song = (IList)Json.Deserialize("[]");
+        for (int i = this.length - 1; i >= 0; i--)
+        {
+            string s_data = PlayerPrefs.GetString("music_" + i);
+            if (s_data != "")
+            {
+                IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
+                data_music["song_index"] = i;
+                list_song.Add(data_music);
             }
         }
 

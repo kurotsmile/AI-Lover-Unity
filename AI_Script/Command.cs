@@ -1,4 +1,5 @@
-﻿using Firebase.Extensions;
+﻿using Carrot;
+using Firebase.Extensions;
 using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
@@ -602,6 +603,23 @@ public class Command : MonoBehaviour
 
             }
         }
+
+        if (data_chat["status"] != null)
+        {
+            string s_status = data_chat["status"].ToString();
+            if (s_status == "passed")
+            {
+                string s_id_chat = data_chat["id"].ToString();
+                string s_link_share = this.app.carrot.mainhost+ "/?p=chat&id="+ s_id_chat + "&lang_chat="+this.app.carrot.lang.get_key_lang();
+                Carrot_Box_Btn_Panel panel_btn = this.box_list.create_panel_btn();
+                Carrot_Button_Item btn_share=panel_btn.create_btn("item_share");
+                btn_share.set_bk_color(this.app.carrot.color_highlight);
+                btn_share.set_icon_white(this.app.carrot.sp_icon_share);
+                btn_share.set_label_color(Color.white);
+                btn_share.set_label(PlayerPrefs.GetString("share", "Share"));
+                btn_share.set_act_click(()=>this.share_chat(s_link_share));
+            }
+        }
     }
 
     public void btn_new_chat_with_fater()
@@ -612,5 +630,10 @@ public class Command : MonoBehaviour
     public void btn_new_chat()
     {
         this.app.command_storage.show_new_command(this.s_command_chat_last);
+    }
+
+    private void share_chat(string s_link)
+    {
+        this.app.carrot.show_share(s_link, "Share this conversation with your friends!");
     }
 }
