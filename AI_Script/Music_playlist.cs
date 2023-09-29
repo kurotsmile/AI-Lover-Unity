@@ -228,6 +228,7 @@ public class Music_playlist : MonoBehaviour
                             list_song.Add(data_music);
                         }
                         this.box_list_song(list_song);
+                        Debug.Log("Search song oline");
                     }
                     else
                     {
@@ -283,14 +284,17 @@ public class Music_playlist : MonoBehaviour
             this.app.carrot.show_msg(PlayerPrefs.GetString("search_results", "Search Results"), "No songs found!", Carrot.Msg_Icon.Alert);
         }
     }
-     
+
     private IList get_list_song_online_by_search_key(string s_key)
     {
-        IList list_song = (IList) Json.Deserialize("[]");
-        for(int i = 0; i < this.list_music.Count; i++)
+        IList list_song = (IList)Json.Deserialize("[]");
+        if (this.list_music != null)
         {
-            IDictionary song_data = this.list_music[i];
-            if (song_data["name"].ToString().Contains(s_key)) list_song.Add(song_data);
+            for (int i = 0; i < this.list_music.Count; i++)
+            {
+                IDictionary song_data = this.list_music[i];
+                if (song_data["name"].ToString().Contains(s_key)) list_song.Add(song_data);
+            }
         }
         return list_song;
     }
@@ -298,22 +302,23 @@ public class Music_playlist : MonoBehaviour
     private IList get_list_song_offline_by_search_key(string s_key)
     {
         IList list_song = (IList)Json.Deserialize("[]");
-        for (int i = this.length - 1; i >= 0; i--)
+        if (this.length > 0)
         {
-            string s_data = PlayerPrefs.GetString("music_" + i);
-            if (s_data != "")
+            for (int i = this.length - 1; i >= 0; i--)
             {
-                IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
-                if (data_music["name"].ToString().Contains(s_key))
+                string s_data = PlayerPrefs.GetString("music_" + i);
+                if (s_data != "")
                 {
-                    data_music["song_index"] = i;
-                    list_song.Add(data_music);
+                    IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
+                    if (data_music["name"].ToString().Contains(s_key))
+                    {
+                        data_music["song_index"] = i;
+                        list_song.Add(data_music);
+                    }
                 }
             }
         }
-
         return list_song;
-
     }
 
     private void act_select_song_search_results(IDictionary data_song)
