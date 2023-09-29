@@ -151,6 +151,19 @@ public class Command_Dev : MonoBehaviour
                         item_chat.set_title(c["key"].ToString());
                         item_chat.set_tip(c["msg"].ToString());
 
+
+                        if (c["pater"] != null)
+                        {
+                            if (c["pater"].ToString() != "")
+                            {
+                                string s_id_chat_father = c["pater"].ToString();
+                                Carrot_Box_Btn_Item btn_father = item_chat.create_item();
+                                btn_father.set_color(this.app.carrot.color_highlight);
+                                btn_father.set_icon(this.app.command_storage.sp_icon_father);
+                                btn_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
+                            }
+                        }
+
                         Carrot_Box_Btn_Item btn_del = item_chat.create_item();
                         btn_del.set_icon(this.app.carrot.sp_icon_del_data);
                         btn_del.set_color(Color.red);

@@ -3,6 +3,7 @@ using Firebase.Extensions;
 using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -198,15 +199,26 @@ public class Music_playlist : MonoBehaviour
 
     private void act_search_music(string key_search)
     {
+        this.app.carrot.show_loading();
         if (this.app.carrot.is_online())
         {
-            Query SongQuery = this.app.carrot.db.Collection("song").WhereEqualTo("name", key_search).Limit(20);
-            SongQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
+            Query SongQuery = this.app.carrot.db.Collection("song").WhereEqualTo("name", key_search);
+            SongQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
                 QuerySnapshot songQuerySnapshot = task.Result;
+
+                if (task.IsFaulted)
+                {
+                    this.app.carrot.hide_loading();
+                    IList list_song = this.get_list_song_online_by_search_key(key_search);
+                    if (list_song != null) this.box_list_song(list_song);
+                }
+
                 if (task.IsCompleted)
                 {
-                    if (songQuerySnapshot.Count > 0)
+                    this.app.carrot.hide_loading();
+                    if (songQuerySnapshot.Count>0)
                     {
+                        Debug.Log("Search song oline");
                         IList list_song = (IList)Json.Deserialize("[]");
                         foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
                         {
@@ -219,33 +231,25 @@ public class Music_playlist : MonoBehaviour
                     }
                     else
                     {
+                        Debug.Log("Search song oline data offline");
                         IList list_song = this.get_list_song_online_by_search_key(key_search);
-                        if (list_song != null)
+                        if (list_song.Count != 0)
                             this.box_list_song(list_song);
                         else
-                            this.app.carrot.show_msg(PlayerPrefs.GetString("search","Search"), PlayerPrefs.GetString("no_song_found", "No songs found!"), Carrot.Msg_Icon.Alert);
+                            this.box_list_song(this.get_list_song_offline_by_search_key(key_search));
                     }
-                }
-
-                if (task.IsFaulted)
-                {
-                    IList list_song = this.get_list_song_online_by_search_key(key_search);
-                    if (list_song != null)
-                        this.box_list_song(list_song);
-                    else
-                        this.app.carrot.show_msg(PlayerPrefs.GetString("search", "Search"), PlayerPrefs.GetString("no_song_found", "No songs found!"), Carrot.Msg_Icon.Alert);
                 }
             });
         }
         else
         {
+            this.app.carrot.hide_loading();
             IList list_song = this.get_list_song_offline_by_search_key(key_search);
             if (list_song != null)
                 this.box_list_song(list_song);
             else
                 this.app.carrot.show_msg(PlayerPrefs.GetString("search_results", "Search Results"), PlayerPrefs.GetString("no_song_found","No songs found!"), Carrot.Msg_Icon.Alert);
         }
-
     }
 
     private void box_list_song(IList list_song)
@@ -275,6 +279,7 @@ public class Music_playlist : MonoBehaviour
         }
         else
         {
+            if (this.box_search_inp != null) this.box_search_inp.close();
             this.app.carrot.show_msg(PlayerPrefs.GetString("search_results", "Search Results"), "No songs found!", Carrot.Msg_Icon.Alert);
         }
     }
@@ -287,11 +292,7 @@ public class Music_playlist : MonoBehaviour
             IDictionary song_data = this.list_music[i];
             if (song_data["name"].ToString().Contains(s_key)) list_song.Add(song_data);
         }
-
-        if (list_song.Count > 0)
-            return list_song;
-        else
-            return null;
+        return list_song;
     }
 
     private IList get_list_song_offline_by_search_key(string s_key)
@@ -311,10 +312,8 @@ public class Music_playlist : MonoBehaviour
             }
         }
 
-        if (list_song.Count > 0)
-            return list_song;
-        else
-            return null;
+        return list_song;
+
     }
 
     private void act_select_song_search_results(IDictionary data_song)
