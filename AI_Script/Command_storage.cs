@@ -78,6 +78,12 @@ public class Command_storage : MonoBehaviour
     private string s_color = "FFFFFF";
     private string s_id_icon = "";
     private string s_type_view_list = "0";
+
+    private string s_user_id = "";
+    private string s_user_name = "";
+    private string s_user_lang = "";
+    private string s_user_avatar = "";
+
     [Header("Asset Func App")]
     public string[] func_app_name;
 
@@ -194,6 +200,7 @@ public class Command_storage : MonoBehaviour
     private void show_edit_by_data(IDictionary data_chat)
     {
         this.s_id_icon = "";
+        this.s_user_id = "";
         this.s_color = "#FFFFFF";
 
         if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
@@ -476,6 +483,17 @@ public class Command_storage : MonoBehaviour
                         this.item_user_create.gameObject.SetActive(false);
                     else
                         this.item_user_create.gameObject.SetActive(true);
+
+                    this.s_user_id=data_user_create["id"].ToString();
+                    this.s_user_name = data_user_create["name"].ToString();
+                    this.s_user_lang= data_user_create["lang"].ToString();
+                    if (data_user_create["avatar"] != null) this.s_user_avatar = data_user_create["avatar"].ToString();
+
+                    Carrot_Box_Btn_Item btn_del_user = this.item_user_create.create_item();
+                    btn_del_user.set_icon(this.app.carrot.sp_icon_del_data);
+                    btn_del_user.set_color(Color.red);
+                    btn_del_user.set_icon_color(Color.white);
+                    btn_del_user.set_act(() => this.btn_del_user_create());
                 }
             }
         }
@@ -498,6 +516,16 @@ public class Command_storage : MonoBehaviour
         obj_btn_test.set_icon(this.GetComponent<App>().carrot.game.icon_play_music_game);
 
         box_add_chat.set_act_before_closing(act_close_box);
+    }
+
+    private void btn_del_user_create()
+    {
+        this.app.carrot.play_sound_click();
+        this.s_user_avatar = "";
+        this.s_user_id = "";
+        this.s_user_name = "";
+        this.s_user_lang = "";
+        if (this.item_user_create != null) this.item_user_create.gameObject.SetActive(false);
     }
 
     public void add_command_offline(IDictionary data_chat)
@@ -1117,15 +1145,28 @@ public class Command_storage : MonoBehaviour
             date_create = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ")
         };
 
-        if (this.app.carrot.user.get_id_user_login() != "")
+        if (this.s_user_id != "")
         {
             Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
-            user_login.name = this.app.carrot.user.get_data_user_login("name");
-            user_login.id = this.app.carrot.user.get_id_user_login();
-            user_login.lang = this.app.carrot.user.get_lang_user_login();
-            user_login.avatar = this.app.carrot.user.get_data_user_login("avatar");
+            user_login.name = this.s_user_name;
+            user_login.id = this.s_user_id;
+            user_login.lang = this.s_user_lang;
+            user_login.avatar = this.s_user_avatar;
             c.user = user_login;
         }
+        else
+        {
+            if (this.app.carrot.user.get_id_user_login() != "")
+            {
+                Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
+                user_login.name = this.app.carrot.user.get_data_user_login("name");
+                user_login.id = this.app.carrot.user.get_id_user_login();
+                user_login.lang = this.app.carrot.user.get_lang_user_login();
+                user_login.avatar = this.app.carrot.user.get_data_user_login("avatar");
+                c.user = user_login;
+            }
+        }
+
         return c;
     }
 
