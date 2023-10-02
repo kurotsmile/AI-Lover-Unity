@@ -72,6 +72,8 @@ public class Music_playlist : MonoBehaviour
             if (this.box_list != null) this.box_list.close();
             this.box_list = this.app.carrot.Create_Box(PlayerPrefs.GetString("music_list", "Music Playlist"), this.icon);
             this.head_btn_box(this.box_list);
+
+            this.list_music = new List<IDictionary>();
             for (int i = this.length-1; i >= 0; i--)
             {
                 string s_data = PlayerPrefs.GetString("music_"+i);
@@ -115,6 +117,8 @@ public class Music_playlist : MonoBehaviour
                     btn_del.set_icon(this.app.carrot.sp_icon_del_data);
                     btn_del.set_color(this.app.carrot.color_highlight);
                     btn_del.set_act(() => this.app.player_music.playlist.delete_item(int_index_m));
+
+                    this.list_music.Add(data_music);
                 }
             }
             this.box_list.update_color_table_row();

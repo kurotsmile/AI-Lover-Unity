@@ -176,10 +176,8 @@ public class Player_music : MonoBehaviour
         }
         if (data_music["mp3"] != null)
         {
-            Debug.Log("ID music:" + this.id_music);
             if (this.app.carrot.get_tool().check_file_exist("music"+this.id_music))
             {
-                Debug.Log("File Ready ID music:" + this.id_music);
                 string path_file_mp3;
                 if (Application.isEditor)
                     path_file_mp3 = Application.dataPath + "/music" + data_music["id"].ToString();
