@@ -366,13 +366,23 @@ public class Command : MonoBehaviour
 
     public void play_text_audio(string s_chat)
     {
-        if (this.app.carrot.is_online())
+        if (this.app.setting.get_tts_type() == "0")
         {
-            StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.get_key_lang()));
+            if (this.app.carrot.is_online())
+            {
+                StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.get_key_lang()));
+            }
+            else
+            {
+                this.app.textToSpeech.StartSpeak(s_chat);
+            }
+        }else if(this.app.setting.get_tts_type() == "2")
+        {
+            this.app.textToSpeech.StartSpeak(s_chat);
         }
         else
         {
-            this.app.textToSpeech.StartSpeak(s_chat);
+            StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.get_key_lang()));
         }
     }
 

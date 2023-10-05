@@ -48,6 +48,7 @@ public class Setting : MonoBehaviour
 
     private string s_user_name;
     private string s_weather_pin;
+    private string s_tts_type;
     private int limit_chat;
     private float voice_speech;
     private bool is_sound_voice;
@@ -84,7 +85,8 @@ public class Setting : MonoBehaviour
     {
         this.character_sex = PlayerPrefs.GetString("character_sex", "1");
         this.user_sex = PlayerPrefs.GetString("sex", "0");
-        s_color_select = PlayerPrefs.GetString("color_select");
+        this.s_color_select = PlayerPrefs.GetString("color_select");
+        this.s_tts_type= PlayerPrefs.GetString("tts_type","0");
         if (s_color_select != "")
         {
             Color newCol;
@@ -346,6 +348,7 @@ public class Setting : MonoBehaviour
         item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("voice_type_tts"));
 
         item_voice_type.set_val(PlayerPrefs.GetString("tts_type", "0"));
+        item_voice_type.dropdown_val.onValueChanged.AddListener(this.act_change_voice_type);
 
         Carrot_Box_Btn_Item btn_help_setting_voice_type = this.item_voice_type.create_item();
         btn_help_setting_voice_type.set_icon(this.app.command.icon_info_chat);
@@ -890,5 +893,16 @@ public class Setting : MonoBehaviour
     {
         this.app.carrot.play_sound_click();
         Application.OpenURL("https://support.google.com/accessibility/answer/11221616?hl="+this.app.carrot.lang.get_key_lang());
+    }
+
+    private void act_change_voice_type(int index)
+    {
+        PlayerPrefs.SetString("tts_type",index.ToString());
+        this.s_tts_type = index.ToString();
+    }
+
+    public string get_tts_type()
+    {
+        return this.s_tts_type;
     }
 }
