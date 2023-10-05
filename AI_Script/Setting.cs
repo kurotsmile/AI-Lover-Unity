@@ -1,3 +1,4 @@
+using Carrot;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ public class Setting : MonoBehaviour
     public Sprite sp_icon_voice_on;
     public Sprite sp_icon_voice_off;
     public Sprite sp_icon_voice_speed;
+    public Sprite sp_icon_voice_type;
     public Sprite sp_icon_chat_limit;
     public Sprite sp_icon_chat_bubble;
     public Sprite sp_icon_shop;
@@ -65,6 +67,7 @@ public class Setting : MonoBehaviour
     private Carrot.Carrot_Box_Item item_weather_pin;
     private Carrot.Carrot_Box_Item item_chat_limit;
     private Carrot.Carrot_Box_Item item_voice_speed;
+    private Carrot.Carrot_Box_Item item_voice_type;
 
     private Carrot.Carrot_Box_Btn_Item btn_user_sex_boy;
     private Carrot.Carrot_Box_Btn_Item btn_user_sex_girl;
@@ -328,6 +331,28 @@ public class Setting : MonoBehaviour
         Destroy(btn_edit_voice_speed.GetComponent<Button>());
         group_chat.add_item(item_voice_speed);
 
+        this.item_voice_type = box_setting.create_item("item_voice_type");
+        item_voice_type.set_icon(this.sp_icon_voice_type);
+        item_voice_type.set_title("Voice Type");
+        item_voice_type.set_type(Carrot.Box_Item_Type.box_value_dropdown);
+        item_voice_type.set_tip("Change the voice pronunciation platform");
+        item_voice_type.set_lang_data("voice_type", "voice_type_tip");
+        item_voice_type.load_lang_data();
+        item_voice_type.set_act(() => act_show_chat_limit());
+
+        item_voice_type.dropdown_val.options.Clear();
+        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("voice_type_google_and_tts"));
+        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("voice_type_google"));
+        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("voice_type_tts"));
+
+        item_voice_type.set_val(PlayerPrefs.GetString("tts_type", "0"));
+
+        Carrot_Box_Btn_Item btn_help_setting_voice_type = this.item_voice_type.create_item();
+        btn_help_setting_voice_type.set_icon(this.app.command.icon_info_chat);
+        btn_help_setting_voice_type.set_color(this.app.carrot.color_highlight);
+        btn_help_setting_voice_type.set_act(() => this.act_open_setting_voice_type());
+        group_chat.add_item(item_voice_type);
+
         this.item_chat_limit = box_setting.create_item("chat_limit");
         item_chat_limit.set_icon(this.sp_icon_chat_limit);
         item_chat_limit.set_title("Chat content limit");
@@ -444,14 +469,14 @@ public class Setting : MonoBehaviour
         Carrot.Carrot_Box_Item_group other_group = box_setting.add_item_group("other_group");
         other_group.set_icon(this.sp_icon_other);
 
-        box_setting.area_all_item.GetChild(5).SetSiblingIndex(23);
+        box_setting.area_all_item.GetChild(5).SetSiblingIndex(24);
         box_setting.area_all_item.GetChild(7).SetSiblingIndex(30);
         box_setting.area_all_item.GetChild(8).SetSiblingIndex(31);
         box_setting.area_all_item.GetChild(6).SetSiblingIndex(32);
         box_setting.area_all_item.GetChild(6).SetSiblingIndex(33);
         box_setting.area_all_item.GetChild(6).SetSiblingIndex(34);
 
-        Carrot.Carrot_Box_Item item_removeads = box_setting.area_all_item.GetChild(18).GetComponent<Carrot.Carrot_Box_Item>();
+        Carrot.Carrot_Box_Item item_removeads = box_setting.area_all_item.GetChild(19).GetComponent<Carrot.Carrot_Box_Item>();
         item_removeads.set_lang_data("shop_ads", "shop_ads_tip");
         item_removeads.load_lang_data();
         Carrot.Carrot_Box_Btn_Item btn_by_ads = item_removeads.create_item();
@@ -464,17 +489,17 @@ public class Setting : MonoBehaviour
         if (this.check_buy_product(2)) item_removeads.gameObject.SetActive(false);
 
         shop_group.add_item(item_removeads);
-        Carrot.Carrot_Box_Item item_share = box_setting.area_all_item.GetChild(24).GetComponent<Carrot.Carrot_Box_Item>();
+        Carrot.Carrot_Box_Item item_share = box_setting.area_all_item.GetChild(25).GetComponent<Carrot.Carrot_Box_Item>();
         other_group.add_item(item_share);
 
-        Carrot.Carrot_Box_Item item_restore = box_setting.area_all_item.GetChild(25).GetComponent<Carrot.Carrot_Box_Item>();
+        Carrot.Carrot_Box_Item item_restore = box_setting.area_all_item.GetChild(26).GetComponent<Carrot.Carrot_Box_Item>();
         other_group.add_item(item_restore);
 
-        Carrot.Carrot_Box_Item item_rate = box_setting.area_all_item.GetChild(26).GetComponent<Carrot.Carrot_Box_Item>();
+        Carrot.Carrot_Box_Item item_rate = box_setting.area_all_item.GetChild(27).GetComponent<Carrot.Carrot_Box_Item>();
         other_group.add_item(item_rate);
 
-        other_group.add_item(box_setting.area_all_item.GetChild(27).GetComponent<Carrot.Carrot_Box_Item>());
         other_group.add_item(box_setting.area_all_item.GetChild(28).GetComponent<Carrot.Carrot_Box_Item>());
+        other_group.add_item(box_setting.area_all_item.GetChild(29).GetComponent<Carrot.Carrot_Box_Item>());
 
         group_sys.add_item(box_setting.area_all_item.GetChild(1).GetComponent<Carrot.Carrot_Box_Item>());
         group_sys.add_item(box_setting.area_all_item.GetChild(5).GetComponent<Carrot.Carrot_Box_Item>());
@@ -483,8 +508,8 @@ public class Setting : MonoBehaviour
 
         string setting_url_sound_test_sex0 = PlayerPrefs.GetString("setting_url_sound_test_sex0");
         string setting_url_sound_test_sex1 = PlayerPrefs.GetString("setting_url_sound_test_sex1");
-        StartCoroutine(this.get_audio_setting_sex_test(setting_url_sound_test_sex0, 0));
-        StartCoroutine(this.get_audio_setting_sex_test(setting_url_sound_test_sex1, 1));
+        if(setting_url_sound_test_sex0!="") StartCoroutine(this.get_audio_setting_sex_test(setting_url_sound_test_sex0, 0));
+        if(setting_url_sound_test_sex1!="") StartCoroutine(this.get_audio_setting_sex_test(setting_url_sound_test_sex1, 1));
     } 
 
     private void act_close_setting()
@@ -859,5 +884,11 @@ public class Setting : MonoBehaviour
     public string get_user_sex()
     {
         return this.user_sex;
+    }
+
+    public void act_open_setting_voice_type()
+    {
+        this.app.carrot.play_sound_click();
+        Application.OpenURL("https://support.google.com/accessibility/answer/11221616?hl="+this.app.carrot.lang.get_key_lang());
     }
 }

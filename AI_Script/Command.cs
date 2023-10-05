@@ -253,7 +253,7 @@ public class Command : MonoBehaviour
             {
                 if (data_chat["mp3"] != null)
                 {
-                    StartCoroutine(get_audio_chat_form_url(data_chat["mp3"].ToString()));
+                    if(data_chat["mp3"].ToString()!="") StartCoroutine(get_audio_chat_form_url(data_chat["mp3"].ToString()));
                 }
             }
         }
