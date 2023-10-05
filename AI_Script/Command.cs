@@ -74,7 +74,10 @@ public class Command : MonoBehaviour
         else
         {
             Debug.Log("Chat online");
-            this.play_chat(s_key);
+            if (this.app.carrot.is_online())
+                this.play_chat(s_key);
+            else
+                this.show_msg_no_chat();
         }
     }
 
@@ -243,7 +246,16 @@ public class Command : MonoBehaviour
         if (data_chat["action"]!= null) this.play_act(data_chat["action"].ToString());
         if (data_chat["face"]!= null) this.act_cm_face(data_chat["face"].ToString());
         if (data_chat["color"]!= null) this.set_color_by_string(data_chat["color"].ToString());
-        if (data_chat["mp3"] != null)if (this.app.setting.get_status_sound_voice()) StartCoroutine(get_audio_chat_form_url(data_chat["mp3"].ToString()));
+
+        if (this.app.setting.get_status_sound_voice())
+        {
+            if (this.app.carrot.is_online())
+                if (data_chat["mp3"] != null) StartCoroutine(get_audio_chat_form_url(data_chat["mp3"].ToString()));
+                else
+                    this.app.textToSpeech.StartSpeak(s_msg_chat);
+        }
+
+
         if (data_chat["link"]!= null) if(data_chat["link"].ToString().Trim()!="") Application.OpenURL(data_chat["link"].ToString());
         if (data_chat["func"] != null)
         {

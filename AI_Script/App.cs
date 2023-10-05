@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using TextSpeech;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -15,6 +16,7 @@ public class App : MonoBehaviour
     public Command_storage command_storage;
     public Command_Dev command_dev;
     public Command command;
+    public TextToSpeech textToSpeech;
 
     [Header("App obj")]
     public bool is_radio_func = true;
@@ -167,7 +169,7 @@ public class App : MonoBehaviour
         this.load_weather();
         this.get_character().gameObject.SetActive(true);
         this.sel_menu_func_app(0);
-        this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice", "vi-VN"));
+        this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice", "en"));
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
         this.command.send_chat("hi_" + hour);

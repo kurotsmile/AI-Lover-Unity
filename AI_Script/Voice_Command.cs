@@ -1,4 +1,6 @@
-﻿using KKSpeech;
+﻿using Carrot;
+using System.Xml.Linq;
+using TextSpeech;
 using UnityEngine;
 using UnityEngine.Android;
 using UnityEngine.UI;
@@ -11,9 +13,8 @@ public class Voice_Command : MonoBehaviour
 {
 	[Header("Obj main")]
 	public App app;
-	public SpeechRecognizerListener listener;
 
-	[Header("Voice Obj")]
+    [Header("Voice Obj")]
 	public Image img_mic_inp_home;
 	public Image img_mic_voice_command;
 	public Sprite icon_mic_suport;
@@ -32,6 +33,13 @@ public class Voice_Command : MonoBehaviour
 
     void Start()
 	{
+        this.panel_voice_command.SetActive(false);
+        this.panel_voice_input.SetActive(true);
+
+        SpeechToText.Instance.Setting("en-US");
+        SpeechToText.Instance.onResultCallback = OnFinalResult;
+
+        /*
         Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;
         if (this.app.carrot.is_online())
 		{
@@ -53,11 +61,13 @@ public class Voice_Command : MonoBehaviour
                     listener.onFinalResults.AddListener(OnFinalResult);
                     listener.onPartialResults.AddListener(OnPartialResult);
                     listener.onEndOfSpeech.AddListener(OnEndOfSpeech);
+                    listener.onSupportedLanguagesFetched.AddListener(OnSupportedLanguagesFetched);
                     startRecordingButton.enabled = false;
                     SpeechRecognizer.RequestAccess();
                     this.is_suport = true;
                     this.img_mic_inp_home.sprite = this.icon_mic_suport;
                     this.img_mic_voice_command.sprite = this.icon_mic_suport;
+                    SpeechRecognizer.GetSupportedLanguages();
                 }
                 else
                 {
@@ -74,11 +84,12 @@ public class Voice_Command : MonoBehaviour
 		{
 			this.img_mic_inp_home.sprite = this.app.carrot.icon_carrot_write;
 		}
-
+        */
     }
 
     public void btn_start()
     {
+        /*
 		if (this.app.carrot.is_online())
 		{
 			if (this.app.carrot.store_public == Carrot.Store.Huawei_store)
@@ -103,17 +114,21 @@ public class Voice_Command : MonoBehaviour
 		{
 			this.app.command.inp_command.Select();
 		}
-
+        */
+        SpeechToText.Instance.StartRecording(PlayerPrefs.GetString("voice_command_ready", "Say something :-)"));
     }
 
     public void btn_stop()
     {
+        /*
 		if(this.is_suport){
 			this.On_stop_voice_command();
 		}else{
 			this.panel_voice_command.SetActive(false);
 			this.panel_voice_input.SetActive(true);
 		}
+        */
+        SpeechToText.Instance.StopRecording();
     }
 
     public void check_start_voice_commad()
@@ -138,19 +153,19 @@ public class Voice_Command : MonoBehaviour
     }
 
     private void lang_Detection(string s_lang){
-        SpeechRecognizer.SetDetectionLanguage(s_lang);
+        SpeechToText.Instance.Setting(s_lang);
+        TextToSpeech.Instance.Setting(s_lang,1, 1);
     }
 
-    public void OnFinalResult(string result)
+    void OnFinalResult(string _data)
 	{
-		resultText.text = result;
-        this.GetComponent<Command>().send_command_by_text(result);
+        this.app.command.send_chat(_data, true);
 	}
 
-	public void OnPartialResult(string result)
+	public void OnPartialResult(string _data)
 	{
-		resultText.text = result;
-	}
+        this.app.command.send_chat(_data, true);
+    }
 
 	public void OnAvailabilityChange(bool available)
 	{
@@ -165,19 +180,7 @@ public class Voice_Command : MonoBehaviour
         }
 	}
 
-	public void OnAuthorizationStatusFetched(AuthorizationStatus status)
-	{
-		switch (status)
-		{
-			case AuthorizationStatus.Authorized:
-				startRecordingButton.enabled = true;
-				break;
-			default:
-				startRecordingButton.enabled = false;
-				resultText.text =  PlayerPrefs.GetString("voice_command_no_authorization");
-                break;
-		}
-	}
+
 
 	public void OnEndOfSpeech()
 	{
@@ -198,7 +201,6 @@ public class Voice_Command : MonoBehaviour
 
 	private void On_start_voice_command(){
 		if (this.GetComponent<App>().setting.get_status_sound_voice()) this.GetComponent<Command>().sound_command.Stop();
-		SpeechRecognizer.StartRecording(true);
 		this.img_mic_voice_command.sprite=this.icon_mic_recoding;
         resultText.text = PlayerPrefs.GetString("voice_command_ready", "Say something :-)");
         this.txt_status.text = PlayerPrefs.GetString("voice_command_start", "When it's your turn to talk, speak into the microphone");
@@ -208,7 +210,7 @@ public class Voice_Command : MonoBehaviour
 	}
 
 	private void On_stop_voice_command(){
-		SpeechRecognizer.StopIfRecording();
+
         resultText.text = "";
         this.txt_status.text = PlayerPrefs.GetString("voice_command_stop", "Pause to receive commands to listen to the character's response");
         this.panel_voice_command.SetActive(false);
@@ -218,7 +220,6 @@ public class Voice_Command : MonoBehaviour
 	}
 
 	private void On_pause_voice_command(){
-		SpeechRecognizer.StopIfRecording();
         resultText.text = "";
         this.txt_status.text = PlayerPrefs.GetString("voice_command_stop", "Pause to receive commands to listen to the character's response");
 		this.img_mic_voice_command.sprite=this.icon_mic_pause;
@@ -227,4 +228,21 @@ public class Voice_Command : MonoBehaviour
 	public void On_try_start_voice_command(){
 		if(this.is_suport&&this.is_ready) this.On_start_voice_command();
 	}
+
+	public void show_list_SupportedLanguages()
+	{
+
+            Carrot_Box box_supported_langs = this.app.carrot.Create_Box("list_supported_langs");
+            box_supported_langs.set_title("list Supported Languages");
+
+            /*
+            foreach (LanguageOption l in this.languageOptions)
+            {
+                Carrot_Box_Item item_lang = box_supported_langs.create_item("item_lang_" + l.id);
+                item_lang.set_icon(this.app.carrot.lang.icon);
+                item_lang.set_title(l.displayName);
+                item_lang.set_tip(l.displayName);
+            }*/
+    }
+
 }
