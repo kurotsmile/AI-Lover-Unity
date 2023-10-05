@@ -34,7 +34,7 @@ public class Voice_Command : MonoBehaviour
     public void set_DetectionLanguage(string s_key_lang)
     {
         SpeechToText.Instance.Setting(s_key_lang);
-        TextToSpeech.Instance.Setting(s_key_lang, 1, 1);
+        TextToSpeech.Instance.Setting(s_key_lang,this.app.setting.get_voice_speed(), 1);
     }
 
     void OnFinalResult(string _data)
@@ -60,21 +60,6 @@ public class Voice_Command : MonoBehaviour
             this.inp_mic.text = _data;
         }
     }
-
-    public void show_list_SupportedLanguages()
-    {
-        Carrot_Box box_supported_langs = this.app.carrot.Create_Box("list_supported_langs");
-        box_supported_langs.set_title("list Supported Languages");
-        /*
-        foreach (LanguageOption l in this.languageOptions)
-        {
-            Carrot_Box_Item item_lang = box_supported_langs.create_item("item_lang_" + l.id);
-            item_lang.set_icon(this.app.carrot.lang.icon);
-            item_lang.set_title(l.displayName);
-            item_lang.set_tip(l.displayName);
-        }*/
-    }
-
 
     public void start_inp_mic(InputField inp)
     {

@@ -343,9 +343,9 @@ public class Setting : MonoBehaviour
         item_voice_type.set_act(() => act_show_chat_limit());
 
         item_voice_type.dropdown_val.options.Clear();
-        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("voice_type_google_and_tts"));
-        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("voice_type_google"));
-        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("voice_type_tts"));
+        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("Google voice (Online) + TTS (Offline)"));
+        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("Google voice"));
+        item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("TTS voice"));
 
         item_voice_type.set_val(PlayerPrefs.GetString("tts_type", "0"));
         item_voice_type.dropdown_val.onValueChanged.AddListener(this.act_change_voice_type);

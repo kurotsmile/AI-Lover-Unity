@@ -104,10 +104,9 @@ public class Command : MonoBehaviour
                     List<IDictionary> list_chat = new List<IDictionary>();
                     foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
                     {
-                        this.id_cur_chat = documentSnapshot.Id;
                         IDictionary c = documentSnapshot.ToDictionary();
-                        c["id"] = this.id_cur_chat;
-                        if(c["sex_user"].ToString()==this.app.setting.get_user_sex()&&c["sex_character"].ToString() == this.app.setting.get_character_sex())
+                        c["id"] = documentSnapshot.Id;
+                        if (c["sex_user"].ToString()==this.app.setting.get_user_sex()&&c["sex_character"].ToString() == this.app.setting.get_character_sex() && c["pater"].ToString()==this.id_cur_chat)
                         {
                             list_chat.Add(c);
                             this.app.command_storage.add_command_offline(c);
@@ -213,7 +212,7 @@ public class Command : MonoBehaviour
 
     public void act_chat(IDictionary data_chat,bool is_test=false)
     {
-        this.obj_btn_info_chat.SetActive(false);
+        this.obj_btn_info_chat.SetActive(true);
         this.obj_btn_new_chat.SetActive(false);
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
@@ -224,7 +223,6 @@ public class Command : MonoBehaviour
 
         if(!is_test)
         {
-            this.obj_btn_info_chat.SetActive(true);
             this.obj_btn_report_chat.SetActive(true);
             this.obj_btn_add_chat_whith_father.SetActive(true);
         }
