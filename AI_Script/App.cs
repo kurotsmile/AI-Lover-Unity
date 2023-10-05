@@ -16,6 +16,7 @@ public class App : MonoBehaviour
     public Command_storage command_storage;
     public Command_Dev command_dev;
     public Command command;
+    public Voice_Command command_voice;
     public TextToSpeech textToSpeech;
 
     [Header("App obj")]
@@ -24,7 +25,6 @@ public class App : MonoBehaviour
     public Color32 color_nomal;
 
     public GameObject panel_main;
-
     public GameObject panel_chat_msg;
     public GameObject panel_chat_func;
     public GameObject panel_inp_msg;
@@ -278,7 +278,6 @@ public class App : MonoBehaviour
         {
             if (this.GetComponent<Command>().sound_command.isPlaying == false)
             {
-                this.GetComponent<Voice_Command>().check_start_voice_commad();
                 this.is_waiting_command = false;
             }
         }
@@ -299,7 +298,6 @@ public class App : MonoBehaviour
     public void waitting_command()
     {
         this.is_waiting_command = true;
-        this.GetComponent<Voice_Command>().check_stop_voice_commad();
     }
 
     public void btn_show_google_weather()
@@ -346,7 +344,6 @@ public class App : MonoBehaviour
         if (this.panel_chat_msg.activeInHierarchy)
         {
             this.show_func_function();
-            this.GetComponent<Voice_Command>().check_stop_voice_commad();
         }
         else
         {

@@ -240,7 +240,7 @@ public class Command : MonoBehaviour
             s_msg_chat = data_chat["msg"].ToString();
             s_msg_chat = this.app.s_rep_key(s_msg_chat);
             this.show_effect_txt_msg(s_msg_chat);
-            this.play_text_audio(s_msg_chat);
+            if (this.app.setting.get_status_sound_voice()) this.play_text_audio(s_msg_chat);
         }
 
         if (data_chat["action"]!= null) this.play_act(data_chat["action"].ToString());
@@ -250,11 +250,13 @@ public class Command : MonoBehaviour
         if (this.app.setting.get_status_sound_voice())
         {
             if (this.app.carrot.is_online())
-                if (data_chat["mp3"] != null) StartCoroutine(get_audio_chat_form_url(data_chat["mp3"].ToString()));
-                else
-                    this.app.textToSpeech.StartSpeak(s_msg_chat);
+            {
+                if (data_chat["mp3"] != null)
+                {
+                    StartCoroutine(get_audio_chat_form_url(data_chat["mp3"].ToString()));
+                }
+            }
         }
-
 
         if (data_chat["link"]!= null) if(data_chat["link"].ToString().Trim()!="") Application.OpenURL(data_chat["link"].ToString());
         if (data_chat["func"] != null)
@@ -364,7 +366,14 @@ public class Command : MonoBehaviour
 
     public void play_text_audio(string s_chat)
     {
-        StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.get_key_lang()));
+        if (this.app.carrot.is_online())
+        {
+            StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.get_key_lang()));
+        }
+        else
+        {
+            this.app.textToSpeech.StartSpeak(s_chat);
+        }
     }
 
     public IEnumerator get_audio_chat_form_txt(string txt_chat, string s_lang)

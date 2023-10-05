@@ -125,12 +125,5 @@ namespace TextSpeech
         [DllImport("__Internal")]
         private static extern void _TAG_StopSpeak();
 #endif
-
-        public void test()
-        {
-            this.StartSpeak("Hello");
-        }
     }
-
-
 }
