@@ -328,18 +328,18 @@ public class Player_music : MonoBehaviour
     public void btn_prev()
     {
         this.sel_index_music--;
-        if (this.sel_index_music < 0) this.sel_index_music = this.playlist.list_music.Count - 1;
+        if (this.sel_index_music < 0) this.sel_index_music = this.playlist.list_music_cur.Count - 1;
         this.sound_music.Pause();
-        this.act_play_data(this.playlist.list_music[this.sel_index_music],true);
+        this.act_play_data(this.playlist.list_music_cur[this.sel_index_music],true);
         this.check_hide_btn_prev();
     }
 
     public void btn_next()
     {
         this.sel_index_music++;
-        if (this.sel_index_music >= this.playlist.list_music.Count) this.sel_index_music = 0;
+        if (this.sel_index_music >= this.playlist.list_music_cur.Count) this.sel_index_music = 0;
         this.sound_music.Pause();
-        this.act_play_data(this.playlist.list_music[this.sel_index_music], true);
+        this.act_play_data(this.playlist.list_music_cur[this.sel_index_music], true);
         this.check_hide_btn_prev();
     }
 
@@ -402,8 +402,8 @@ public class Player_music : MonoBehaviour
 
     private void play_random_song()
     {
-        int rand_index = UnityEngine.Random.Range(0,this.playlist.list_music.Count);
-        this.act_play_data(this.playlist.list_music[rand_index], true);
+        int rand_index = UnityEngine.Random.Range(0,this.playlist.list_music_cur.Count);
+        this.act_play_data(this.playlist.list_music_cur[rand_index], true);
     }
 
     public void play_radio(Sprite sp_avatar,string s_name,string s_url_stream)
@@ -523,9 +523,9 @@ public class Player_music : MonoBehaviour
         //this.app.carrot.show_msg(s_error, index_error + " :" + s_error_msg, Carrot.Msg_Icon.Error);
     }
 
-    public int get_index_music_play()
+    public string get_s_id_music_cur_play()
     {
-        return this.sel_index_music;
+        return this.id_music;
     }
 
     public string StripHTML(string input)
