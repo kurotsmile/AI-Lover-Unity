@@ -65,23 +65,28 @@ public class Player_music : MonoBehaviour
 
     private Carrot.Carrot_Box box_list;
 
-    private void hide_all_info()
-    {
-        this.panel_info_album.SetActive(false);
-        this.panel_info_artrist.SetActive(false);
-        this.panel_info_king_of_music.SetActive(false);
-        this.panel_info_year.SetActive(false);
-    }
+
 
     public void act_play_data(IDictionary data_music, bool is_music_online)
     {
         this.data_song = Carrot.Json.Serialize(data_music);
+        this.button_download_mp3.SetActive(false);
+        this.slider_download_music.gameObject.SetActive(false);
+
+        this.panel_info_album.SetActive(false);
+        this.panel_info_artrist.SetActive(false);
+        this.panel_info_king_of_music.SetActive(false);
+        this.panel_info_year.SetActive(false);
+
+        this.button_add_playlist.SetActive(false);
+        this.button_share_song.SetActive(false);
+        this.button_lyrics.SetActive(false);
+
         if (data_music["type"].ToString() == "radio")
         {
             this.sound_music.Stop();
             if (this.radio.isAudioPlaying) this.radio.Stop();
             this.is_radio = true;
-            this.hide_all_info();
             this.txt_name_song_full.text = data_music["name"].ToString();
             this.txt_name_song_mini.text = data_music["name"].ToString();
             string id_sp_radio = "radio_avatar_" + data_music["id"].ToString();
@@ -101,22 +106,16 @@ public class Player_music : MonoBehaviour
             this.GetComponent<RadioPlayer>().Station.Name = data_music["name"].ToString();
             this.GetComponent<RadioPlayer>().Station.Url = data_music["url"].ToString();
             this.GetComponent<RadioPlayer>().Play();
-            this.slider_download_music.gameObject.SetActive(false);
             this.slider_timer_music.value = this.slider_timer_music.maxValue;
             this.img_play.sprite = this.icon_pause;
             this.img_play_mini.sprite = this.icon_pause;
-            this.button_download_mp3.SetActive(false);
-            this.button_add_playlist.SetActive(false);
-            this.button_share_song.SetActive(false);
             this.txt_time_music.text = "***";
-            this.button_lyrics.SetActive(false);
             if (this.app.get_index_sel_func() != 2) this.panel_player_mini.SetActive(true);
             this.app.get_character().play_ani_stop_dance();
         }
         else
         {
             this.is_radio = false;
-            this.hide_all_info();
             this.sound_music.Stop();
             this.slider_timer_music.value = 0;
             this.avatar_music.sprite = icon_music_default;
@@ -136,15 +135,12 @@ public class Player_music : MonoBehaviour
 
             this.panel_info_more.SetActive(true);
             this.button_link_ytb.SetActive(false);
-            this.button_lyrics.SetActive(false);
-            this.button_download_mp3.SetActive(false);
-            this.button_share_song.SetActive(false);
+
             this.is_buy_mp3_present = false;
             this.txt_time_music.text = "";
 
             this.data_lyrics = "";
 
-            this.button_add_playlist.SetActive(false);
             this.is_online_music = is_music_online;
 
             if (is_music_online)
