@@ -82,6 +82,7 @@ public class Music_playlist : MonoBehaviour
                 if (s_data != "")
                 {
                     IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
+                    data_music["type"] = "offline";
                     this.list_music_offline.Add(data_music);
                 }
             }
@@ -162,6 +163,7 @@ public class Music_playlist : MonoBehaviour
                             string s_id_song = SongSnapshot.Id;
                             IDictionary data_music = SongSnapshot.ToDictionary();
                             data_music["id"] = s_id_song;
+                            data_music["type"] = "online";
                             list_song.Add(data_music);
                         }
                         this.box_list_song(list_song);
@@ -219,13 +221,15 @@ public class Music_playlist : MonoBehaviour
 
             Carrot.Carrot_Box_Btn_Item btn_search = box_list.create_btn_menu_header(this.app.carrot.icon_carrot_search);
             btn_search.set_act(() => this.btn_show_seach_music());
+            if (this.type != Playlist_Type.music_search_result) btn_search.set_icon_color(this.app.carrot.color_highlight);
 
             Carrot.Carrot_Box_Btn_Item btn_playlist = box_list.create_btn_menu_header(this.icon);
             btn_playlist.set_act(() => this.show_playlist());
+            if (this.type != Playlist_Type.offline) btn_playlist.set_icon_color(this.app.carrot.color_highlight);
 
             Carrot.Carrot_Box_Btn_Item btn_history = box_list.create_btn_menu_header(this.icon_music_online);
             btn_history.set_act(() => this.show_list_music_online());
-
+            if (this.type != Playlist_Type.online) btn_history.set_icon_color(this.app.carrot.color_highlight);
 
             for (int i = 0; i < list_song.Count; i++)
             {
@@ -339,6 +343,7 @@ public class Music_playlist : MonoBehaviour
 
     public void show_list_radio()
     {
+        this.type = Playlist_Type.radio;
         Query RadioQuery = this.app.carrot.db.Collection("radio").Limit(20);
         RadioQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot songQuerySnapshot = task.Result;
@@ -355,6 +360,7 @@ public class Music_playlist : MonoBehaviour
                     {
                         string s_id_radio = SongSnapshot.Id;
                         IDictionary data_radio = SongSnapshot.ToDictionary();
+                        data_radio["type"] = "radio";
                         var s_name_radio = data_radio["name"].ToString();
                         var s_url_radio = data_radio["url"].ToString();
                         Carrot.Carrot_Box_Item item_radio = this.box_list.create_item("radio_" + data_radio["id"].ToString());
@@ -373,11 +379,12 @@ public class Music_playlist : MonoBehaviour
                             if (s_url_icon != "") this.app.carrot.get_img_and_save_playerPrefs(s_url_icon, item_radio.img_icon, id_sp_radio);
                         }
 
-                        item_radio.set_act(() => this.act_play_radio(item_radio.img_icon.sprite, s_name_radio, s_url_radio));
+                        item_radio.set_act(() => this.act_play_song_online(data_radio));
 
                         data_radio["id"] = s_id_radio;
                         list_radio.Add(data_radio);
                     };
+                    this.list_music_cur = list_radio;
                     this.box_list.update_color_table_row();
                 }
                 else
@@ -387,14 +394,6 @@ public class Music_playlist : MonoBehaviour
             }
         });
     }
-
-
-    private void act_play_radio(Sprite sp_icon,string s_name,string s_url)
-    {
-        this.app.player_music.play_radio(sp_icon, s_name, s_url);
-        if (this.box_list != null) this.box_list.close();
-    }
-
 
     public void get_data_list_playlist(string lang,UnityAction act_done=null)
     {
@@ -413,6 +412,7 @@ public class Music_playlist : MonoBehaviour
                         string s_id_song = SongSnapshot.Id;
                         IDictionary data_music = SongSnapshot.ToDictionary();
                         data_music["id"] = s_id_song;
+                        data_music["type"] = "online";
                         this.list_music_online.Add(data_music);
                     };
 
