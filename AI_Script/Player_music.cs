@@ -29,15 +29,21 @@ public class Player_music : MonoBehaviour
     public Sprite icon_play;
     public Sprite icon_pause;
     public Sprite icon_music_default;
+
     public Image avatar_music;
     public Image avatar_music_mini;
+
     public Image img_play;
     public Image img_play_mini;
+
+    public Image img_btn_list_online;
+    public Image img_btn_list_offline;
+    public Image img_btn_list_radio;
+
     public GameObject button_link_ytb;
     private int sel_index_music=-1;
     public GameObject button_prev;
     public GameObject button_next;
-    public GameObject button_history;
     public GameObject button_lyrics;
     public GameObject button_download_mp3;
     public GameObject button_share_song;
@@ -65,9 +71,7 @@ public class Player_music : MonoBehaviour
 
     private Carrot.Carrot_Box box_list;
 
-
-
-    public void act_play_data(IDictionary data_music, bool is_music_online)
+    public void act_play_data(IDictionary data_music)
     {
         this.data_song = Carrot.Json.Serialize(data_music);
         this.button_download_mp3.SetActive(false);
@@ -81,6 +85,11 @@ public class Player_music : MonoBehaviour
         this.button_add_playlist.SetActive(false);
         this.button_share_song.SetActive(false);
         this.button_lyrics.SetActive(false);
+        this.button_link_ytb.SetActive(false);
+
+        this.img_btn_list_offline.color=Color.white;
+        this.img_btn_list_online.color=Color.white;
+        this.img_btn_list_radio.color=Color.white;
 
         if (data_music["type"].ToString() == "radio")
         {
@@ -102,16 +111,17 @@ public class Player_music : MonoBehaviour
                 if (data_music["icon"] != null) s_url_icon = data_music["icon"].ToString();
                 if (s_url_icon != "") this.app.carrot.get_img_and_save_playerPrefs(s_url_icon, this.avatar_music, id_sp_radio);
             }
-            this.GetComponent<RadioPlayer>().Restart(2f);
-            this.GetComponent<RadioPlayer>().Station.Name = data_music["name"].ToString();
-            this.GetComponent<RadioPlayer>().Station.Url = data_music["url"].ToString();
-            this.GetComponent<RadioPlayer>().Play();
+            this.radio.Restart(2f);
+            this.radio.Station.Name = data_music["name"].ToString();
+            this.radio.Station.Url = data_music["url"].ToString();
+            this.radio.Play();
             this.slider_timer_music.value = this.slider_timer_music.maxValue;
             this.img_play.sprite = this.icon_pause;
             this.img_play_mini.sprite = this.icon_pause;
             this.txt_time_music.text = "***";
             if (this.app.get_index_sel_func() != 2) this.panel_player_mini.SetActive(true);
             this.app.get_character().play_ani_stop_dance();
+            this.img_btn_list_radio.color = this.app.carrot.color_highlight;
         }
         else
         {
@@ -134,16 +144,24 @@ public class Player_music : MonoBehaviour
             }
 
             this.panel_info_more.SetActive(true);
-            this.button_link_ytb.SetActive(false);
-
+            
             this.is_buy_mp3_present = false;
             this.txt_time_music.text = "";
 
             this.data_lyrics = "";
 
-            this.is_online_music = is_music_online;
-
-            if (is_music_online)
+            if (data_music["type"].ToString() == "offline")
+            {
+                this.is_online_music = false;
+                this.img_btn_list_offline.color = this.app.carrot.color_highlight;
+            }
+            else
+            {
+                this.is_online_music = true;
+                this.img_btn_list_online.color = this.app.carrot.color_highlight;
+            }
+                
+            if (this.is_online_music)
             {
                 this.button_download_mp3.SetActive(true);
                 this.app.command.add_item_log_music(data_music["name"].ToString(), data_music);
@@ -367,7 +385,7 @@ public class Player_music : MonoBehaviour
         this.sel_index_music--;
         if (this.sel_index_music < 0) this.sel_index_music = this.playlist.list_music_cur.Count - 1;
         this.sound_music.Pause();
-        this.act_play_data(this.playlist.list_music_cur[this.sel_index_music],true);
+        this.act_play_data(this.playlist.list_music_cur[this.sel_index_music]);
         this.check_hide_btn_prev();
     }
 
@@ -376,7 +394,7 @@ public class Player_music : MonoBehaviour
         this.sel_index_music++;
         if (this.sel_index_music >= this.playlist.list_music_cur.Count) this.sel_index_music = 0;
         this.sound_music.Pause();
-        this.act_play_data(this.playlist.list_music_cur[this.sel_index_music], true);
+        this.act_play_data(this.playlist.list_music_cur[this.sel_index_music]);
         this.check_hide_btn_prev();
     }
 
@@ -443,7 +461,7 @@ public class Player_music : MonoBehaviour
     private void play_random_song()
     {
         int rand_index = UnityEngine.Random.Range(0,this.playlist.list_music_cur.Count);
-        this.act_play_data(this.playlist.list_music_cur[rand_index], true);
+        this.act_play_data(this.playlist.list_music_cur[rand_index]);
     }
 
     public void show_lyrics()
@@ -474,7 +492,7 @@ public class Player_music : MonoBehaviour
         if (System.IO.File.Exists(name_file_mp3))
             StartCoroutine(this.get_mp3_form_url("file://"+name_file_mp3));
         else
-            this.act_play_data(data_music, true);
+            this.act_play_data(data_music);
     }
 
     public void load_avatar_offline(string s_id_m)

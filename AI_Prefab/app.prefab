@@ -16756,7 +16756,7 @@ GameObject:
   - component: {fileID: 2755477470961594054}
   - component: {fileID: 2755477470961594055}
   m_Layer: 5
-  m_Name: Panel_music_btn_playlist
+  m_Name: btn_music_btn_playlist
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24495,10 +24495,12 @@ MonoBehaviour:
   avatar_music_mini: {fileID: 2755477471936966246}
   img_play: {fileID: 2755477471456732026}
   img_play_mini: {fileID: 2755477470707028349}
+  img_btn_list_online: {fileID: 2755477471559065815}
+  img_btn_list_offline: {fileID: 2755477470961594054}
+  img_btn_list_radio: {fileID: 8183095038088125051}
   button_link_ytb: {fileID: 2755477470689526703}
   button_prev: {fileID: 2755477472238717964}
   button_next: {fileID: 2755477471632560695}
-  button_history: {fileID: 2755477471559065810}
   button_lyrics: {fileID: 2755477471491789542}
   button_download_mp3: {fileID: 2755477472504709080}
   button_share_song: {fileID: 7563224872832972109}
@@ -37082,7 +37084,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: -0.00016021729}
+  m_AnchoredPosition: {x: -3, y: 0.00038909912}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004

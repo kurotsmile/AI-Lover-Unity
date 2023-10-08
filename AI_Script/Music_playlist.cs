@@ -96,15 +96,9 @@ public class Music_playlist : MonoBehaviour
         }
     }
 
-    private void act_play_song_in_playlist(IDictionary data_music)
+    private void act_play_song(IDictionary data_music)
     {
-        this.app.player_music.act_play_data(data_music, false);
-        if (this.box_list != null) this.box_list.close();
-    }
-
-    private void act_play_song_online(IDictionary data_music)
-    {
-        this.app.player_music.act_play_data(data_music, true);
+        this.app.player_music.act_play_data(data_music);
         if(this.box_search_inp!=null) this.box_search_inp.close();
         if (this.box_list != null) this.box_list.close();
     }
@@ -234,6 +228,7 @@ public class Music_playlist : MonoBehaviour
             for (int i = 0; i < list_song.Count; i++)
             {
                 IDictionary data_song = (IDictionary)list_song[i];
+                data_song["index"] = i;
                 string s_id_song = data_song["id"].ToString();
                 string s_name_m = data_song["name"].ToString().Trim();
                 var int_index_m = i;
@@ -291,9 +286,9 @@ public class Music_playlist : MonoBehaviour
                     btn_del.set_act(() => this.app.player_music.playlist.delete_item(int_index_m));
                 }
 
-                if (this.type == Playlist_Type.online) item_song.set_act(() => this.act_play_song_online(data_song));
-                if (this.type == Playlist_Type.music_search_result) item_song.set_act(() => this.act_play_song_online(data_song));
-                if (this.type == Playlist_Type.offline) item_song.set_act(() => this.act_play_song_in_playlist(data_song));
+                if (this.type == Playlist_Type.online) item_song.set_act(() => this.act_play_song(data_song));
+                if (this.type == Playlist_Type.music_search_result) item_song.set_act(() => this.act_play_song(data_song));
+                if (this.type == Playlist_Type.offline) item_song.set_act(() => this.act_play_song(data_song));
             }
 
             this.box_list.update_color_table_row();
@@ -379,7 +374,7 @@ public class Music_playlist : MonoBehaviour
                             if (s_url_icon != "") this.app.carrot.get_img_and_save_playerPrefs(s_url_icon, item_radio.img_icon, id_sp_radio);
                         }
 
-                        item_radio.set_act(() => this.act_play_song_online(data_radio));
+                        item_radio.set_act(() => this.act_play_song(data_radio));
 
                         data_radio["id"] = s_id_radio;
                         list_radio.Add(data_radio);
