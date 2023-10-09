@@ -1339,5 +1339,4 @@ public class Command_storage : MonoBehaviour
         string s_tr = "https://translate.google.com/?sl="+this.app.carrot.lang.get_key_lang()+"&tl=vi&text="+s_txt+"&op=translate";
         Application.OpenURL(s_tr);
     }
-
 }

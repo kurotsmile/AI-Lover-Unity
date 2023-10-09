@@ -272,6 +272,7 @@ public class Player_music : MonoBehaviour
             else
             {
                 this.data_mp3 = www.downloadHandler.data;
+                this.app.carrot.get_tool().save_file("music" + this.id_music,this.data_mp3);
                 this.sound_music.clip = DownloadHandlerAudioClip.GetContent(www);
                 this.slider_timer_music.maxValue = this.sound_music.clip.length;
                 this.sound_music.Play();
@@ -470,7 +471,7 @@ public class Player_music : MonoBehaviour
         }
     }
 
-    public void play_new_song()
+    public void play_new_song()  
     {
         get_new_song(this.app.carrot.lang.get_key_lang());
     }
@@ -550,11 +551,6 @@ public class Player_music : MonoBehaviour
     public string get_id_song_current()
     {
         return this.id_music;
-    }
-
-    public void error_radio(string s_error,Int32 index_error,string s_error_msg)
-    {
-        //this.app.carrot.show_msg(s_error, index_error + " :" + s_error_msg, Carrot.Msg_Icon.Error);
     }
 
     public string get_s_id_music_cur_play()

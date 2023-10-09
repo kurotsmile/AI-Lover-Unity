@@ -238,31 +238,30 @@ public class Music_playlist : MonoBehaviour
                 string s_id_song = data_song["id"].ToString();
                 string s_name_m = data_song["name"].ToString().Trim();
                 var int_index_m = i;
+                Carrot.Carrot_Box_Item item_song = this.box_list.create_item("song_" + s_id_song);
 
                 if (data_song["type"].ToString()== "radio")
                 {
-                    var s_name_radio = data_song["name"].ToString();
                     var s_url_radio = data_song["url"].ToString();
-                    Carrot.Carrot_Box_Item item_radio = this.box_list.create_item("radio_" + s_id_song);
-                    item_radio.set_icon(this.icon_radio);
-                    item_radio.set_title(s_name_radio);
-                    item_radio.set_tip(s_url_radio);
+                    item_song.set_icon(this.icon_radio);
+                    item_song.set_title(s_name_m);
+                    item_song.set_tip(s_url_radio);
 
                     string id_sp_radio = "radio_avatar_"+s_id_song;
                     Sprite sp_radio = this.app.carrot.get_tool().get_sprite_to_playerPrefs(id_sp_radio);
                     if (sp_radio != null)
-                        item_radio.set_icon_white(sp_radio);
+                    {
+                        item_song.set_icon_white(sp_radio);
+                    }
                     else
                     {
                         string s_url_icon = "";
                         if (data_song["icon"] != null) s_url_icon = data_song["icon"].ToString();
-                        if (s_url_icon != "") this.app.carrot.get_img_and_save_playerPrefs(s_url_icon, item_radio.img_icon, id_sp_radio);
+                        if (s_url_icon != "") this.app.carrot.get_img_and_save_playerPrefs(s_url_icon, item_song.img_icon, id_sp_radio);
                     }
-                    item_radio.set_act(() => this.act_play_song(data_song));
                 }
                 else
                 {
-                    Carrot.Carrot_Box_Item item_song = this.box_list.create_item("song_" + s_id_song);
                     Sprite sp_avatar = this.app.player_music.get_avatar_music(s_id_song);
                     if (sp_avatar != null)
                     {
@@ -284,12 +283,6 @@ public class Music_playlist : MonoBehaviour
 
                     item_song.set_tip(data_song["artist"].ToString());
                     item_song.set_title(data_song["name"].ToString());
-
-                    if (this.app.player_music.get_id_song_current() == s_id_song)
-                    {
-                        item_song.GetComponent<Image>().color = this.app.carrot.color_highlight;
-                        item_song.txt_tip.color = Color.white;
-                    }
 
                     if (this.app.carrot.is_online())
                     {
@@ -314,9 +307,15 @@ public class Music_playlist : MonoBehaviour
                         btn_del.set_color(this.app.carrot.color_highlight);
                         btn_del.set_act(() => this.app.player_music.playlist.delete_item(int_index_m));
                     }
-
-                    item_song.set_act(() => this.act_play_song(data_song));
                 }
+
+                if (this.app.player_music.get_id_song_current() == s_id_song)
+                {
+                    item_song.GetComponent<Image>().color = this.app.carrot.color_highlight;
+                    item_song.txt_tip.color = Color.white;
+                }
+
+                item_song.set_act(() => this.act_play_song(data_song));
             }
 
             this.box_list.update_color_table_row();

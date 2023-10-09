@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Command_Dev_Type {pending,by_user,same_key}
+
 public class Command_Dev : MonoBehaviour
 {
     public App app;
@@ -17,6 +19,8 @@ public class Command_Dev : MonoBehaviour
 
     private Carrot_Box box;
     private Carrot_Box box_list_same;
+
+    private Command_Dev_Type type;
 
     public void check()
     {
@@ -33,6 +37,7 @@ public class Command_Dev : MonoBehaviour
 
     public void show()
     {
+        this.type = Command_Dev_Type.pending;
         this.app.carrot.show_loading();
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
         ChatQuery = ChatQuery.WhereEqualTo("status", "pending");
@@ -54,29 +59,11 @@ public class Command_Dev : MonoBehaviour
                     List<IDictionary> list_chat = new List<IDictionary>();
                     foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
                     {
-                        IDictionary c = documentSnapshot.ToDictionary();
-
-                        string id_chat=documentSnapshot.Id;
-                        string key_chat = c["key"].ToString();
-                        
-                        c["id"] = id_chat;
-                        Carrot_Box_Item item_chat = this.box.create_item("item_chat");
-
-                        item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
-                        item_chat.set_title(c["key"].ToString());
-                        item_chat.set_tip(c["msg"].ToString());
-                        item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
-
-                        Carrot_Box_Btn_Item btn_same = item_chat.create_item();
-                        btn_same.set_icon(this.sp_icon_key_same);
-                        btn_same.set_color(this.app.carrot.color_highlight);
-                        btn_same.set_act(() => show_chat_key_same(key_chat));
-
-                        Carrot_Box_Btn_Item btn_del=item_chat.create_item();
-                        btn_del.set_icon(this.app.carrot.sp_icon_del_data);
-                        btn_del.set_color(Color.red);
-                        btn_del.set_act(() => this.delete(id_chat, item_chat.gameObject));
+                        IDictionary chat_data = documentSnapshot.ToDictionary();
+                        chat_data["id"] = documentSnapshot.Id;
+                        list_chat.Add(chat_data);
                     }
+                    this.box_list(list_chat);
                 }
                 else
                 {
@@ -96,6 +83,7 @@ public class Command_Dev : MonoBehaviour
 
     public void show_chat_key_same(string s_key_chat)
     {
+        this.type = Command_Dev_Type.same_key;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
@@ -119,56 +107,11 @@ public class Command_Dev : MonoBehaviour
                     List<IDictionary> list_chat = new List<IDictionary>();
                     foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
                     {
-                        IDictionary c = documentSnapshot.ToDictionary();
-
-                        string id_chat = documentSnapshot.Id;
-                        string key_chat = c["key"].ToString();
-
-                        c["id"] = id_chat;
-                        Carrot_Box_Item item_chat = this.box_list_same.create_item("item_chat");
-
-                        if (c["status"] != null)
-                        {
-                            string s_status = c["status"].ToString();
-                            if (s_status == "passed")
-                            {
-                                item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
-                                item_chat.img_icon.color = this.app.carrot.color_highlight;
-                            }
-                            else
-                            {
-                                item_chat.set_icon(this.sp_icon_chat_pending);
-                                item_chat.img_icon.color = Color.black;
-                            }
-                        }
-                        else
-                        {
-                            item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
-                            item_chat.img_icon.color = Color.black;
-                        }
-
-                        item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
-                        item_chat.set_title(c["key"].ToString());
-                        item_chat.set_tip(c["msg"].ToString());
-
-
-                        if (c["pater"] != null)
-                        {
-                            if (c["pater"].ToString() != "")
-                            {
-                                string s_id_chat_father = c["pater"].ToString();
-                                Carrot_Box_Btn_Item btn_father = item_chat.create_item();
-                                btn_father.set_color(this.app.carrot.color_highlight);
-                                btn_father.set_icon(this.app.command_storage.sp_icon_father);
-                                btn_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
-                            }
-                        }
-
-                        Carrot_Box_Btn_Item btn_del = item_chat.create_item();
-                        btn_del.set_icon(this.app.carrot.sp_icon_del_data);
-                        btn_del.set_color(Color.red);
-                        btn_del.set_act(() => this.delete(id_chat, item_chat.gameObject));
+                        IDictionary chat_data = documentSnapshot.ToDictionary();
+                        chat_data["id"] = documentSnapshot.Id;
+                        list_chat.Add(chat_data);
                     }
+                    this.box_list(list_chat);
                 }
                 else
                 {
@@ -190,6 +133,7 @@ public class Command_Dev : MonoBehaviour
 
     public void show_chat_pass_by_user()
     {
+        this.type = Command_Dev_Type.by_user;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
@@ -213,64 +157,11 @@ public class Command_Dev : MonoBehaviour
                     List<IDictionary> list_chat = new List<IDictionary>();
                     foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
                     {
-                        IDictionary c = documentSnapshot.ToDictionary();
-
-                        string id_chat = documentSnapshot.Id;
-                        string key_chat = c["key"].ToString();
-
-                        c["id"] = id_chat;
-                        Carrot_Box_Item item_chat = this.box.create_item("item_chat");
-
-                        item_chat.set_title(c["key"].ToString());
-                        item_chat.set_tip(c["msg"].ToString());
-
-                        if (c["status"] != null)
-                        {
-                            string s_status = c["status"].ToString();
-                            if(s_status== "passed")
-                            {
-                                item_chat.set_icon(this.app.carrot.icon_carrot_done);
-                                item_chat.img_icon.color = Color.green;
-                            }
-                            else
-                            {
-                                item_chat.set_icon(this.sp_icon_chat_pending);
-                                item_chat.img_icon.color = this.app.carrot.color_highlight;
-                            }   
-                        }
-                        else
-                        {
-                            item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
-                        }
-
-
-                        if (this.app.carrot.model_app == ModelApp.Develope)
-                        {
-                            item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
-
-                            Carrot_Box_Btn_Item btn_del = item_chat.create_item();
-                            btn_del.set_icon(this.app.carrot.sp_icon_del_data);
-                            btn_del.set_color(Color.red);
-                            btn_del.set_act(() => this.delete(id_chat, item_chat.gameObject));
-                        }
-
-                        if (c["pater"] != null)
-                        {
-                            if (c["pater"].ToString() != "")
-                            {
-                                string s_id_chat_father = c["pater"].ToString();
-                                Carrot_Box_Btn_Item btn_father = item_chat.create_item();
-                                btn_father.set_color(this.app.carrot.color_highlight);
-                                btn_father.set_icon(this.app.command_storage.sp_icon_father);
-                                btn_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
-                            }
-                        }
-
-                        Carrot.Carrot_Box_Btn_Item btn_play= item_chat.create_item();
-                        btn_play.set_icon(this.app.player_music.icon_play);
-                        btn_play.set_color(this.app.carrot.color_highlight);
-                        btn_play.set_act(() => this.app.command_storage.play_one_test_command(c));
+                        IDictionary chat_data = documentSnapshot.ToDictionary();
+                        chat_data["id"] = documentSnapshot.Id;
+                        list_chat.Add(chat_data);
                     }
+                    this.box_list(list_chat);
                 }
                 else
                 {
@@ -281,4 +172,75 @@ public class Command_Dev : MonoBehaviour
         });
     }
 
+    private void box_list(IList list_data)
+    {
+        for(int i = 0; i < list_data.Count; i++)
+        {
+            IDictionary c = (IDictionary) list_data[i];
+
+            string id_chat = c["id"].ToString();
+            string key_chat = c["key"].ToString();
+
+            Carrot_Box_Item item_chat = this.box.create_item("item_chat");
+
+            item_chat.set_title(key_chat);
+            item_chat.set_tip(c["msg"].ToString());
+
+            if (c["status"] != null)
+            {
+                string s_status = c["status"].ToString();
+                if (s_status == "passed")
+                {
+                    if (this.type == Command_Dev_Type.by_user)
+                        item_chat.set_icon(this.app.command_storage.icon_command_pass);
+                    else
+                        item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
+
+                    item_chat.img_icon.color = this.app.carrot.color_highlight;
+                }
+                else
+                {
+                    item_chat.set_icon(this.sp_icon_chat_pending);
+                    item_chat.img_icon.color = Color.black;
+                }
+            }
+            else
+            {
+                item_chat.set_icon(this.app.command.sp_icon_info_add_chat);
+                item_chat.img_icon.color = Color.black;
+            }
+
+            if (c["pater"] != null)
+            {
+                if (c["pater"].ToString() != "")
+                {
+                    string s_id_chat_father = c["pater"].ToString();
+                    Carrot_Box_Btn_Item btn_father = item_chat.create_item();
+                    btn_father.set_color(this.app.carrot.color_highlight);
+                    btn_father.set_icon(this.app.command_storage.sp_icon_father);
+                    btn_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
+                }
+            }
+
+            Carrot.Carrot_Box_Btn_Item btn_play = item_chat.create_item();
+            btn_play.set_icon(this.app.player_music.icon_play);
+            btn_play.set_color(this.app.carrot.color_highlight);
+            btn_play.set_act(() => this.app.command_storage.play_one_test_command(c));
+
+            if (this.app.carrot.model_app == ModelApp.Develope)
+            {
+                Carrot_Box_Btn_Item btn_same = item_chat.create_item();
+                btn_same.set_icon(this.sp_icon_key_same);
+                btn_same.set_color(this.app.carrot.color_highlight);
+                btn_same.set_act(() => show_chat_key_same(key_chat));
+
+                Carrot_Box_Btn_Item btn_del = item_chat.create_item();
+                btn_del.set_icon(this.app.carrot.sp_icon_del_data);
+                btn_del.set_color(Color.red);
+                btn_del.set_act(() => this.delete(id_chat, item_chat.gameObject));
+
+                item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
+            }
+        }
+    }
 }
