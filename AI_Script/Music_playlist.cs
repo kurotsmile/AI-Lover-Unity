@@ -397,25 +397,44 @@ public class Music_playlist : MonoBehaviour
         });
     }
 
-    public void get_data_list_playlist(string lang,UnityAction act_done=null)
+    public void get_data_list_playlist(string lang="",UnityAction act_done=null)
     {
-        Query ChatQuery = this.app.carrot.db.Collection("song").WhereEqualTo("lang", lang).OrderByDescending("publishedAt").Limit(20);
+        Debug.Log("get_data_list_playlist:" + lang);
+        this.app.carrot.show_loading();
+        Query ChatQuery = null;
+        if (lang=="")
+        {
+            ChatQuery = this.app.carrot.db.Collection("song").OrderByDescending("publishedAt").Limit(20);
+        }
+        else
+        {
+            ChatQuery = this.app.carrot.db.Collection("song").WhereEqualTo("lang", lang).OrderByDescending("publishedAt").Limit(20);
+        }
 
         ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot songQuerySnapshot = task.Result;
 
+            if (task.IsFaulted)
+            {
+                this.app.carrot.hide_loading();
+            }
+
             if (task.IsCompleted)
             {
+                this.app.carrot.hide_loading();
                 if (songQuerySnapshot.Count > 0)
                 {
                     this.list_music_online = new List<IDictionary>();
+                    int index_song = 0;
                     foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
                     {
                         string s_id_song = SongSnapshot.Id;
                         IDictionary data_music = SongSnapshot.ToDictionary();
                         data_music["id"] = s_id_song;
                         data_music["type"] = "online";
+                        data_music["index"] = index_song;
                         this.list_music_online.Add(data_music);
+                        index_song++;
                     };
 
                     this.list_music_cur = this.list_music_online;

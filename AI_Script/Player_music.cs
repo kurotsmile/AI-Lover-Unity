@@ -327,7 +327,10 @@ public class Player_music : MonoBehaviour
     {
         if (this.sound_music.clip == null)
         {
-            this.play_new_song();
+            if (this.playlist.list_music_cur == null)
+                this.play_new_song();
+            else
+                this.play_random_song();
         }
         else
         {
@@ -335,8 +338,9 @@ public class Player_music : MonoBehaviour
                 this.sound_music.Pause();
             else
                 this.sound_music.Play();
+
+            this.check_icon_play_pause();
         }
-        this.check_icon_play_pause();
     }
 
     public void btn_play()
