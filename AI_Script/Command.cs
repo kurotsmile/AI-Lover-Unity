@@ -39,6 +39,7 @@ public class Command : MonoBehaviour
     public GameObject obj_btn_report_chat;
     public GameObject obj_btn_new_chat;
     public GameObject obj_btn_add_chat_whith_father;
+    public GameObject obj_btn_translate;
     private float count_timer_show_text = 0;
     private float count_timer_hide_text = 0;
     private bool is_show_text = false;
@@ -155,6 +156,7 @@ public class Command : MonoBehaviour
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
         this.obj_btn_new_chat.SetActive(true);
+        this.obj_btn_translate.SetActive(false);
         this.set_color(Color.red);
     }
 
@@ -223,13 +225,20 @@ public class Command : MonoBehaviour
 
         if(!is_test)
         {
-            this.obj_btn_report_chat.SetActive(true);
             this.obj_btn_add_chat_whith_father.SetActive(true);
         }
 
         if (data_chat["id"] != null)
         {
             this.id_cur_chat = data_chat["id"].ToString();
+        }
+
+        if (data_chat["status"] != null)
+        {
+            if (data_chat["status"].ToString() == "passed")
+            {
+                this.obj_btn_report_chat.SetActive(true);
+            }
         }
 
         string s_msg_chat = "";
@@ -664,5 +673,11 @@ public class Command : MonoBehaviour
     private void share_chat(string s_link)
     {
         this.app.carrot.show_share(s_link, "Share this conversation with your friends!");
+    }
+
+    public void btn_translate()
+    {
+        string s_link_tr = "https://translate.google.com/?sl=auto&text=" + UnityWebRequest.EscapeURL(this.data_chat_cur["msg"].ToString())+"&op=translate";
+        Application.OpenURL(s_link_tr);
     }
 }

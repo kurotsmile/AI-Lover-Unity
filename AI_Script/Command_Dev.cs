@@ -163,10 +163,9 @@ public class Command_Dev : MonoBehaviour
         for(int i = 0; i < list_data.Count; i++)
         {
             IDictionary c =list_data[i];
-
             string id_chat = c["id"].ToString();
             string key_chat = c["key"].ToString();
-            Debug.Log(c["key"].ToString());
+
             Carrot_Box_Item item_chat = this.box.create_item("item_chat"+i);
 
             item_chat.set_title(key_chat);
