@@ -517,21 +517,6 @@ public class Player_music : MonoBehaviour
             this.act_play_data(data_music);
     }
 
-    public void load_avatar_offline(string s_id_m)
-    {
-        Sprite sp_avatar_music = get_avatar_music(s_id_m);
-        if (sp_avatar_music != null)
-        {
-            this.avatar_music.sprite = sp_avatar_music;
-            this.avatar_music_mini.sprite = sp_avatar_music;
-        }
-        else
-        {
-            this.avatar_music.sprite = this.icon_music_default;
-            this.avatar_music_mini.sprite = this.icon_music_default;
-        }
-    }
-
     public Sprite get_avatar_music(string s_id_m)
     {
         Sprite sp_avatar_music = this.app.carrot.get_tool().get_sprite_to_playerPrefs("music_avatar"+s_id_m);
