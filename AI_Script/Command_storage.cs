@@ -955,7 +955,6 @@ public class Command_storage : MonoBehaviour
 
         if (this.box_list != null) this.box_list.close();
         if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
-        if (this.app.command_dev.get_box_list_same() != null) this.app.command_dev.get_box_list_same().close();
 
         this.box_add_chat.gameObject.SetActive(false);
         this.is_list_command_test_play = false;
@@ -971,7 +970,6 @@ public class Command_storage : MonoBehaviour
         this.data_chat_test = data_chat;
         if (this.box_list != null) this.box_list.close();
         if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
-        if (this.app.command_dev.get_box_list_same() != null) this.app.command_dev.get_box_list_same().close();
 
         this.is_list_command_test_play = false;
         this.obj_button_next_command_test.SetActive(false);

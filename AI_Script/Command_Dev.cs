@@ -18,7 +18,6 @@ public class Command_Dev : MonoBehaviour
     public GameObject btn_chat_pass_user;
 
     private Carrot_Box box;
-    private Carrot_Box box_list_same;
 
     private Command_Dev_Type type;
 
@@ -65,10 +64,6 @@ public class Command_Dev : MonoBehaviour
                     }
                     this.box_list(list_chat);
                 }
-                else
-                {
-                    this.app.carrot.hide_loading();
-                }
             }
         });
     }
@@ -86,8 +81,7 @@ public class Command_Dev : MonoBehaviour
         this.type = Command_Dev_Type.same_key;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
-        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-        ChatQuery = ChatQuery.WhereEqualTo("key", s_key_chat);
+        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).WhereEqualTo("key", s_key_chat);
         ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted)
@@ -101,9 +95,10 @@ public class Command_Dev : MonoBehaviour
 
                 if (capitalQuerySnapshot.Count > 0)
                 {
-                    this.box_list_same = this.app.carrot.Create_Box("chat_key_same");
-                    this.box_list_same.set_title(s_key_chat);
-                    this.box_list_same.set_icon(this.sp_icon_key_same);
+                    Debug.Log("show_chat_key_same:"+ capitalQuerySnapshot.Count);
+                    this.box = this.app.carrot.Create_Box("chat_key_same");
+                    this.box.set_title(s_key_chat);
+                    this.box.set_icon(this.sp_icon_key_same);
                     List<IDictionary> list_chat = new List<IDictionary>();
                     foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
                     {
@@ -113,10 +108,6 @@ public class Command_Dev : MonoBehaviour
                     }
                     this.box_list(list_chat);
                 }
-                else
-                {
-                    this.app.carrot.hide_loading();
-                }
             }
         });
     }
@@ -124,11 +115,6 @@ public class Command_Dev : MonoBehaviour
     public Carrot_Box get_box_list()
     {
         return this.box;
-    }
-
-    public Carrot_Box get_box_list_same()
-    {
-        return this.box_list_same;
     }
 
     public void show_chat_pass_by_user()
@@ -172,19 +158,19 @@ public class Command_Dev : MonoBehaviour
         });
     }
 
-    private void box_list(IList list_data)
+    private void box_list(IList<IDictionary> list_data)
     {
         for(int i = 0; i < list_data.Count; i++)
         {
-            IDictionary c = (IDictionary) list_data[i];
+            IDictionary c =list_data[i];
 
             string id_chat = c["id"].ToString();
             string key_chat = c["key"].ToString();
-
-            Carrot_Box_Item item_chat = this.box.create_item("item_chat");
+            Debug.Log(c["key"].ToString());
+            Carrot_Box_Item item_chat = this.box.create_item("item_chat"+i);
 
             item_chat.set_title(key_chat);
-            item_chat.set_tip(c["msg"].ToString());
+            if(c["msg"]!=null) item_chat.set_tip(c["msg"].ToString());
 
             if (c["status"] != null)
             {

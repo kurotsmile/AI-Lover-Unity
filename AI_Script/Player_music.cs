@@ -92,9 +92,9 @@ public class Player_music : MonoBehaviour
         this.button_lyrics.SetActive(false);
         this.button_link_ytb.SetActive(false);
 
-        this.img_btn_list_offline.color=Color.white;
-        this.img_btn_list_online.color=Color.white;
-        this.img_btn_list_radio.color=Color.white;
+        this.img_btn_list_offline.color = Color.white;
+        this.img_btn_list_online.color = Color.white;
+        this.img_btn_list_radio.color = Color.white;
 
         this.avatar_music.sprite = icon_music_default;
         this.avatar_music_mini.sprite = icon_music_default;
@@ -145,7 +145,7 @@ public class Player_music : MonoBehaviour
             this.slider_timer_music.value = 0;
             this.panel_player_mini.SetActive(true);
             this.panel_info_more.SetActive(true);
-            
+
             this.is_buy_mp3_present = false;
             this.txt_time_music.text = "";
 
@@ -161,7 +161,7 @@ public class Player_music : MonoBehaviour
                 this.is_online_music = true;
                 this.img_btn_list_online.color = this.app.carrot.color_highlight;
             }
-                
+
             if (this.is_online_music)
             {
                 this.button_download_mp3.SetActive(true);
@@ -211,7 +211,7 @@ public class Player_music : MonoBehaviour
             }
 
             this.slider_download_music.gameObject.SetActive(true);
-            
+
             Sprite sp_avatar_music = this.app.carrot.get_tool().get_sprite_to_playerPrefs(this.id_music);
             if (sp_avatar_music != null)
             {
@@ -227,6 +227,7 @@ public class Player_music : MonoBehaviour
                     if (s_avatar != "") this.app.carrot.get_img_and_save_playerPrefs(data_music["avatar"].ToString(), this.avatar_music, id_sp_avatar_music, act_load_done_avatar_music);
                 }
             }
+
             if (data_music["mp3"] != null)
             {
                 if (this.app.carrot.get_tool().check_file_exist("music" + this.id_music))
@@ -236,10 +237,12 @@ public class Player_music : MonoBehaviour
                         path_file_mp3 = Application.dataPath + "/music" + data_music["id"].ToString();
                     else
                         path_file_mp3 = Application.persistentDataPath + "/music" + data_music["id"].ToString();
-                    StartCoroutine(get_mp3_form_url(path_file_mp3));
+                    StartCoroutine(get_mp3_form_url(path_file_mp3,false));
                 }
                 else
-                    StartCoroutine(get_mp3_form_url(data_music["mp3"].ToString()));
+                {
+                    StartCoroutine(get_mp3_form_url(data_music["mp3"].ToString(), true));
+                }   
             }
         }
 
@@ -253,7 +256,7 @@ public class Player_music : MonoBehaviour
         this.avatar_music_mini.sprite = sp_avatar_music;
     }
 
-    IEnumerator get_mp3_form_url(string s_url_audio)
+    IEnumerator get_mp3_form_url(string s_url_audio,bool is_save_file)
     {
         this.s_link_download_mp3 = s_url_audio;
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG))
@@ -272,7 +275,7 @@ public class Player_music : MonoBehaviour
             else
             {
                 this.data_mp3 = www.downloadHandler.data;
-                this.app.carrot.get_tool().save_file("music" + this.id_music,this.data_mp3);
+                if(is_save_file)  this.app.carrot.get_tool().save_file("music" + this.id_music,this.data_mp3);
                 this.sound_music.clip = DownloadHandlerAudioClip.GetContent(www);
                 this.slider_timer_music.maxValue = this.sound_music.clip.length;
                 this.sound_music.Play();
@@ -503,19 +506,6 @@ public class Player_music : MonoBehaviour
     {
         this.button_add_playlist.SetActive(false);
         this.playlist.add_song(this.id_music,this.data_song,this.data_mp3,this.data_avatar);
-    }
-
-    public void load_file_mp3_and_play(string id_song, IDictionary data_music)
-    {
-        string name_file_mp3 = "music" + id_song;
-        if (Application.isEditor)
-            name_file_mp3 = Application.dataPath + "/" + name_file_mp3;
-        else
-            name_file_mp3 = Application.persistentDataPath + "/" + name_file_mp3;
-        if (System.IO.File.Exists(name_file_mp3))
-            StartCoroutine(this.get_mp3_form_url("file://"+name_file_mp3));
-        else
-            this.act_play_data(data_music);
     }
 
     public Sprite get_avatar_music(string s_id_m)
