@@ -727,7 +727,7 @@ public class App : MonoBehaviour
     #region Scene Rotation
     public void act_change_Scene_Rotation()
     {
-        this.carrot.delay_function(1.2f, this.check_Scene_Rotation);
+        this.carrot.delay_function(1.1f, this.check_Scene_Rotation);
     }
 
     public void check_Scene_Rotation()

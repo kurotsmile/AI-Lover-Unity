@@ -1,14 +1,10 @@
 ﻿using Crosstales.Radio;
-using Firebase.Firestore;
 using System;
 using System.Collections;
-using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Player_music : MonoBehaviour
 {
@@ -237,12 +233,13 @@ public class Player_music : MonoBehaviour
                 string id_index = data_music["index_del"].ToString();
 
                 Byte[] data_song = this.app.carrot.get_tool().get_data_to_playerPrefs("music_" + id_index + "_mp3");
+
                 var memStream = new System.IO.MemoryStream(data_song);
                 var mpgFile = new Crosstales.NLayer.MpegFile(memStream);
                 var samples = new float[mpgFile.Length];
                 mpgFile.ReadSamples(samples, 0, (int)mpgFile.Length);
 
-                var clip = AudioClip.Create("foo", samples.Length, mpgFile.Channels, mpgFile.SampleRate, false);
+                var clip = AudioClip.Create("music_song", samples.Length, mpgFile.Channels, mpgFile.SampleRate, false);
                 clip.SetData(samples, 0);
                 this.slider_timer_music.maxValue = clip.length;
                 this.sound_music.clip = clip;
