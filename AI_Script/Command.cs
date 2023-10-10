@@ -130,7 +130,6 @@ public class Command : MonoBehaviour
                             this.act_chat(list_chat[0], false);
                         }
                     }
-
                 }
                 else
                 {
@@ -680,7 +679,7 @@ public class Command : MonoBehaviour
     {
         string s_txt = this.data_chat_cur["msg"].ToString();
         s_txt = UnityWebRequest.EscapeURL(s_txt);
-        string s_tr = "https://translate.google.com/?sl=auto&tl=auto&text=" + s_txt + "&op=translate";
+        string s_tr = "https://translate.google.com/?sl="+this.app.carrot.lang.get_key_lang()+"&tl=en&text=" + s_txt + "&op=translate";
         Application.OpenURL(s_tr);
     }
 }

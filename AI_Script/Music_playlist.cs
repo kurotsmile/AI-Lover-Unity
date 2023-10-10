@@ -57,7 +57,7 @@ public class Music_playlist : MonoBehaviour
 
     public void add_song(string s_id_m,string s_data_music, byte[] data_mp3, byte[] data_avatar)
     {
-        if (data_mp3 != null) this.app.carrot.get_tool().save_file("music"+ this.length+".mp3", data_mp3);
+        if (data_mp3 != null) this.app.carrot.get_tool().PlayerPrefs_Save_by_data("music_" + this.length + "_mp3", data_mp3);
         if (data_avatar != null) this.app.carrot.get_tool().PlayerPrefs_Save_by_data("music_avatar" + s_id_m, data_avatar);
 
         PlayerPrefs.SetString("music_" + this.length, s_data_music);
@@ -115,8 +115,8 @@ public class Music_playlist : MonoBehaviour
 
     public void delete_item(int index)
     {
-        this.app.carrot.get_tool().delete_file("music" + index);
         PlayerPrefs.DeleteKey("music_" + index);
+        PlayerPrefs.DeleteKey("music_" + index+ "_mp3");
         this.show_playlist();
     }
 
@@ -302,13 +302,6 @@ public class Music_playlist : MonoBehaviour
 
                     if (this.type == Playlist_Type.offline)
                     {
-                        if (!this.app.carrot.get_tool().check_file_exist("music"+ data_song["index_del"] +".mp3"))
-                        {
-                            item_song.set_type(Carrot.Box_Item_Type.box_value_txt);
-                            item_song.set_val("Error:mp3 file has been lost!");
-                            item_song.txt_val.color = Color.red;
-                        }
-
                         Carrot.Carrot_Box_Btn_Item btn_del = item_song.create_item();
                         btn_del.set_icon(this.app.carrot.sp_icon_del_data);
                         btn_del.set_color(this.app.carrot.color_highlight);

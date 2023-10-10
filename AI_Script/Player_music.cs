@@ -1,10 +1,14 @@
 ﻿using Crosstales.Radio;
+using Firebase.Firestore;
 using System;
 using System.Collections;
+using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Player_music : MonoBehaviour
 {
@@ -231,22 +235,24 @@ public class Player_music : MonoBehaviour
             if (data_music["type"].ToString()== "offline")
             {
                 string id_index = data_music["index_del"].ToString();
-                if (this.app.carrot.get_tool().check_file_exist("music" + id_index + ".mp3"))
-                {
-                    string path_file_mp3;
-                    if (Application.isEditor)
-                        path_file_mp3 = Application.dataPath + "/music" + id_index + ".mp3";
-                    else
-                        path_file_mp3 = Application.persistentDataPath + "/music" + id_index + ".mp3";
-                    StartCoroutine(get_mp3_form_url(path_file_mp3));
-                }
+
+                Byte[] data_song = this.app.carrot.get_tool().get_data_to_playerPrefs("music_" + id_index + "_mp3");
+                var memStream = new System.IO.MemoryStream(data_song);
+                var mpgFile = new Crosstales.NLayer.MpegFile(memStream);
+                var samples = new float[mpgFile.Length];
+                mpgFile.ReadSamples(samples, 0, (int)mpgFile.Length);
+
+                var clip = AudioClip.Create("foo", samples.Length, mpgFile.Channels, mpgFile.SampleRate, false);
+                clip.SetData(samples, 0);
+                this.slider_timer_music.maxValue = clip.length;
+                this.sound_music.clip = clip;
+                this.sound_music.Play();
+                this.slider_download_music.gameObject.SetActive(false);
+                this.app.get_character().play_ani_dance();
+                if (this.app.get_index_sel_func() == 2)
+                    this.panel_player_mini.SetActive(false);
                 else
-                {
-                    if (data_music["mp3"] != null)
-                    {
-                        StartCoroutine(get_mp3_form_url(data_music["mp3"].ToString()));
-                    }
-                }
+                    this.panel_player_mini.SetActive(true);
             }
             else
             {
@@ -255,9 +261,10 @@ public class Player_music : MonoBehaviour
                     StartCoroutine(get_mp3_form_url(data_music["mp3"].ToString()));
                 }
             }
+            this.check_icon_play_pause();
         }
 
-        this.check_icon_play_pause();
+        
         this.check_hide_btn_prev();
     }
 
@@ -269,6 +276,7 @@ public class Player_music : MonoBehaviour
 
     IEnumerator get_mp3_form_url(string s_url_audio)
     {
+        Debug.Log(s_url_audio);
         this.s_link_download_mp3 = s_url_audio;
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG))
         {
