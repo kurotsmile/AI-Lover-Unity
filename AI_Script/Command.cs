@@ -215,6 +215,7 @@ public class Command : MonoBehaviour
     public void act_chat(IDictionary data_chat,bool is_test=false)
     {
         this.obj_btn_info_chat.SetActive(true);
+        this.obj_btn_translate.SetActive(true);
         this.obj_btn_new_chat.SetActive(false);
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
@@ -677,7 +678,9 @@ public class Command : MonoBehaviour
 
     public void btn_translate()
     {
-        string s_link_tr = "https://translate.google.com/?sl=auto&text=" + UnityWebRequest.EscapeURL(this.data_chat_cur["msg"].ToString())+"&op=translate";
-        Application.OpenURL(s_link_tr);
+        string s_txt = this.data_chat_cur["msg"].ToString();
+        s_txt = UnityWebRequest.EscapeURL(s_txt);
+        string s_tr = "https://translate.google.com/?sl=auto&tl=auto&text=" + s_txt + "&op=translate";
+        Application.OpenURL(s_tr);
     }
 }
