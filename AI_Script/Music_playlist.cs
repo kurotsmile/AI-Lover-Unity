@@ -16,9 +16,7 @@ public class Music_playlist : MonoBehaviour
     public App app;
 
     public List<IDictionary> list_music_cur = null;
-
     private List<IDictionary> list_music_online = null;
-    private List<IDictionary> list_music_offline = null;
 
     [Header("Asset Icon")]
     public Sprite icon;
@@ -76,27 +74,30 @@ public class Music_playlist : MonoBehaviour
         if (this.length > 0) {
             this.type = Playlist_Type.offline;
             if (this.box_list != null) this.box_list.close();
-
-            this.list_music_offline = new List<IDictionary>();
-            for (int i = this.length-1; i >= 0; i--)
-            {
-                string s_data = PlayerPrefs.GetString("music_"+i);
-                if (s_data != "")
-                {
-                    IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
-                    data_music["type"] = "offline";
-                    data_music["index_del"] = i;
-                    this.list_music_offline.Add(data_music);
-                }
-            }
-
-            this.list_music_cur = this.list_music_offline;
-            this.box_list_song(this.list_music_offline);
+            this.list_music_cur = this.get_list_offline();
+            this.box_list_song(this.list_music_cur);
         }
         else
         {
             this.app.carrot.show_msg(PlayerPrefs.GetString("music_list", "Music Playlist"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
         }
+    }
+
+    private List<IDictionary> get_list_offline()
+    {
+        List<IDictionary> list_music_offline = new List<IDictionary>();
+        for (int i = this.length - 1; i >= 0; i--)
+        {
+            string s_data = PlayerPrefs.GetString("music_" + i);
+            if (s_data != "")
+            {
+                IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
+                data_music["type"] = "offline";
+                data_music["index_del"] = i;
+                list_music_offline.Add(data_music);
+            }
+        }
+        return list_music_offline;
     }
 
     private void act_play_song(IDictionary data_music)
