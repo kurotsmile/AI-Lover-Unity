@@ -341,10 +341,19 @@ public class Player_music : MonoBehaviour
     {
         if (this.sound_music.clip == null)
         {
-            if (this.playlist.list_music_cur == null)
-                this.play_new_song();
+            if (this.app.carrot.is_online())
+            {
+                if (this.playlist.list_music_cur == null)
+                    this.play_new_song();
+                else
+                    this.play_random_song();
+            }
             else
-                this.play_random_song();
+            {
+                IDictionary song_offline = this.playlist.get_radom_one_song_offline();
+                if (song_offline != null) this.act_play_data(song_offline);
+            }
+
         }
         else
         {

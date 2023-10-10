@@ -1,10 +1,8 @@
 ﻿using Carrot;
 using Firebase.Extensions;
 using Firebase.Firestore;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -98,6 +96,14 @@ public class Music_playlist : MonoBehaviour
             }
         }
         return list_music_offline;
+    }
+
+    public IDictionary get_radom_one_song_offline()
+    {
+        List<IDictionary> list_song = this.get_list_offline();
+        if (list_song.Count == 0) return null;
+        int index_random = Random.Range(0, list_song.Count);
+        return list_song[index_random];
     }
 
     private void act_play_song(IDictionary data_music)
