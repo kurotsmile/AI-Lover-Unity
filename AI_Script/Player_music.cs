@@ -228,21 +228,32 @@ public class Player_music : MonoBehaviour
                 }
             }
 
-            if (data_music["mp3"] != null)
+            if (data_music["type"].ToString()== "offline")
             {
-                if (this.app.carrot.get_tool().check_file_exist("music" + this.id_music))
+                string id_index = data_music["index_del"].ToString();
+                if (this.app.carrot.get_tool().check_file_exist("music" + id_index + ".mp3"))
                 {
                     string path_file_mp3;
                     if (Application.isEditor)
-                        path_file_mp3 = Application.dataPath + "/music" + data_music["id"].ToString();
+                        path_file_mp3 = Application.dataPath + "/music" + id_index + ".mp3";
                     else
-                        path_file_mp3 = Application.persistentDataPath + "/music" + data_music["id"].ToString();
-                    StartCoroutine(get_mp3_form_url(path_file_mp3,false));
+                        path_file_mp3 = Application.persistentDataPath + "/music" + id_index + ".mp3";
+                    StartCoroutine(get_mp3_form_url(path_file_mp3));
                 }
                 else
                 {
-                    StartCoroutine(get_mp3_form_url(data_music["mp3"].ToString(), true));
-                }   
+                    if (data_music["mp3"] != null)
+                    {
+                        StartCoroutine(get_mp3_form_url(data_music["mp3"].ToString()));
+                    }
+                }
+            }
+            else
+            {
+                if (data_music["mp3"] != null)
+                {
+                    StartCoroutine(get_mp3_form_url(data_music["mp3"].ToString()));
+                }
             }
         }
 
@@ -256,7 +267,7 @@ public class Player_music : MonoBehaviour
         this.avatar_music_mini.sprite = sp_avatar_music;
     }
 
-    IEnumerator get_mp3_form_url(string s_url_audio,bool is_save_file)
+    IEnumerator get_mp3_form_url(string s_url_audio)
     {
         this.s_link_download_mp3 = s_url_audio;
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG))
@@ -275,7 +286,6 @@ public class Player_music : MonoBehaviour
             else
             {
                 this.data_mp3 = www.downloadHandler.data;
-                if(is_save_file)  this.app.carrot.get_tool().save_file("music" + this.id_music,this.data_mp3);
                 this.sound_music.clip = DownloadHandlerAudioClip.GetContent(www);
                 this.slider_timer_music.maxValue = this.sound_music.clip.length;
                 this.sound_music.Play();

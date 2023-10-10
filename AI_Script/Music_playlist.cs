@@ -4,6 +4,7 @@ using Firebase.Firestore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -60,7 +61,7 @@ public class Music_playlist : MonoBehaviour
 
     public void add_song(string s_id_m,string s_data_music, byte[] data_mp3, byte[] data_avatar)
     {
-        if (data_mp3 != null) this.app.carrot.get_tool().save_file("music"+ s_id_m, data_mp3);
+        if (data_mp3 != null) this.app.carrot.get_tool().save_file("music"+ this.length+".mp3", data_mp3);
         if (data_avatar != null) this.app.carrot.get_tool().PlayerPrefs_Save_by_data("music_avatar" + s_id_m, data_avatar);
 
         PlayerPrefs.SetString("music_" + this.length, s_data_music);
@@ -84,6 +85,7 @@ public class Music_playlist : MonoBehaviour
                 {
                     IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
                     data_music["type"] = "offline";
+                    data_music["index_del"] = i;
                     this.list_music_offline.Add(data_music);
                 }
             }
@@ -155,8 +157,7 @@ public class Music_playlist : MonoBehaviour
                         foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
                         {
                             IDictionary data_music = SongSnapshot.ToDictionary();
-                            data_music["id"] = Get16BitHash(SongSnapshot.Id);
-                            data_music["id_web"] = SongSnapshot.Id;
+                            data_music["id"] = SongSnapshot.Id;
                             data_music["type"] = "online";
                             list_song.Add(data_music);
                         }
@@ -285,19 +286,16 @@ public class Music_playlist : MonoBehaviour
 
                     if (this.app.carrot.is_online())
                     {
-                        if (data_song["id_web"] != null)
-                        {
-                            var link_song_share = "https://carrotstore.web.app/?p=song&id=" + data_song["id_web"].ToString();
-                            Carrot.Carrot_Box_Btn_Item btn_share = item_song.create_item();
-                            btn_share.set_icon(this.app.carrot.sp_icon_share);
-                            btn_share.set_color(this.app.carrot.color_highlight);
-                            btn_share.set_act(() => this.app.carrot.show_share(link_song_share, PlayerPrefs.GetString("share_song", "Share this song so everyone can hear it!")));
-                        }
+                        var link_song_share = "https://carrotstore.web.app/?p=song&id=" + s_id_song;
+                        Carrot.Carrot_Box_Btn_Item btn_share = item_song.create_item();
+                        btn_share.set_icon(this.app.carrot.sp_icon_share);
+                        btn_share.set_color(this.app.carrot.color_highlight);
+                        btn_share.set_act(() => this.app.carrot.show_share(link_song_share, PlayerPrefs.GetString("share_song", "Share this song so everyone can hear it!")));
                     }
 
                     if (this.type == Playlist_Type.offline)
                     {
-                        if (!this.app.carrot.get_tool().check_file_exist("music" + s_id_song))
+                        if (!this.app.carrot.get_tool().check_file_exist("music"+ data_song["index_del"] +".mp3"))
                         {
                             item_song.set_type(Carrot.Box_Item_Type.box_value_txt);
                             item_song.set_val("Error:mp3 file has been lost!");
@@ -307,7 +305,7 @@ public class Music_playlist : MonoBehaviour
                         Carrot.Carrot_Box_Btn_Item btn_del = item_song.create_item();
                         btn_del.set_icon(this.app.carrot.sp_icon_del_data);
                         btn_del.set_color(this.app.carrot.color_highlight);
-                        btn_del.set_act(() => this.app.player_music.playlist.delete_item(int_index_m));
+                        btn_del.set_act(() => this.app.player_music.playlist.delete_item(int.Parse(data_song["index_del"].ToString())));
                     }
                 }
 
@@ -383,8 +381,7 @@ public class Music_playlist : MonoBehaviour
                     foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
                     {
                         IDictionary data_radio = SongSnapshot.ToDictionary();
-                        data_radio["id"]= Get16BitHash(SongSnapshot.Id);
-                        data_radio["id_web"] = SongSnapshot.Id;
+                        data_radio["id"]= SongSnapshot.Id;
                         data_radio["type"] = "radio";
                         list_radio.Add(data_radio);
                     }
@@ -430,8 +427,7 @@ public class Music_playlist : MonoBehaviour
                     foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
                     {
                         IDictionary data_music = SongSnapshot.ToDictionary();
-                        data_music["id"] =Get16BitHash(SongSnapshot.Id);
-                        data_music["id_web"] = SongSnapshot.Id;
+                        data_music["id"] = SongSnapshot.Id;
                         data_music["type"] = "online";
                         data_music["index"] = index_song;
                         this.list_music_online.Add(data_music);
@@ -447,10 +443,5 @@ public class Music_playlist : MonoBehaviour
                 }
             }
         });
-    }
-
-    public static Int16 Get16BitHash(string s)
-    {
-        return (Int16)(s.GetHashCode() & 0xFFFF);
     }
 }
