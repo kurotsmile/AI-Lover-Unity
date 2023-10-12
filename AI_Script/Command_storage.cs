@@ -512,18 +512,18 @@ public class Command_storage : MonoBehaviour
 
         Carrot.Carrot_Button_Item obj_btn_done = obj_panel_btn.create_btn("btn_done");
         obj_btn_done.set_act_click(act_done_submit_command);
-        obj_btn_done.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
+        obj_btn_done.set_bk_color(this.app.carrot.color_highlight);
         obj_btn_done.set_label_color(Color.white);
         obj_btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
         obj_btn_done.set_icon(this.sp_icon_add_chat);
 
         obj_btn_test = obj_panel_btn.create_btn("btn_test");
         obj_btn_test.set_act_click(btn_test_command);
-        obj_btn_test.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
+        obj_btn_test.set_bk_color(this.app.carrot.color_highlight);
 
         obj_btn_test.set_label_color(Color.white);
         obj_btn_test.set_label(PlayerPrefs.GetString("cm_test", "Test"));
-        obj_btn_test.set_icon(this.GetComponent<App>().carrot.game.icon_play_music_game);
+        obj_btn_test.set_icon(this.app.carrot.game.icon_play_music_game);
 
         box_add_chat.set_act_before_closing(act_close_box);
     }
@@ -1217,10 +1217,21 @@ public class Command_storage : MonoBehaviour
                 if (this.app.carrot.model_app == ModelApp.Publish)
                 {
                     DocumentReference chatRef = chatDbRef.Document(s_id_chat_new);
-                    chatRef.SetAsync(c);
                     c.id = s_id_chat_new;
                     IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
-                    this.add_command_offline(chat_data);
+                    chatRef.SetAsync(c).ContinueWithOnMainThread(task => {
+
+                        if (task.IsFaulted)
+                        {
+                            this.add_command_offline(chat_data);
+                        }
+
+                        if (task.IsCompleted)
+                        {
+                            this.add_command_offline(chat_data);
+                        }
+                    });
+
                 }
 
                 if (this.app.carrot.model_app == ModelApp.Develope)

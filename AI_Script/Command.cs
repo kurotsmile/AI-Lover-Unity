@@ -93,9 +93,7 @@ public class Command : MonoBehaviour
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted)
             {
-                this.id_cur_chat = "";
-                this.show_effect_txt_msg(task.Exception.Message);
-                this.set_color(Color.red);
+                this.show_msg_error(task.Exception.Message);
             }
 
             if (task.IsCompleted)
@@ -147,16 +145,27 @@ public class Command : MonoBehaviour
         });
     }
 
-    private void show_msg_no_chat()
+    private void hide_all_obj_msg()
     {
         this.id_cur_chat = "";
-        this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
         this.obj_btn_info_chat.SetActive(false);
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
         this.obj_btn_new_chat.SetActive(true);
         this.obj_btn_translate.SetActive(false);
         this.set_color(Color.red);
+    }
+
+    private void show_msg_no_chat()
+    {
+        this.hide_all_obj_msg();
+        this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
+    }
+
+    private void show_msg_error(string s_msg_error)
+    {
+        this.hide_all_obj_msg();
+        this.show_effect_txt_msg(s_msg_error);
     }
 
     public void send_command_by_text(string s_text)
