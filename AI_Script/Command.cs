@@ -1,4 +1,5 @@
 ﻿using Carrot;
+using Crosstales;
 using Firebase.Extensions;
 using Firebase.Firestore;
 using System.Collections;
@@ -7,12 +8,15 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+public enum Command_Type_Mode{chat,live}
+
 public class Command : MonoBehaviour
 {
     [Header("Obj Main")]
     public App app;
 
     [Header("Obj chat")]
+    public Command_Type_Mode mode = Command_Type_Mode.chat;
     public InputField inp_command;
     public GameObject prefab_item_command_chat;
     public GameObject prefab_item_command_pc;
@@ -51,7 +55,7 @@ public class Command : MonoBehaviour
     private string s_command_chat_last;
     private string id_cur_chat = "";
     private IDictionary data_chat_cur;
-
+    
     public void send_command()
     {
         if (this.inp_command.text.Trim() != "")
@@ -65,20 +69,27 @@ public class Command : MonoBehaviour
     {
         this.s_command_chat_last = s_key;
         if(is_log_show) add_item_log_chat(s_key);
-        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key,this.id_cur_chat);
-        if (chat_offline != null)
+        if (this.mode == Command_Type_Mode.chat)
         {
-            this.id_cur_chat = chat_offline["id"].ToString();
-            this.act_chat(chat_offline);
-            Debug.Log("Chat offline");
+            IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
+            if (chat_offline != null)
+            {
+                this.id_cur_chat = chat_offline["id"].ToString();
+                this.act_chat(chat_offline);
+                Debug.Log("Chat offline");
+            }
+            else
+            {
+                Debug.Log("Chat online");
+                if (this.app.carrot.is_online())
+                    this.play_chat(s_key);
+                else
+                    this.show_msg_no_chat();
+            }
         }
         else
         {
-            Debug.Log("Chat online");
-            if (this.app.carrot.is_online())
-                this.play_chat(s_key);
-            else
-                this.show_msg_no_chat();
+            this.send_live(s_key);
         }
     }
 
@@ -690,5 +701,24 @@ public class Command : MonoBehaviour
         s_txt = UnityWebRequest.EscapeURL(s_txt);
         string s_tr = "https://translate.google.com/?sl="+this.app.carrot.lang.get_key_lang()+"&tl=en&text=" + s_txt + "&op=translate";
         Application.OpenURL(s_tr);
+    }
+
+    private void send_live(string s_key)
+    {
+        List<string> icons = this.app.command_storage.get_list_icon_name();
+        this.data_chat_cur = (IDictionary)Json.Deserialize("{}");
+        this.data_chat_cur["key"] = s_key;
+        this.data_chat_cur["msg"] = s_key;
+        this.data_chat_cur["action"] = Random.Range(0, 40).ToString();
+        this.data_chat_cur["color"] = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f).CTToHexRGBA();
+        this.data_chat_cur["status"] = "live";
+
+        if (icons.Count > 0)
+        {
+            int index_icons = Random.Range(0, icons.Count);
+            this.data_chat_cur["icon"] = icons[index_icons];
+        }
+
+        this.act_chat(this.data_chat_cur);
     }
 }
