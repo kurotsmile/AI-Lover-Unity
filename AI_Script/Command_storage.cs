@@ -129,7 +129,6 @@ public class Command_storage : MonoBehaviour
     private Carrot.Carrot_Box_Item item_keyword;
     private Carrot.Carrot_Box_Item item_action;
     private Carrot.Carrot_Box_Item item_face;
-    private Carrot.Carrot_Box_Item item_limit;
     private Carrot.Carrot_Box_Item item_user_create;
 
     private Carrot.Carrot_Box_Btn_Item btn_model_nomal;
@@ -223,7 +222,7 @@ public class Command_storage : MonoBehaviour
         this.btn_model_advanced = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_advanced);
         btn_model_advanced.set_act(() => this.act_box_add_model_advanced());
         if (this.is_cm_mode_nomal == false) btn_model_advanced.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
-        Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.setting.sp_icon_chat_limit);
+        Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_bug);
         btn_list_key_block.set_act(() => this.show_list_block_key_chat());
 
         if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
@@ -384,25 +383,6 @@ public class Command_storage : MonoBehaviour
                 this.item_run_control.set_val(index_control_app.ToString());
             }
         }
-
-        this.item_limit = box_add_chat.create_item("item_limit");
-        item_limit.set_type(Carrot.Box_Item_Type.box_value_slider);
-        item_limit.set_icon(this.sp_icon_limit);
-        item_limit.set_title("Limit vulgarity and sex");
-        item_limit.set_tip("Set limits for children");
-        item_limit.set_lang_data("report_limit_chat", "chat_limit_tip");
-        item_limit.load_lang_data();
-        item_limit.set_fill_color(this.GetComponent<App>().carrot.color_highlight);
-        item_limit.check_type();
-        this.item_limit.slider_val.wholeNumbers = true;
-        this.item_limit.slider_val.minValue = 1;
-        this.item_limit.slider_val.maxValue = 4;
-        item_limit.set_val(this.GetComponent<App>().setting.get_limit_chat().ToString());
-        if (this.is_cm_mode_nomal)
-            this.item_limit.gameObject.SetActive(false);
-        else
-            this.item_limit.gameObject.SetActive(true);
-        if (data_chat["limit"] != null) this.item_limit.set_val(data_chat["limit"].ToString());
 
         this.item_icon = box_add_chat.create_item("item_icon");
         item_icon.set_type(Carrot.Box_Item_Type.box_value_txt);
@@ -1080,7 +1060,6 @@ public class Command_storage : MonoBehaviour
         this.item_icon.gameObject.SetActive(false);
         this.item_run_cmd.gameObject.SetActive(false);
         this.item_run_control.gameObject.SetActive(false);
-        this.item_limit.gameObject.SetActive(false);
         if(this.item_user_create!=null) this.item_user_create.gameObject.SetActive(false);
     }
 
@@ -1093,7 +1072,6 @@ public class Command_storage : MonoBehaviour
         this.item_icon.gameObject.SetActive(true);
         this.item_run_cmd.gameObject.SetActive(true);
         this.item_run_control.gameObject.SetActive(true);
-        this.item_limit.gameObject.SetActive(true);
         if (this.item_user_create != null) this.item_user_create.gameObject.SetActive(true);
     }
 
@@ -1149,7 +1127,7 @@ public class Command_storage : MonoBehaviour
             msg = this.item_msg.get_val(),
             action = this.item_action.get_val(),
             face = this.item_face.get_val(),
-            limit = this.item_limit.get_val(),
+            limit = "1",
             sex_character = this.app.setting.get_character_sex(),
             sex_user = this.app.setting.get_user_sex(),
             pater = this.s_pater_id,
@@ -1339,7 +1317,7 @@ public class Command_storage : MonoBehaviour
 
         Carrot.Carrot_Box box_list_key = this.app.carrot.Create_Box("key_block");
         box_list_key.set_title(PlayerPrefs.GetString("list_banned_keywords","List of prohibited keywords"));
-        box_list_key.set_icon(this.app.setting.sp_icon_chat_limit);
+        box_list_key.set_icon(this.app.carrot.icon_carrot_bug);
 
         for(int i = 0; i < this.list_key_block.Count; i++)
         {

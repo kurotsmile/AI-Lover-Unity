@@ -29,7 +29,7 @@ public class Setting : MonoBehaviour
     public Sprite sp_icon_voice_off;
     public Sprite sp_icon_voice_speed;
     public Sprite sp_icon_voice_type;
-    public Sprite sp_icon_chat_limit;
+    public Sprite sp_icon_chat_voice_test;
     public Sprite sp_icon_chat_bubble;
     public Sprite sp_icon_shop;
     public Sprite sp_icon_shop_mp3;
@@ -47,7 +47,6 @@ public class Setting : MonoBehaviour
     private string s_user_name;
     private string s_weather_pin;
     private string s_tts_type;
-    private int limit_chat;
     private float voice_speech;
     private bool is_sound_voice;
     private bool is_bubble_icon;
@@ -64,9 +63,9 @@ public class Setting : MonoBehaviour
     private Carrot.Carrot_Box_Item item_name_user;
     private Carrot.Carrot_Box_Item item_name_npc;
     private Carrot.Carrot_Box_Item item_weather_pin;
-    private Carrot.Carrot_Box_Item item_chat_limit;
     private Carrot.Carrot_Box_Item item_voice_speed;
     private Carrot.Carrot_Box_Item item_voice_type;
+    private Carrot.Carrot_Box_Item item_voice_test;
 
     private Carrot.Carrot_Box_Btn_Item btn_user_sex_boy;
     private Carrot.Carrot_Box_Btn_Item btn_user_sex_girl;
@@ -105,7 +104,6 @@ public class Setting : MonoBehaviour
             this.app.update_color_select();
         }
 
-        this.limit_chat = PlayerPrefs.GetInt("setting_limit_chat", 3);
         this.voice_speech = PlayerPrefs.GetFloat("setting_voice_speech", 1.2f);
 
         if (PlayerPrefs.GetInt("is_bubble_icon", 1) == 1)
@@ -338,7 +336,6 @@ public class Setting : MonoBehaviour
         item_voice_type.set_tip("Change the voice pronunciation platform");
         item_voice_type.set_lang_data("voice_type", "voice_type_tip");
         item_voice_type.load_lang_data();
-        item_voice_type.set_act(() => act_show_chat_limit());
 
         item_voice_type.dropdown_val.options.Clear();
         item_voice_type.dropdown_val.options.Add(new Dropdown.OptionData("Google voice (Online) + TTS (Offline)"));
@@ -354,21 +351,20 @@ public class Setting : MonoBehaviour
         btn_help_setting_voice_type.set_act(() => this.act_open_setting_voice_type());
         group_chat.add_item(item_voice_type);
 
-        this.item_chat_limit = box_setting.create_item("chat_limit");
-        item_chat_limit.set_icon(this.sp_icon_chat_limit);
-        item_chat_limit.set_title("Chat content limit");
-        item_chat_limit.set_type(Carrot.Box_Item_Type.box_value_txt);
-        item_chat_limit.set_tip("Choose the level of vulgarity and sexuality of the content of the chat with the character");
-        item_chat_limit.set_lang_data("chat_limit", "chat_limit_tip");
-        item_chat_limit.load_lang_data();
-        item_chat_limit.set_val(this.limit_chat.ToString());
-        item_chat_limit.set_act(() => act_show_chat_limit());
+        this.item_voice_test = box_setting.create_item("chat_voice_test");
+        item_voice_test.set_icon(this.sp_icon_chat_voice_test);
+        item_voice_test.set_title("Listen to the audition and pronunciation");
+        item_voice_test.set_type(Carrot.Box_Item_Type.box_nomal);
+        item_voice_test.set_tip("Pronounce an audio clip with the above customizations");
+        item_voice_test.set_lang_data("chat_voice_test", "chat_voice_test_tip");
+        item_voice_test.load_lang_data();
+        item_voice_test.set_act(() => this.play_chat_voice_test());
+        group_chat.add_item(item_voice_test);
 
-        Carrot.Carrot_Box_Btn_Item btn_edit_limit_chat = item_chat_limit.create_item();
-        btn_edit_limit_chat.set_icon(this.app.carrot.user.icon_user_edit);
-        btn_edit_limit_chat.set_color(this.app.carrot.color_highlight);
-        Destroy(btn_edit_limit_chat.GetComponent<Button>());
-        group_chat.add_item(item_chat_limit);
+        Carrot.Carrot_Box_Btn_Item btn_voice_play = item_voice_test.create_item();
+        btn_voice_play.set_icon(this.app.player_music.icon_play);
+        btn_voice_play.set_color(this.app.carrot.color_highlight);
+        Destroy(btn_voice_play.GetComponent<Button>());
 
         Carrot.Carrot_Box_Item item_chat_bubble = box_setting.create_item("chat_bubble");
         item_chat_bubble.set_icon(this.sp_icon_chat_bubble);
@@ -513,6 +509,11 @@ public class Setting : MonoBehaviour
         if(setting_url_sound_test_sex1!="") StartCoroutine(this.get_audio_setting_sex_test(setting_url_sound_test_sex1, 1));
     } 
 
+    private void play_chat_voice_test()
+    {
+        this.app.command.play_text_audio("Hello");
+    }
+
     private void act_close_setting()
     {
         this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
@@ -640,39 +641,6 @@ public class Setting : MonoBehaviour
         if (index_sex == "1") this.btn_user_sex_girl.set_color(this.app.carrot.color_highlight);
     }
 
-    private void act_show_chat_limit()
-    {
-        string s_chat_limit_txt =this.get_label_limit(this.limit_chat);
-        this.box_inp = this.app.carrot.show_input(PlayerPrefs.GetString("chat_limit", "Chat content limit"), s_chat_limit_txt, this.limit_chat.ToString());
-        this.box_inp.set_inp_type(Carrot.Window_Input_value_Type.slider);
-        this.box_inp.inp_slider.wholeNumbers = true;
-        this.box_inp.inp_slider.minValue = 1;
-        this.box_inp.inp_slider.maxValue = 4;
-        this.box_inp.inp_slider.value = this.limit_chat;
-        this.box_inp.inp_slider.onValueChanged.AddListener(act_change_value_limit);
-        this.box_inp.set_act_done(act_done_change_limit_chat);
-    }
-
-    public string get_label_limit(int index_limit)
-    {
-        return PlayerPrefs.GetString("limit_chat_"+index_limit);
-    }
-
-    private void act_change_value_limit(float val_limit)
-    {
-        string s_chat_limit_txt = PlayerPrefs.GetString("limit_chat_" + int.Parse(val_limit.ToString()));
-        this.box_inp.set_tip(s_chat_limit_txt);
-    }
-
-    private void act_done_change_limit_chat(string s_value)
-    {
-        string s_chat_limit_txt = PlayerPrefs.GetString("limit_chat_" + int.Parse(s_value.ToString()));
-        this.limit_chat = int.Parse(s_value);
-        this.item_chat_limit.set_val(s_chat_limit_txt);
-        PlayerPrefs.SetInt("setting_limit_chat", int.Parse(s_value));
-        if (this.box_inp != null) this.box_inp.close();
-    }
-
     public void act_change_status_voice()
     {
         string s_title = PlayerPrefs.GetString("setting_sound", "Chat audio");
@@ -768,11 +736,6 @@ public class Setting : MonoBehaviour
             else
                 this.audio_source_setting.clip = this.audio_voice_sex_test[1];
         }
-    }
-
-    public int get_limit_chat()
-    {
-        return this.limit_chat;
     }
 
     public bool check_buy_product(int index)

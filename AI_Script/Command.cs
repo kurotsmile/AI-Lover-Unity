@@ -713,7 +713,7 @@ public class Command : MonoBehaviour
         this.data_chat_cur["color"] = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f).CTToHexRGBA();
         this.data_chat_cur["status"] = "live";
 
-        if (icons.Count > 0)
+        if (icons!=null)
         {
             int index_icons = Random.Range(0, icons.Count);
             this.data_chat_cur["icon"] = icons[index_icons];

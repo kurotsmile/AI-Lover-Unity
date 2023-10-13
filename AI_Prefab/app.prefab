@@ -33317,7 +33317,7 @@ MonoBehaviour:
   sp_icon_voice_off: {fileID: 21300000, guid: 32a34945df295af40b60a53225d3f617, type: 3}
   sp_icon_voice_speed: {fileID: 21300000, guid: f7f0ce5456867b543b207dbf24857503, type: 3}
   sp_icon_voice_type: {fileID: 21300000, guid: c8d8b5bfc1f37e94482bcbd9cb9223d7, type: 3}
-  sp_icon_chat_limit: {fileID: 21300000, guid: e8ad58c2b3d34414da2eacb868b1aafd, type: 3}
+  sp_icon_chat_voice_test: {fileID: 21300000, guid: 9c704d991d20c8544bbaa2da404dde69, type: 3}
   sp_icon_chat_bubble: {fileID: 21300000, guid: 55ad7dad9660ac44fa499fad45f5ea9f, type: 3}
   sp_icon_shop: {fileID: 21300000, guid: 29a027789c6514b43a98b56884aba825, type: 3}
   sp_icon_shop_mp3: {fileID: 21300000, guid: 2089b6be8a837e745b2dd5282a8cb533, type: 3}
