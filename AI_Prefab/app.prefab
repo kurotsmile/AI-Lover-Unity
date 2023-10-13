@@ -32911,6 +32911,7 @@ MonoBehaviour:
   - {fileID: 2755477472184746837}
   - {fileID: 1716341995180241182}
   - {fileID: 4713522769838140180}
+  - {fileID: 468413741390234815}
   img_change_color:
   - {fileID: 2755477471373691819}
   - {fileID: 2755477472135186013}
@@ -32970,6 +32971,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
+  mode: 0
   inp_command: {fileID: 2755477472397272199}
   prefab_item_command_chat: {fileID: 8507482465009177127, guid: 5d05e22407fb85d4dbb924821b2ec01a, type: 3}
   prefab_item_command_pc: {fileID: 8742407762213273243, guid: 2a5158c959d070b40ab19bb0f3c1a766, type: 3}
