@@ -300,6 +300,7 @@ public class Command : MonoBehaviour
             if (index_func == "9") this.app.player_music.playlist.show_list_radio();
             if (index_func == "10") this.app.carrot.show_rate();
             if (index_func == "11") this.app.carrot.show_share();
+            if (index_func == "12") this.app.carrot.delay_function(3.6f,this.app.exit_app);
         } 
         if (data_chat["icon"]!= null)
         {
