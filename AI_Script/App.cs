@@ -591,8 +591,8 @@ public class App : MonoBehaviour
         }
         this.check_manager_character();
         this.load("");
-        this.GetComponent<Command>().clear_log_chat();
-        this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
+        this.command.clear_log_chat();
+        this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
     }
 
     [ContextMenu("Delete all data app")]
@@ -611,12 +611,6 @@ public class App : MonoBehaviour
     public void play_sound(int index_sound=0)
     {
         if (this.carrot.get_status_sound()) this.audio_sound[index_sound].Play();
-    }
-
-    public void show_chat_log()
-    {
-        this.GetComponent<Command>().panel_show_msg_chat.SetActive(false);
-        this.GetComponent<Command>().panel_show_log_chat.SetActive(true);
     }
 
     public void show_report()
@@ -722,6 +716,7 @@ public class App : MonoBehaviour
         this.play_sound(1);
         this.get_character().get_npc().transform.localPosition = Vector3.zero;
         this.view.mouseOrbit_Improved.Reset_pos();
+        this.command_voice.on_input_mode_chat();
     }
 
     #region Scene Rotation

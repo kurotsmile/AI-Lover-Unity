@@ -22,6 +22,7 @@ public class Command : MonoBehaviour
     public GameObject prefab_item_command_pc;
     public GameObject prefab_effect_icon_chat;
 
+    public GameObject obj_btn_clear_all_log;
     public Transform area_body_log_command;
     public ScrollRect ScrollRect_log_command;
     public AudioSource sound_command; 
@@ -208,20 +209,31 @@ public class Command : MonoBehaviour
         item_command_chat.transform.localPosition = new Vector3(item_command_chat.transform.localPosition.x, item_command_chat.transform.localPosition.y, 0f);
         item_command_chat.transform.localScale = new Vector3(1f, 1f, 1f);
         item_command_chat.transform.localRotation = Quaternion.Euler(Vector3.zero);
-        item_command_chat.GetComponent<Item_command_chat>().txt_chat.text = s_txt_show;
-        item_command_chat.GetComponent<Item_command_chat>().icon.sprite = icon;
-        item_command_chat.GetComponent<Item_command_chat>().is_music = is_music;
-        item_command_chat.GetComponent<Item_command_chat>().btn_add_app.GetComponent<Image>().color=this.GetComponent<App>().carrot.color_highlight;
-        if(i_data_chat!=null) item_command_chat.GetComponent<Item_command_chat>().idata_chat = i_data_chat;
-        if (this.is_test_command)
+
+        Item_command_chat comand_chat = item_command_chat.GetComponent<Item_command_chat>();
+
+        comand_chat.txt_chat.text = s_txt_show;
+        comand_chat.icon.sprite = icon;
+        comand_chat.is_music = is_music;
+        comand_chat.btn_add_app.GetComponent<Image>().color=this.GetComponent<App>().carrot.color_highlight;
+        if (i_data_chat != null)
         {
-            item_command_chat.GetComponent<Item_command_chat>().btn_add_app.SetActive(false);
+            item_command_chat.GetComponent<Item_command_chat>().idata_chat = i_data_chat;
+            if (i_data_chat["status"] != null)
+            {
+                string s_status = i_data_chat["status"].ToString();
+                if (s_status == "live") comand_chat.btn_add_app.SetActive(false);
+                if (s_status == "passed") comand_chat.btn_add_app.SetActive(true);
+                if (s_status == "pending") comand_chat.btn_add_app.SetActive(false);
+                Debug.Log("add_item_pc_chat:"+i_data_chat["status"].ToString());
+            }
         }
         else
         {
-            if(is_music) item_command_chat.GetComponent<Item_command_chat>().btn_add_app.SetActive(false);
+            comand_chat.btn_add_app.SetActive(false);
         }
-        this.GetComponent<App>().set_item_cur_log_chat(item_command_chat.GetComponent<Item_command_chat>());
+
+        this.app.set_item_cur_log_chat(comand_chat);
         this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
         Canvas.ForceUpdateCanvases();
     }
@@ -238,6 +250,7 @@ public class Command : MonoBehaviour
         this.obj_btn_new_chat.SetActive(false);
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
+        this.obj_btn_clear_all_log.SetActive(false);
 
         this.data_chat_cur = data_chat;
         this.app.panel_main.SetActive(true);
@@ -335,12 +348,12 @@ public class Command : MonoBehaviour
 
     public void play_face(int index)
     {
-        this.GetComponent<App>().get_character().play_ani_face(index);
+        this.app.get_character().play_ani_face(index);
     }
 
     private void action_waitting()
     {
-        this.GetComponent<App>().get_character().play_ani_waitting();
+        this.app.get_character().play_ani_waitting();
     }
 
     void Update()
@@ -370,6 +383,7 @@ public class Command : MonoBehaviour
                 this.is_hide_text = false;
                 this.panel_show_msg_chat.SetActive(false);
                 this.panel_show_log_chat.SetActive(true);
+                if(this.area_body_log_command.childCount>0) this.obj_btn_clear_all_log.SetActive(true);
                 this.action_waitting();
             }
         }
@@ -483,7 +497,7 @@ public class Command : MonoBehaviour
     }
 
     public void clear_log_chat(){
-        this.GetComponent<App>().carrot.clear_contain(this.area_body_log_command);
+        this.app.carrot.clear_contain(this.area_body_log_command);
     }
 
     public void show_box_link_share_chat(string s_link_share)
@@ -721,5 +735,20 @@ public class Command : MonoBehaviour
         }
 
         this.act_chat(this.data_chat_cur);
+    }
+
+    public void btn_clear_all_chat_log()
+    {
+        this.app.carrot.play_sound_click();
+        this.clear_log_chat();
+        this.obj_btn_clear_all_log.SetActive(false);
+    }
+
+    public void show_chat_log()
+    {
+        this.app.carrot.play_sound_click();
+        this.app.command.panel_show_msg_chat.SetActive(false);
+        this.app.command.panel_show_log_chat.SetActive(true);
+        this.obj_btn_clear_all_log.SetActive(true);
     }
 }

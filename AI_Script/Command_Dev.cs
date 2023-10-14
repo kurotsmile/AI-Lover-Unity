@@ -16,7 +16,6 @@ public class Command_Dev : MonoBehaviour
     public Sprite sp_icon_chat_pending;
     public GameObject btn_chat_dev;
     public GameObject btn_chat_pass_user;
-    public GameObject btn_chat_live;
 
     private Carrot_Box box;
 
@@ -25,15 +24,9 @@ public class Command_Dev : MonoBehaviour
     public void check()
     {
         if (app.carrot.model_app == ModelApp.Develope)
-        {
             this.btn_chat_dev.SetActive(true);
-            this.btn_chat_live.SetActive(true);
-        }
         else
-        {
             this.btn_chat_dev.SetActive(false);
-            this.btn_chat_live.SetActive(false);
-        }
 
         if (app.carrot.user.get_id_user_login() != "")
             this.btn_chat_pass_user.SetActive(true);
