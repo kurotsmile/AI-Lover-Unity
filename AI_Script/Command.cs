@@ -225,7 +225,6 @@ public class Command : MonoBehaviour
                 if (s_status == "live") comand_chat.btn_add_app.SetActive(false);
                 if (s_status == "passed") comand_chat.btn_add_app.SetActive(true);
                 if (s_status == "pending") comand_chat.btn_add_app.SetActive(false);
-                Debug.Log("add_item_pc_chat:"+i_data_chat["status"].ToString());
             }
         }
         else

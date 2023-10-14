@@ -1248,7 +1248,6 @@ public class Command_storage : MonoBehaviour
                 this.add_command_offline(s_data_chat_new);
             }
 
-
             if (this.box_list != null) this.box_list.close();
             if (this.box_add_chat != null) this.box_add_chat.close();
 

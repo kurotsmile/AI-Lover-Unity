@@ -1,7 +1,5 @@
 using Carrot;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class Setting : MonoBehaviour
@@ -41,8 +39,6 @@ public class Setting : MonoBehaviour
     public Sprite sp_icon_off;
     public Sprite sp_icon_ads;
     public Sprite sp_icon_buy;
-
-    public AudioSource audio_source_setting;
 
     private string s_user_name;
     private string s_weather_pin;
@@ -502,16 +498,11 @@ public class Setting : MonoBehaviour
         group_sys.add_item(box_setting.area_all_item.GetChild(5).GetComponent<Carrot.Carrot_Box_Item>());
 
         this.box_setting.update_color_table_row();
-
-        string setting_url_sound_test_sex0 = PlayerPrefs.GetString("setting_url_sound_test_sex0");
-        string setting_url_sound_test_sex1 = PlayerPrefs.GetString("setting_url_sound_test_sex1");
-        if(setting_url_sound_test_sex0!="") StartCoroutine(this.get_audio_setting_sex_test(setting_url_sound_test_sex0, 0));
-        if(setting_url_sound_test_sex1!="") StartCoroutine(this.get_audio_setting_sex_test(setting_url_sound_test_sex1, 1));
     } 
 
     private void play_chat_voice_test()
     {
-        this.app.command.play_text_audio("Hello");
+        this.app.command.play_text_audio(PlayerPrefs.GetString("chat_voice_test_text", "Here is the sample voice you installed and customized!"));
     }
 
     private void act_close_setting()
@@ -619,16 +610,8 @@ public class Setting : MonoBehaviour
         this.item_name_npc.set_val(s_name_char);
         this.btn_character_sex_boy.set_color(Color.grey);
         this.btn_character_sex_girl.set_color(Color.grey);
-        if (s_index_sex == "0")
-        {
-            this.btn_character_sex_boy.set_color(this.app.carrot.color_highlight);
-            this.audio_source_setting.clip = this.audio_voice_sex_test[1];
-        }
-
-        if (s_index_sex == "1") {
-            this.btn_character_sex_girl.set_color(this.app.carrot.color_highlight);
-            this.audio_source_setting.clip = this.audio_voice_sex_test[0];
-        }
+        if (s_index_sex == "0") this.btn_character_sex_boy.set_color(this.app.carrot.color_highlight);
+        if (s_index_sex == "1") this.btn_character_sex_girl.set_color(this.app.carrot.color_highlight);
     }
 
     private void act_change_user_sex(string index_sex)
@@ -677,8 +660,6 @@ public class Setting : MonoBehaviour
 
     private void act_change_value_slider_voice_speed(float speed_voice)
     {
-        this.audio_source_setting.pitch = speed_voice;
-        this.audio_source_setting.Play();
         this.box_inp.set_tip(speed_voice.ToString() + "/s");
     }
 
@@ -718,23 +699,6 @@ public class Setting : MonoBehaviour
             this.app.carrot.show_msg("Watch ads to receive rewards", "Get Success Rewards!", Carrot.Msg_Icon.Success);
             this.GetComponent<Command_storage>().download_command_shop();
             this.is_ads_rewarded_data = false;
-        }
-    }
-
-    IEnumerator get_audio_setting_sex_test(string s_url_audio, int index)
-    {
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG))
-        {
-            yield return www.SendWebRequest();
-            if (www.result != UnityWebRequest.Result.Success)
-                Debug.Log(www.error);
-            else
-                this.audio_voice_sex_test[index] = DownloadHandlerAudioClip.GetContent(www);
-
-            if (this.character_sex == "1")
-                this.audio_source_setting.clip = this.audio_voice_sex_test[0];
-            else
-                this.audio_source_setting.clip = this.audio_voice_sex_test[1];
         }
     }
 
