@@ -232,15 +232,19 @@ public class Player_music : MonoBehaviour
             {
                 string id_index = data_music["index_del"].ToString();
 
-                Byte[] data_song = this.app.carrot.get_tool().get_data_to_playerPrefs("music_" + id_index + "_mp3");
+                byte[] data_song = this.app.carrot.get_tool().get_data_to_playerPrefs("music_" + id_index + "_mp3");
 
+                /*
                 var memStream = new System.IO.MemoryStream(data_song);
                 var mpgFile = new Crosstales.NLayer.MpegFile(memStream);
                 var samples = new float[mpgFile.Length];
                 mpgFile.ReadSamples(samples, 0, (int)mpgFile.Length);
-
-                var clip = AudioClip.Create("music_song", samples.Length, mpgFile.Channels, mpgFile.SampleRate, false);
+                
+                var clip = AudioClip.Create("music_song", samples.Length, mpgFile.Channels, mpgFile.SampleRate,false);
                 clip.SetData(samples, 0);
+                */
+
+                AudioClip clip = Crosstales.Common.Audio.WavMaster.ToAudioClip(data_song);
                 this.slider_timer_music.maxValue = clip.length;
                 this.sound_music.clip = clip;
                 this.sound_music.Play();
@@ -250,6 +254,7 @@ public class Player_music : MonoBehaviour
                     this.panel_player_mini.SetActive(false);
                 else
                     this.panel_player_mini.SetActive(true);
+
             }
             else
             {
@@ -260,8 +265,6 @@ public class Player_music : MonoBehaviour
             }
             this.check_icon_play_pause();
         }
-
-        
         this.check_hide_btn_prev();
     }
 
@@ -529,7 +532,7 @@ public class Player_music : MonoBehaviour
     public void add_song_to_playlist()
     {
         this.button_add_playlist.SetActive(false);
-        this.playlist.add_song(this.id_music,this.data_song,this.data_mp3,this.data_avatar);
+        this.playlist.add_song(this.id_music,this.data_song,Crosstales.Common.Audio.WavMaster.FromAudioClip(this.sound_music.clip), this.data_avatar);
     }
 
     public Sprite get_avatar_music(string s_id_m)

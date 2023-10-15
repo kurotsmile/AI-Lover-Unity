@@ -126,6 +126,7 @@ public class App : MonoBehaviour
         this.carrot.shop.onCarrotRestoreSuccess += this.onRestoreSuccessCarrotPay;
         this.carrot.ads.onRewardedSuccess += this.setting.act_ads_rewarded_success;
         this.carrot.act_after_delete_all_data = this.delete_all_data;
+        this.carrot.act_after_close_all_box += this.close_all_box;
 
         this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().check_show_emp_by_resolution();
         this.act_change_Scene_Rotation();
@@ -140,6 +141,11 @@ public class App : MonoBehaviour
         this.command_storage.check_load_command_storage();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
         this.command_dev.check();
+    }
+
+    private void close_all_box()
+    {
+        this.command_dev.close_all_box();;
     }
 
     public void load_app_where_online()

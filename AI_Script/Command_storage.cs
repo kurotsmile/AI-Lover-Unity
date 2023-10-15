@@ -117,7 +117,6 @@ public class Command_storage : MonoBehaviour
     public Sprite icon_command_pass;
     public Sprite sp_icon_translation;
 
-    private Carrot.Carrot_Box box_list;
     private Carrot.Carrot_Box box_list_icon;
     private Carrot.Carrot_Box box_list_icon_category;
     private Carrot.Carrot_Box box_add_chat;
@@ -142,6 +141,8 @@ public class Command_storage : MonoBehaviour
     private QuerySnapshot IconQuerySnapshot;
     private QuerySnapshot IconCategoryQuerySnapshot=null;
     private List<string> list_icon_name;
+
+    private Carrot_Box box_parameter_tag;
 
     public void check_load_command_storage()
     {
@@ -594,40 +595,44 @@ public class Command_storage : MonoBehaviour
         string s_title=PlayerPrefs.GetString("brain_list", "List command");
         this.app.carrot.show_msg(s_title, "Delete all command success!!!");
         this.check_load_command_storage();
-        if (this.box_list != null) this.box_list.close();
     }
 
     public void show_list_cm(string s_type)
     {
         this.s_type_view_list = s_type;
 
-        if (this.box_list != null) this.box_list.close();
+        Carrot_Box box;
         if (s_type == "0")
-            this.box_list = this.GetComponent<App>().carrot.Create_Box(PlayerPrefs.GetString("brain_list", "List command"), this.icon_list_command);
+        {
+            box = this.app.command_dev.box_list(this.get_list_all_cm());
+            if (box == null) return;
+            box.set_icon(this.icon_list_command);
+            box.set_title(PlayerPrefs.GetString("brain_list", "List command"));
+        }
         else
-            this.box_list = this.GetComponent<App>().carrot.Create_Box(PlayerPrefs.GetString("brain_list_buy", "Purchase command"), this.sp_icon_command_purchased);
+        {
+            box = this.app.command_dev.box_list(this.get_list_buy_cm());
+            if (box == null) return;
+            box.set_icon(this.sp_icon_command_purchased);
+            box.set_title(PlayerPrefs.GetString("brain_list_buy", "Purchase command"));
+        }
 
-        Carrot.Carrot_Box_Btn_Item btn_command_teach = this.box_list.create_btn_menu_header(this.sp_icon_command_teach);
+        Carrot.Carrot_Box_Btn_Item btn_command_teach = box.create_btn_menu_header(this.sp_icon_command_teach);
         btn_command_teach.set_act(() => this.show_list_cm("0"));
-        if(s_type!="0") btn_command_teach.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        if (s_type != "0") btn_command_teach.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
 
-        Carrot.Carrot_Box_Btn_Item btn_command_purchased = this.box_list.create_btn_menu_header(this.sp_icon_command_purchased);
+        Carrot.Carrot_Box_Btn_Item btn_command_purchased = box.create_btn_menu_header(this.sp_icon_command_purchased);
         btn_command_purchased.set_act(() => this.show_list_cm("1"));
-        if(s_type != "1")  btn_command_purchased.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        if (s_type != "1") btn_command_purchased.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
 
-        Carrot.Carrot_Box_Btn_Item btn_del_all = this.box_list.create_btn_menu_header(this.GetComponent<App>().carrot.sp_icon_del_data);
+        Carrot.Carrot_Box_Btn_Item btn_del_all = box.create_btn_menu_header(this.GetComponent<App>().carrot.sp_icon_del_data);
         btn_del_all.set_act(() => this.delete_all_cm());
         btn_del_all.set_icon_color(Color.red);
-
-        if(s_type=="0")
-            this.table_box_tata(this.get_list_all_cm());
-        else
-            this.table_box_tata(this.get_list_buy_cm());
     }
 
-    private IList get_list_all_cm()
+    private List<IDictionary> get_list_all_cm()
     {
-        IList list_cm = (IList)Json.Deserialize("[]");
+        List<IDictionary> list_cm = new List<IDictionary>();
         for (int i = this.length; i >= 0; i--)
         {
             string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
@@ -640,9 +645,9 @@ public class Command_storage : MonoBehaviour
         return list_cm;
     }
 
-    private IList get_list_buy_cm()
+    private List<IDictionary> get_list_buy_cm()
     {
-        IList list_cm = (IList)Json.Deserialize("[]");
+        List<IDictionary> list_cm = new List<IDictionary>();
         for (int i = this.length; i >= 0; i--)
         {
             string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
@@ -659,96 +664,6 @@ public class Command_storage : MonoBehaviour
             }
         }
         return list_cm;
-    }
-
-
-    private void table_box_tata(IList list_data)
-    {
-        if (list_data.Count == 0)
-        {
-            if (this.box_list != null) this.box_list.close();
-            this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
-            return;
-        }
-
-        for (int i = list_data.Count-1; i >= 0; i--)
-        {
-            IDictionary data_chat = (IDictionary)list_data[i];
-            Carrot.Carrot_Box_Item item_cm = this.box_list.create_item("cm_item_" + i);
-            item_cm.set_title(data_chat["key"].ToString());
-
-            item_cm.set_tip(data_chat["msg"].ToString());
-            item_cm.set_icon(this.sp_icon_msg);
-            item_cm.set_title(data_chat["key"].ToString());
-
-            int index_cm = i;
-            string s_status = "";
-
-            if (data_chat["index_cm"] != null)
-            {
-                if (data_chat["index_cm"].ToString() != "")
-                {
-                    index_cm = int.Parse(data_chat["index_cm"].ToString());
-                    item_cm.set_act(() => this.show_edit_command(index_cm));
-                }
-            }
-
-            if (data_chat["status"] != null)
-            {
-                s_status = data_chat["status"].ToString();
-                if (s_status == "passed")
-                {
-                    item_cm.img_icon.color = this.app.carrot.color_highlight;
-                }
-                else if (s_status == "buy")
-                {
-                    item_cm.img_icon.sprite = this.sp_icon_command_purchased;
-                    item_cm.img_icon.color = this.app.carrot.color_highlight;
-                }
-                else
-                {
-                    item_cm.img_icon.color = Color.black;
-                }
-            }
-
-            Carrot.Carrot_Box_Btn_Item btn_add = item_cm.create_item();
-            btn_add.set_color(this.GetComponent<App>().carrot.color_highlight);
-            btn_add.set_icon(this.sp_icon_patert);
-            btn_add.set_act(() => this.show_add_command_with_pater(data_chat["msg"].ToString(), data_chat["id"].ToString()));
-
-            Carrot.Carrot_Box_Btn_Item btn_test = item_cm.create_item();
-            btn_test.set_color(this.GetComponent<App>().carrot.color_highlight);
-            btn_test.set_icon(this.GetComponent<App>().carrot.game.icon_play_music_game);
-            btn_test.set_act(() => this.play_test_command(index_cm));
-
-            if (data_chat["pater"] != null)
-            {
-                if (data_chat["pater"].ToString() != "")
-                {
-                    string s_id_chat_father = data_chat["pater"].ToString();
-                    Carrot_Box_Btn_Item btn_father = item_cm.create_item();
-                    btn_father.set_color(this.app.carrot.color_highlight);
-                    btn_father.set_icon(this.sp_icon_father);
-                    btn_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
-                }
-            }
-
-            Carrot.Carrot_Box_Btn_Item btn_del = item_cm.create_item();
-            btn_del.set_color(this.GetComponent<App>().carrot.color_highlight);
-            btn_del.set_icon(this.sp_icon_delete);
-            btn_del.set_act(() => this.delete_cm(index_cm));
-
-            if (s_status == "passed")
-            {
-                if (this.app.carrot.model_app == ModelApp.Develope)
-                {
-                    Carrot_Box_Btn_Item btn_del_dev = item_cm.create_item();
-                    btn_del_dev.set_icon(this.app.carrot.sp_icon_del_data);
-                    btn_del_dev.set_color(Color.red);
-                    btn_del_dev.set_act(() => this.app.command_dev.delete(data_chat["id"].ToString(), item_cm.gameObject));
-                }
-            }
-        }
     }
 
     public void delete_cm(int index)
@@ -941,8 +856,7 @@ public class Command_storage : MonoBehaviour
             return;
         }
 
-        if (this.box_list != null) this.box_list.close();
-        if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
+        this.app.command_dev.set_all_box_active(false);
 
         this.box_add_chat.gameObject.SetActive(false);
         this.is_list_command_test_play = false;
@@ -956,8 +870,7 @@ public class Command_storage : MonoBehaviour
     public void play_one_test_command(IDictionary data_chat)
     {
         this.data_chat_test = data_chat;
-        if (this.box_list != null) this.box_list.close();
-        if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
+        this.app.command_dev.set_all_box_active(false);
 
         this.is_list_command_test_play = false;
         this.obj_button_next_command_test.SetActive(false);
@@ -968,7 +881,7 @@ public class Command_storage : MonoBehaviour
     public void btn_close_test_command()
     {
         if (this.box_add_chat != null) this.box_add_chat.gameObject.SetActive(true);
-        if (this.box_list != null) this.box_list.gameObject.SetActive(true);
+        this.app.command_dev.set_all_box_active(true);
 
         this.GetComponent<App>().panel_inp_command_test.SetActive(false);
         this.GetComponent<App>().panel_inp_func.SetActive(false);
@@ -998,7 +911,6 @@ public class Command_storage : MonoBehaviour
 
     public void play_test_command(int index_comand)
     {
-        if (this.box_list != null) this.box_list.close();
         this.obj_button_next_command_test.SetActive(true);
         this.obj_button_prev_command_test.SetActive(true);
         this.is_list_command_test_play = true;
@@ -1009,14 +921,14 @@ public class Command_storage : MonoBehaviour
 
     private void act_test_command(IDictionary data_chat)
     {
-        this.GetComponent<App>().panel_main.SetActive(true);
-        this.GetComponent<App>().panel_inp_command_test.SetActive(true);
-        this.GetComponent<App>().panel_inp_func.SetActive(false);
-        this.GetComponent<App>().panel_inp_msg.SetActive(false);
-        this.GetComponent<App>().panel_chat_func.SetActive(false);
-        this.GetComponent<App>().panel_chat_msg.SetActive(true);
-        if(this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.GetComponent<App>().panel_menu_right.SetActive(false);
-        this.GetComponent<Command>().act_chat(data_chat, true);
+        this.app.panel_main.SetActive(true);
+        this.app.panel_inp_command_test.SetActive(true);
+        this.app.panel_inp_func.SetActive(false);
+        this.app.panel_inp_msg.SetActive(false);
+        this.app.panel_chat_func.SetActive(false);
+        this.app.panel_chat_msg.SetActive(true);
+        if(this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.app.panel_menu_right.SetActive(false);
+        this.app.command.act_chat(data_chat, true);
     }
 
     public void btn_play_next_command_test()
@@ -1055,7 +967,7 @@ public class Command_storage : MonoBehaviour
     {
         this.is_cm_mode_nomal = true;
         this.btn_model_advanced.set_icon_color(Color.black);
-        this.btn_model_nomal.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        this.btn_model_nomal.set_icon_color(this.app.carrot.color_highlight);
         PlayerPrefs.SetInt("is_cm_mode_nomal", 0);
         this.item_icon.gameObject.SetActive(false);
         this.item_run_cmd.gameObject.SetActive(false);
@@ -1066,7 +978,7 @@ public class Command_storage : MonoBehaviour
     private void act_box_add_model_advanced()
     {
         this.is_cm_mode_nomal = false;
-        this.btn_model_advanced.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
+        this.btn_model_advanced.set_icon_color(this.app.carrot.color_highlight);
         this.btn_model_nomal.set_icon_color(Color.black);
         PlayerPrefs.SetInt("is_cm_mode_nomal",1);
         this.item_icon.gameObject.SetActive(true);
@@ -1081,11 +993,7 @@ public class Command_storage : MonoBehaviour
         this.s_color = "";
         this.s_pater_id = "";
         this.s_pater_msg = "";
-        this.GetComponent<App>().show_func_function();
-        if (this.box_list != null)
-        {
-            if (this.box_list.gameObject.activeInHierarchy) return;
-        }
+        this.app.show_func_function();
     }
 
     private void get_list_key_block()
@@ -1238,7 +1146,7 @@ public class Command_storage : MonoBehaviour
                         chatRef.SetAsync(c);
                     }
 
-                    if (this.app.command_dev.get_box_list() != null) this.app.command_dev.get_box_list().close();
+                    this.app.command_dev.close_all_box();
                 }
             }
             else
@@ -1248,13 +1156,12 @@ public class Command_storage : MonoBehaviour
                 this.add_command_offline(s_data_chat_new);
             }
 
-            if (this.box_list != null) this.box_list.close();
             if (this.box_add_chat != null) this.box_add_chat.close();
 
             if(this.app.carrot.model_app==ModelApp.Publish)
-                this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("brain_add_success", "Your chat has been published successfully!"));
+                this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("brain_add_success", "Your chat has been published successfully!"));
             else
-                this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "The chat has been published successfully! (Dev)");
+                this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "The chat has been published successfully! (Dev)");
         }
 
         if (this.type_act == Command_Type_Act.edit_command)
@@ -1263,7 +1170,6 @@ public class Command_storage : MonoBehaviour
             string s_chat_data = JsonConvert.SerializeObject(c);
             PlayerPrefs.SetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_cm_update, s_chat_data);
             this.app.carrot.hide_loading();
-            if (this.box_list != null) this.box_list.close();
             if (this.box_add_chat != null) this.box_add_chat.close();
             this.show_list_cm(this.s_type_view_list);
         }
@@ -1282,19 +1188,19 @@ public class Command_storage : MonoBehaviour
     {
         string s_val= this.item_msg.get_val() + " " + s_tag + " ";
         this.item_msg.set_val(s_val);
-        if (this.box_list != null) this.box_list.close();
+        if (this.box_parameter_tag != null) this.box_parameter_tag.close();
     }
 
     public void show_list_parameter_tag()
     {
-        this.box_list=this.GetComponent<App>().carrot.Create_Box("list_tag");
-        this.box_list.set_title("Parameter Tag");
-        this.box_list.set_icon(this.sp_icon_parameter_tag);
+        this.box_parameter_tag=this.app.carrot.Create_Box("list_tag");
+        this.box_parameter_tag.set_title("Parameter Tag");
+        this.box_parameter_tag.set_icon(this.sp_icon_parameter_tag);
 
         for(int i = 0; i < this.list_parameter_tag_name.Length; i++)
         {
             var s_tag = this.list_parameter_tag_name[i];
-            Carrot.Carrot_Box_Item item_tag=this.box_list.create_item("item_tag_" + i);
+            Carrot.Carrot_Box_Item item_tag=this.box_parameter_tag.create_item("item_tag_" + i);
             item_tag.set_icon(this.sp_icon_parameter_tag);
             item_tag.set_title(this.list_parameter_tag_name[i]);
             item_tag.set_tip(this.list_parameter_tag_val[i]);
