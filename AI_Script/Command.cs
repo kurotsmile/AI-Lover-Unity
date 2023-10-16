@@ -719,7 +719,7 @@ public class Command : MonoBehaviour
 
     private void send_live(string s_key)
     {
-        List<string> icons = this.app.command_storage.get_list_icon_name();
+        List<string> icons = this.app.icon.get_list_icon_name();
         this.data_chat_cur = (IDictionary)Json.Deserialize("{}");
         this.data_chat_cur["key"] = s_key;
         this.data_chat_cur["msg"] = s_key;

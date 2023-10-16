@@ -18,6 +18,7 @@ public class App : MonoBehaviour
     public Command command;
     public Voice_Command command_voice;
     public TextToSpeech textToSpeech;
+    public Icon icon;
 
     [Header("App obj")]
     public bool is_radio_func = true;
