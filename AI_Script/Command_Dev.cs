@@ -269,7 +269,7 @@ public class Command_Dev : MonoBehaviour
         return box;
     }
 
-    private void sub_menu(IDictionary data,GameObject obj_focus=null)
+    public void sub_menu(IDictionary data,GameObject obj_focus=null)
     {
         Carrot_Box box_sub_menu = this.app.carrot.Create_Box("sub_menu");
         box_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
