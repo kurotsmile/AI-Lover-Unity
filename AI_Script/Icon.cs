@@ -20,6 +20,12 @@ public class Icon : MonoBehaviour
     private Carrot.Carrot_Box box_list_icon_category;
 
     private Carrot_Box_Item item_icon = null;
+    private string s_data_cache = "";
+
+    public void load()
+    {
+        this.s_data_cache=PlayerPrefs.GetString("s_data_icon_temp");
+    }
 
     private void list_category_icon()
     {
@@ -101,8 +107,7 @@ public class Icon : MonoBehaviour
         {
             Query IconQuery = this.app.carrot.db.Collection("icon");
             IconQuery = IconQuery.Limit(50);
-            IconQuery.GetSnapshotAsync().ContinueWithOnMainThread(task =>
-            {
+            IconQuery.GetSnapshotAsync().ContinueWithOnMainThread(task =>{
                 this.IconQuerySnapshot = task.Result;
                 this.act_load_icon_and_emoji(this.IconQuerySnapshot);
             });

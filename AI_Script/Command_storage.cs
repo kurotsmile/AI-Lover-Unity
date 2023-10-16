@@ -661,11 +661,14 @@ public class Command_storage : MonoBehaviour
         return list_cm;
     }
 
-    public void delete_cm(int index)
+    public void delete_cm(int index,GameObject obj_item)
     {
         this.act_delete_cm(index);
-        this.check_load_command_storage();
-        this.show_list_cm(this.s_type_view_list);
+        if (obj_item != null)
+        {
+            Destroy(obj_item.gameObject);
+            this.app.command_dev.close_box_last();
+        }
     }
 
     private void act_delete_cm(int index)
@@ -770,6 +773,7 @@ public class Command_storage : MonoBehaviour
 
     public void play_test_command(int index_comand)
     {
+        this.app.command_dev.set_all_box_active(false);
         this.obj_button_next_command_test.SetActive(true);
         this.obj_button_prev_command_test.SetActive(true);
         this.is_list_command_test_play = true;
@@ -864,11 +868,9 @@ public class Command_storage : MonoBehaviour
             {
                 if (task.IsCompleted)
                 {
-                    
                     DocumentSnapshot collectionSnapshot = task.Result;
                     IDictionary key_block = collectionSnapshot.ToDictionary();
                     this.list_key_block = (IList)key_block["chat"];
-                    Debug.Log("Key block:" + this.list_key_block.Count);
                 }
             });
         }
@@ -973,16 +975,8 @@ public class Command_storage : MonoBehaviour
                     c.id = s_id_chat_new;
                     IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
                     chatRef.SetAsync(c).ContinueWithOnMainThread(task => {
-
-                        if (task.IsFaulted)
-                        {
-                            this.add_command_offline(chat_data);
-                        }
-
-                        if (task.IsCompleted)
-                        {
-                            this.add_command_offline(chat_data);
-                        }
+                        if (task.IsFaulted) this.add_command_offline(chat_data);
+                        if (task.IsCompleted) this.add_command_offline(chat_data);
                     });
 
                 }
@@ -1052,7 +1046,7 @@ public class Command_storage : MonoBehaviour
 
     public void show_list_parameter_tag()
     {
-        this.box_parameter_tag=this.app.carrot.Create_Box("list_tag");
+        this.box_parameter_tag=this.app.carrot.Create_Box("list_tag");   
         this.box_parameter_tag.set_title("Parameter Tag");
         this.box_parameter_tag.set_icon(this.sp_icon_parameter_tag);
 

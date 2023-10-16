@@ -70,7 +70,11 @@ public class Command_Dev : MonoBehaviour
         DocumentReference chatRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).Document(s_id_chat);
         chatRef.DeleteAsync();
         this.app.carrot.show_msg("Chat", "Delete Success", Msg_Icon.Success);
-        if(obj_item_chat!=null) Destroy(obj_item_chat);
+        if (obj_item_chat != null)
+        {
+            Destroy(obj_item_chat);
+            this.close_box_last();
+        }
     }
 
     public void show_chat_key_same(string s_key_chat)
@@ -233,11 +237,6 @@ public class Command_Dev : MonoBehaviour
                 }
             }
 
-            Carrot.Carrot_Box_Btn_Item btn_play = item_chat.create_item();
-            btn_play.set_icon(this.app.carrot.game.icon_play_music_game);
-            btn_play.set_color(this.app.carrot.color_highlight);
-            btn_play.set_act(() => this.app.command_storage.play_one_test_command(c));
-
             Carrot.Carrot_Box_Btn_Item btn_add = item_chat.create_item();
             btn_add.set_color(this.app.carrot.color_highlight);
             btn_add.set_icon(this.app.command_storage.sp_icon_patert);
@@ -259,26 +258,18 @@ public class Command_Dev : MonoBehaviour
                 btn_same.set_color(this.app.carrot.color_highlight);
                 btn_same.set_act(() => show_chat_key_same(key_chat));
 
-                if(s_status== "passed"||s_status=="pending")
-                {
-                    Carrot_Box_Btn_Item btn_del = item_chat.create_item();
-                    btn_del.set_icon(this.app.carrot.sp_icon_del_data);
-                    btn_del.set_color(Color.red);
-                    btn_del.set_act(() => this.delete(id_chat, item_chat.gameObject));
-                }
-
                 item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
             }
 
             Carrot_Box_Btn_Item btn_sub_menu = item_chat.create_item();
             btn_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
             btn_sub_menu.set_color(this.app.carrot.color_highlight);
-            btn_sub_menu.set_act(() => this.sub_menu(c));
+            btn_sub_menu.set_act(() => this.sub_menu(c,item_chat.gameObject));
         }
         return box;
     }
 
-    private void sub_menu(IDictionary data)
+    private void sub_menu(IDictionary data,GameObject obj_focus=null)
     {
         Carrot_Box box_sub_menu = this.app.carrot.Create_Box("sub_menu");
         box_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
@@ -290,6 +281,12 @@ public class Command_Dev : MonoBehaviour
         item_info.set_title("Info");
         item_info.set_tip("View Info");
         item_info.set_act(() => this.app.command.box_info_chat(data));
+
+        Carrot_Box_Item item_add = box_sub_menu.create_item();
+        item_add.set_icon(this.app.command_storage.sp_icon_patert);
+        item_add.set_title(PlayerPrefs.GetString("brain_add", "Create a new command"));
+        item_add.set_tip("Create a conversation with content that continues this conversation");
+        item_add.set_act(() => this.app.command_storage.show_add_command_with_pater(data["msg"].ToString(), data["id"].ToString()));
 
         Carrot_Box_Item item_play=box_sub_menu.create_item();
         item_play.set_icon(this.app.carrot.game.icon_play_music_game);
@@ -304,7 +301,7 @@ public class Command_Dev : MonoBehaviour
                 int index_cm = int.Parse(data["index_cm"].ToString());
 
                 Carrot_Box_Item item_play_list = box_sub_menu.create_item();
-                item_play_list.set_icon(this.app.command_storage.sp_icon_run);
+                item_play_list.set_icon(this.app.player_music.icon_play);
                 item_play_list.set_title("List Test");
                 item_play_list.set_tip("Test preview of all chat");
                 item_play_list.set_act(() => this.app.command_storage.play_test_command(index_cm));
@@ -313,7 +310,7 @@ public class Command_Dev : MonoBehaviour
                 item_del_offline.set_icon(this.app.command_storage.sp_icon_delete);
                 item_del_offline.set_title("Delete (Offline)");
                 item_del_offline.set_tip("Delete chat offline");
-                item_del_offline.set_act(() => this.app.command_storage.delete_cm(index_cm));
+                item_del_offline.set_act(() => this.app.command_storage.delete_cm(index_cm, obj_focus));
             }
         }
 
@@ -324,7 +321,13 @@ public class Command_Dev : MonoBehaviour
             item_del.img_icon.color = Color.red;
             item_del.set_title("Delete (Dev)");
             item_del.set_tip("Delete chat on server");
-            item_del.set_act(() => this.delete(data["id"].ToString()));
+            item_del.set_act(() => this.delete(data["id"].ToString(), obj_focus));
         }
+    }
+
+    public void close_box_last()
+    {
+        int index_last = this.list_obj_box.Count - 1;
+        if (this.list_obj_box[index_last] != null) this.list_obj_box[index_last].GetComponent<Carrot_Box>().close();
     }
 }

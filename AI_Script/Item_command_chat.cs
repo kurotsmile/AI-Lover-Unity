@@ -20,11 +20,6 @@ public class Item_command_chat : MonoBehaviour
         if (this.url_edit != "") Application.OpenURL(this.url_edit);
     }
 
-    public void delete()
-    {
-        GameObject.Find("app").GetComponent<Command_storage>().delete_cm(this.index);
-    }
-
     public void show_edit_cm()
     {
         GameObject.Find("app").GetComponent<Command_storage>().show_edit_command(this.index);
