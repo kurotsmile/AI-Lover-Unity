@@ -65,7 +65,7 @@ public class Command_Dev : MonoBehaviour
         });
     }
 
-    public void delete(string s_id_chat,GameObject obj_item_chat)
+    public void delete(string s_id_chat,GameObject obj_item_chat=null)
     {
         DocumentReference chatRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).Document(s_id_chat);
         chatRef.DeleteAsync();
@@ -243,18 +243,12 @@ public class Command_Dev : MonoBehaviour
             btn_add.set_icon(this.app.command_storage.sp_icon_patert);
             btn_add.set_act(() => this.app.command_storage.show_add_command_with_pater(c["msg"].ToString(), c["id"].ToString()));
 
-            int index_cm = i;
             if (c["index_cm"] != null)
             {
                 if (c["index_cm"].ToString() != "")
                 {
-                    index_cm = int.Parse(c["index_cm"].ToString());
+                    int index_cm = int.Parse(c["index_cm"].ToString());
                     item_chat.set_act(() => this.app.command_storage.show_edit_command(index_cm));
-
-                    Carrot_Box_Btn_Item btn_del_offline = item_chat.create_item();
-                    btn_del_offline.set_icon(this.app.command_storage.sp_icon_delete);
-                    btn_del_offline.set_color(this.app.carrot.color_highlight);
-                    btn_del_offline.set_act(() => this.delete(id_chat, item_chat.gameObject));
                 }
             }
 
@@ -265,17 +259,59 @@ public class Command_Dev : MonoBehaviour
                 btn_same.set_color(this.app.carrot.color_highlight);
                 btn_same.set_act(() => show_chat_key_same(key_chat));
 
-                if(s_status== "passed")
+                if(s_status== "passed"||s_status=="pending")
                 {
                     Carrot_Box_Btn_Item btn_del = item_chat.create_item();
                     btn_del.set_icon(this.app.carrot.sp_icon_del_data);
                     btn_del.set_color(Color.red);
                     btn_del.set_act(() => this.delete(id_chat, item_chat.gameObject));
                 }
+
                 item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
+            }
+
+            Carrot_Box_Btn_Item btn_sub_menu = item_chat.create_item();
+            btn_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
+            btn_sub_menu.set_color(this.app.carrot.color_highlight);
+            btn_sub_menu.set_act(() => this.sub_menu(c));
+        }
+        return box;
+    }
+
+    private void sub_menu(IDictionary data)
+    {
+        Carrot_Box box_sub_menu = this.app.carrot.Create_Box("sub_menu");
+        box_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
+        box_sub_menu.set_title(data["key"].ToString());
+        this.list_obj_box.Add(box_sub_menu.gameObject);
+
+        Carrot_Box_Item item_info = box_sub_menu.create_item();
+        item_info.set_icon(this.app.command.icon_info_chat);
+        item_info.set_title("Info");
+        item_info.set_tip("View Info");
+        item_info.set_act(() => this.app.command.box_info_chat(data));
+
+        if (data["index_cm"] != null)
+        {
+            if (data["index_cm"].ToString() != "")
+            {
+                int index_cm = int.Parse(data["index_cm"].ToString());
+                Carrot_Box_Item item_del_offline = box_sub_menu.create_item();
+                item_del_offline.set_icon(this.app.command_storage.sp_icon_delete);
+                item_del_offline.set_title("Delete (Offline)");
+                item_del_offline.set_tip("Delete chat offline");
+                item_del_offline.set_act(() => this.app.command_storage.delete_cm(index_cm));
             }
         }
 
-        return box;
+        if (this.app.carrot.model_app == ModelApp.Develope)
+        {
+            Carrot_Box_Item item_del = box_sub_menu.create_item();
+            item_del.set_icon(this.app.carrot.sp_icon_del_data);
+            item_del.img_icon.color = Color.red;
+            item_del.set_title("Delete (Dev)");
+            item_del.set_tip("Delete chat on server");
+            item_del.set_act(() => this.delete(data["id"].ToString()));
+        }
     }
 }

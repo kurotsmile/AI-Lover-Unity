@@ -562,7 +562,7 @@ public class Command : MonoBehaviour
         }
     }
 
-    private void box_info_chat(IDictionary data_chat)
+    public void box_info_chat(IDictionary data_chat)
     {
         if (this.box_list != null) this.box_list.close();
         this.box_list = this.app.carrot.Create_Box("info_chat");
