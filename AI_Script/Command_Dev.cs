@@ -282,7 +282,7 @@ public class Command_Dev : MonoBehaviour
     {
         Carrot_Box box_sub_menu = this.app.carrot.Create_Box("sub_menu");
         box_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
-        box_sub_menu.set_title(data["key"].ToString());
+        if (data["key"]!=null) box_sub_menu.set_title(data["key"].ToString());
         this.list_obj_box.Add(box_sub_menu.gameObject);
 
         Carrot_Box_Item item_info = box_sub_menu.create_item();
@@ -291,11 +291,24 @@ public class Command_Dev : MonoBehaviour
         item_info.set_tip("View Info");
         item_info.set_act(() => this.app.command.box_info_chat(data));
 
+        Carrot_Box_Item item_play=box_sub_menu.create_item();
+        item_play.set_icon(this.app.carrot.game.icon_play_music_game);
+        item_play.set_title("Test");
+        item_play.set_tip("Test preview of chat");
+        item_play.set_act(() => this.app.command_storage.play_one_test_command(data));
+
         if (data["index_cm"] != null)
         {
             if (data["index_cm"].ToString() != "")
             {
                 int index_cm = int.Parse(data["index_cm"].ToString());
+
+                Carrot_Box_Item item_play_list = box_sub_menu.create_item();
+                item_play_list.set_icon(this.app.command_storage.sp_icon_run);
+                item_play_list.set_title("List Test");
+                item_play_list.set_tip("Test preview of all chat");
+                item_play_list.set_act(() => this.app.command_storage.play_test_command(index_cm));
+
                 Carrot_Box_Item item_del_offline = box_sub_menu.create_item();
                 item_del_offline.set_icon(this.app.command_storage.sp_icon_delete);
                 item_del_offline.set_title("Delete (Offline)");
