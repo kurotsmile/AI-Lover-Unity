@@ -16,6 +16,7 @@ public class App : MonoBehaviour
     public Command_storage command_storage;
     public Command_Dev command_dev;
     public Command command;
+    public Command_Live live;
     public Voice_Command command_voice;
     public TextToSpeech textToSpeech;
     public Icon icon;
@@ -138,7 +139,8 @@ public class App : MonoBehaviour
         this.player_music.panel_player_mini.SetActive(false);
         this.show_chat_function();
         this.check_manager_character();
-        
+
+        this.command.load();
         this.command_storage.check_load_command_storage();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
         this.command_dev.check();
@@ -726,6 +728,7 @@ public class App : MonoBehaviour
         this.get_character().get_npc().transform.localPosition = Vector3.zero;
         this.view.mouseOrbit_Improved.Reset_pos();
         this.command_voice.on_input_mode_chat();
+        this.command.stop_live();
     }
 
     #region Scene Rotation

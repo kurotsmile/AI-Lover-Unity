@@ -23,6 +23,7 @@ public class Command : MonoBehaviour
     public GameObject prefab_effect_icon_chat;
 
     public GameObject obj_btn_clear_all_log;
+    public GameObject obj_btn_play_all_log;
     public Transform area_body_log_command;
     public ScrollRect ScrollRect_log_command;
     public AudioSource sound_command; 
@@ -49,15 +50,23 @@ public class Command : MonoBehaviour
 
     private float count_timer_show_text = 0;
     private float count_timer_hide_text = 0;
-    private bool is_show_text = false;
+    private float count_timer_live_chat = 0;
     private int index_text = 0;
     private string s_chat_temp;
     private bool is_hide_text = false;
+    private bool is_show_text = false;
+    private bool is_live = false;
 
     private Carrot.Carrot_Box box_list;
     private string s_command_chat_last;
     private string id_cur_chat = "";
     private IDictionary data_chat_cur;
+
+    public void load()
+    {
+        this.obj_btn_play_all_log.SetActive(false);
+        this.obj_btn_clear_all_log.SetActive(false);
+    }
     
     public void send_command()
     {
@@ -253,6 +262,7 @@ public class Command : MonoBehaviour
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
         this.obj_btn_clear_all_log.SetActive(false);
+        this.obj_btn_play_all_log.SetActive(false);
         this.obj_btn_more.SetActive(true);
 
         this.data_chat_cur = data_chat;
@@ -386,8 +396,22 @@ public class Command : MonoBehaviour
                 this.is_hide_text = false;
                 this.panel_show_msg_chat.SetActive(false);
                 this.panel_show_log_chat.SetActive(true);
-                if(this.area_body_log_command.childCount>0) this.obj_btn_clear_all_log.SetActive(true);
+                if (this.area_body_log_command.childCount > 0)
+                {
+                    this.obj_btn_clear_all_log.SetActive(true);
+                    if(this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
+                }
                 this.action_waitting();
+            }
+        }
+
+        if (this.is_live)
+        {
+            this.count_timer_live_chat = this.count_timer_live_chat + Time.deltaTime;
+            if (this.count_timer_live_chat > 5f)
+            {
+                this.count_timer_live_chat = 0;
+                this.app.live.next();
             }
         }
     }
@@ -745,6 +769,7 @@ public class Command : MonoBehaviour
         this.app.carrot.play_sound_click();
         this.clear_log_chat();
         this.obj_btn_clear_all_log.SetActive(false);
+        this.obj_btn_play_all_log.SetActive(false);
     }
 
     public void show_chat_log()
@@ -753,10 +778,26 @@ public class Command : MonoBehaviour
         this.app.command.panel_show_msg_chat.SetActive(false);
         this.app.command.panel_show_log_chat.SetActive(true);
         this.obj_btn_clear_all_log.SetActive(true);
+        if(this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
     }
 
     public void btn_show_sub_menu()
     {
         this.app.command_dev.sub_menu(this.data_chat_cur);
     }
+
+    #region Live Chat
+    public void btn_play_all_live_chat()
+    {
+        this.is_live = true;
+        this.app.carrot.play_sound_click();
+        this.app.live.play();
+    }
+
+    public void stop_live()
+    {
+        this.is_live = false;
+        this.app.live.off_live();
+    }
+    #endregion
 }

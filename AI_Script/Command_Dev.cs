@@ -9,11 +9,17 @@ public enum Command_Dev_Type {pending,by_user,same_key}
 
 public class Command_Dev : MonoBehaviour
 {
+    [Header("Main Obj")]
     public App app;
+
+    [Header("Asset Icon")]
     public Sprite sp_icon_key_same;
     public Sprite sp_icon_translate;
     public Sprite sp_icon_chat_passed;
     public Sprite sp_icon_chat_pending;
+    public Sprite sp_icon_chat_live;
+
+    [Header("Ui Chat Dev")]
     public GameObject btn_chat_dev;
     public GameObject btn_chat_pass_user;
 
