@@ -142,6 +142,8 @@ public class App : MonoBehaviour
         this.command_storage.check_load_command_storage();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
         this.command_dev.check();
+
+        this.icon.load();
     }
 
     private void close_all_box()

@@ -15,7 +15,7 @@ public class Icon : MonoBehaviour
     public Sprite sp_icon_icons;
     private QuerySnapshot IconQuerySnapshot;
     private QuerySnapshot IconCategoryQuerySnapshot = null;
-    private List<string> list_icon_name;
+    private IList list_icon_name;
     private Carrot.Carrot_Box box_list_icon;
     private Carrot.Carrot_Box box_list_icon_category;
 
@@ -24,7 +24,12 @@ public class Icon : MonoBehaviour
 
     public void load()
     {
-        this.s_data_cache=PlayerPrefs.GetString("s_data_icon_temp");
+        this.s_data_cache=PlayerPrefs.GetString("s_data_icon_temp","");
+        if (this.s_data_cache != "")
+        {
+            this.list_icon_name =(IList) Json.Deserialize(this.s_data_cache);
+            Debug.Log("list_icon_name:"+this.list_icon_name.Count);
+        }
     }
 
     private void list_category_icon()
@@ -156,9 +161,12 @@ public class Icon : MonoBehaviour
 
             item_icon.set_act(() => this.set_icon_and_emoji(Color.red, item_icon.img_icon.sprite, s_color, id_icon));
         }
+
+        Debug.Log(Json.Serialize(this.list_icon_name));
+        PlayerPrefs.SetString("s_data_icon_temp",Json.Serialize(this.list_icon_name));
     }
 
-    public List<String> get_list_icon_name()
+    public IList get_list_icon_name()
     {
         return this.list_icon_name;
     }
