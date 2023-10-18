@@ -18,6 +18,8 @@ public class Command_Live : MonoBehaviour
     private int lenth_cm = 0;
     private bool is_active = false;
 
+    private Item_command_chat item_live_temp;
+
     public void on_live()
     {
         this.is_active = true;
@@ -64,5 +66,11 @@ public class Command_Live : MonoBehaviour
     public bool get_status_active()
     {
         return this.is_active;
+    }
+
+    public void show_edit_item_chat_live(Item_command_chat item_c)
+    {
+        this.item_live_temp = item_c;
+        this.app.command_storage.show_edit_live(item_c.idata_chat);
     }
 }

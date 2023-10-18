@@ -13,6 +13,7 @@ public enum Command_Type_Act {
     add_command,
     edit_command,
     edit_pass,
+    edit_live,
     list_command,
     list_pass,
     list_pedding
@@ -190,6 +191,12 @@ public class Command_storage : MonoBehaviour
     public void show_edit_dev(IDictionary data_chat)
     {
         this.type_act= Command_Type_Act.add_command;
+        this.show_edit_by_data(data_chat);
+    }
+
+    public void show_edit_live(IDictionary data_chat)
+    {
+        this.type_act = Command_Type_Act.edit_live;
         this.show_edit_by_data(data_chat);
     }
 

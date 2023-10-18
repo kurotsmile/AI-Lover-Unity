@@ -32,4 +32,9 @@ public class Item_command_chat : MonoBehaviour
     {
         this.act_add = u_act;
     }
+
+    public void set_icon_btn(Sprite icon)
+    {
+        this.btn_add_app.GetComponent<Image>().sprite = icon;
+    }
 }

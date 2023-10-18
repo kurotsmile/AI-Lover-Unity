@@ -242,15 +242,17 @@ public class Command : MonoBehaviour
             if (i_data["status"] != null)
             {
                 string s_status = i_data["status"].ToString();
-                if (s_status=="live") comand_chat.btn_add_app.SetActive(false);
-                if (s_status=="passed") comand_chat.btn_add_app.SetActive(true);
-                if (s_status=="pending") comand_chat.btn_add_app.SetActive(false);
 
                 if (s_status == "music")
                 {
                     item_command_chat.gameObject.name = "music_item";
                     comand_chat.btn_add_app.SetActive(false);
                     comand_chat.set_act_click(() => this.app.player_music.act_play_data(i_data));
+                }
+                else if (s_status == "live")
+                {
+                    comand_chat.set_icon_btn(this.app.carrot.user.icon_user_edit);
+                    comand_chat.set_act_click(() => this.app.live.show_edit_item_chat_live(comand_chat));
                 }
                 else
                 {
