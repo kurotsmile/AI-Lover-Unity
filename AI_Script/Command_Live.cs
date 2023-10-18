@@ -34,6 +34,10 @@ public class Command_Live : MonoBehaviour
     public void play()
     {
         this.index_cur_cm = 0;
+        foreach(Transform tr in this.app.command.area_body_log_command)
+        {
+            if(tr.gameObject.name== "user_chat"||tr.gameObject.name== "music_item") Destroy(tr.gameObject);
+        }
         this.lenth_cm = this.app.command.area_body_log_command.childCount;
         this.act_live_chat(this.index_cur_cm);
         this.img_icon_live_chat_box.sprite = this.app.player_music.icon_pause;
@@ -54,7 +58,7 @@ public class Command_Live : MonoBehaviour
     private void act_live_chat(int index)
     {
         Item_command_chat live_item = this.app.command.area_body_log_command.GetChild(index).GetComponent<Item_command_chat>();
-        this.app.command.act_chat(live_item.idata_chat, true);
+        this.app.command.act_chat(live_item.idata_chat, false,false);
     }
 
     public bool get_status_active()

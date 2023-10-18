@@ -205,12 +205,13 @@ public class Command : MonoBehaviour
         item_command_chat.transform.localScale = new Vector3(1f, 1f, 1f);
         item_command_chat.transform.localPosition = new Vector3(item_command_chat.transform.localPosition.x, item_command_chat.transform.localPosition.y, 0f);
         item_command_chat.transform.localRotation = Quaternion.Euler(Vector3.zero);
-        item_command_chat.GetComponent<Item_command_chat>().txt_chat.text = s_inp_command;
-        item_command_chat.GetComponent<Item_command_chat>().txt_chat.color = this.GetComponent<App>().carrot.color_highlight;
-        item_command_chat.GetComponent<Item_command_chat>().icon.sprite = this.GetComponent<App>().get_icon_sex_user();
-        item_command_chat.GetComponent<Item_command_chat>().btn_add_app.GetComponent<Image>().color=this.GetComponent<App>().carrot.color_highlight;
-        if(this.GetComponent<App>().carrot.model_app==Carrot.ModelApp.Develope) item_command_chat.GetComponent<Item_command_chat>().btn_add_web.SetActive(true);
-        else item_command_chat.GetComponent<Item_command_chat>().btn_add_web.SetActive(false);
+        item_command_chat.name = "user_chat";
+
+        Item_command_chat c_chat = item_command_chat.GetComponent<Item_command_chat>();
+        c_chat.txt_chat.text = s_inp_command;
+        c_chat.txt_chat.color = this.app.carrot.color_highlight;
+        c_chat.icon.sprite = this.app.get_icon_sex_user();
+        c_chat.btn_add_app.GetComponent<Image>().color=this.app.carrot.color_highlight;
 
         IDictionary Idata = (IDictionary) Json.Deserialize("{}");
         Idata["id"] = "chat"+this.app.carrot.generateID();
@@ -218,11 +219,12 @@ public class Command : MonoBehaviour
         Idata["msg"] = s_inp_command;
         Idata["status"]= "input";
 
-        item_command_chat.GetComponent<Item_command_chat>().idata_chat = Idata;
-        this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
+        c_chat.idata_chat = Idata;
+        c_chat.set_act_click(()=>this.app.command_storage.show_new_command(s_inp_command));
+        c_chat.set_act_add(() => this.app.command_storage.show_new_command(s_inp_command));
     }
 
-    public void add_item_pc_chat(string s_txt_show,Sprite icon,bool is_music=false, IDictionary i_data_chat=null)
+    public Item_command_chat add_item_pc_chat(string s_txt_show,Sprite icon, IDictionary i_data=null)
     {
         GameObject item_command_chat = Instantiate(this.prefab_item_command_pc);
         item_command_chat.transform.SetParent(this.area_body_log_command);
@@ -231,20 +233,30 @@ public class Command : MonoBehaviour
         item_command_chat.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
         Item_command_chat comand_chat = item_command_chat.GetComponent<Item_command_chat>();
-
         comand_chat.txt_chat.text = s_txt_show;
         comand_chat.icon.sprite = icon;
-        comand_chat.is_music = is_music;
         comand_chat.btn_add_app.GetComponent<Image>().color=this.GetComponent<App>().carrot.color_highlight;
-        if (i_data_chat != null)
+        if (i_data != null)
         {
-            item_command_chat.GetComponent<Item_command_chat>().idata_chat = i_data_chat;
-            if (i_data_chat["status"] != null)
+            item_command_chat.GetComponent<Item_command_chat>().idata_chat = i_data;
+            if (i_data["status"] != null)
             {
-                string s_status = i_data_chat["status"].ToString();
-                if (s_status == "live") comand_chat.btn_add_app.SetActive(false);
-                if (s_status == "passed") comand_chat.btn_add_app.SetActive(true);
-                if (s_status == "pending") comand_chat.btn_add_app.SetActive(false);
+                string s_status = i_data["status"].ToString();
+                if (s_status=="live") comand_chat.btn_add_app.SetActive(false);
+                if (s_status=="passed") comand_chat.btn_add_app.SetActive(true);
+                if (s_status=="pending") comand_chat.btn_add_app.SetActive(false);
+
+                if (s_status == "music")
+                {
+                    item_command_chat.gameObject.name = "music_item";
+                    comand_chat.btn_add_app.SetActive(false);
+                    comand_chat.set_act_click(() => this.app.player_music.act_play_data(i_data));
+                }
+                else
+                {
+                    comand_chat.set_act_add(() => this.app.command_storage.show_add_command_with_pater(i_data["msg"].ToString(), i_data["id"].ToString()));
+                    comand_chat.set_act_click(() => this.act_chat(i_data,false,false));
+                }
             }
         }
         else
@@ -255,14 +267,16 @@ public class Command : MonoBehaviour
         this.app.set_item_cur_log_chat(comand_chat);
         this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
         Canvas.ForceUpdateCanvases();
+        return comand_chat;
     }
 
     public void add_item_log_music(string s_name, IDictionary id_data)
     {
-        this.add_item_pc_chat(s_name, this.icon_pc_music, true, id_data);
+        id_data["status"] = "music";
+        this.add_item_pc_chat(s_name, this.icon_pc_music, id_data);
     }
 
-    public void act_chat(IDictionary data_chat,bool is_test=false)
+    public void act_chat(IDictionary data_chat,bool is_test=false,bool is_add_log=true)
     {
         this.obj_btn_info_chat.SetActive(true);
         this.obj_btn_translate.SetActive(true);
@@ -356,7 +370,7 @@ public class Command : MonoBehaviour
             }
         }
 
-        this.add_item_pc_chat(s_msg_chat, this.app.get_character().icon_sex, false, data_chat);
+        if(is_add_log) this.add_item_pc_chat(s_msg_chat, this.app.get_character().icon_sex, data_chat);
         this.app.carrot.ads.show_ads_Interstitial();
     }
 
@@ -760,6 +774,7 @@ public class Command : MonoBehaviour
     {
         IList icons = this.app.icon.get_list_icon_name();
         this.data_chat_cur = (IDictionary)Json.Deserialize("{}");
+        this.data_chat_cur["id"] = "chat"+this.app.carrot.generateID();
         this.data_chat_cur["key"] = s_key;
         this.data_chat_cur["msg"] = s_key;
         this.data_chat_cur["action"] = Random.Range(0, 40).ToString();

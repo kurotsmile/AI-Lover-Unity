@@ -1,59 +1,35 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class Item_command_chat : MonoBehaviour
 {
     public Image icon;
-    public Image icon_type;
     public Text txt_chat;
-    public Text txt_tip;
-    public string url_edit;
-    public GameObject btn_add_web;
     public GameObject btn_add_app;
-    public int index;
-    public bool is_music;
     public IDictionary idata_chat;
 
-    public void btn_click()
+    private UnityAction act_click;
+    private UnityAction act_add;
+
+    public void on_click_item()
     {
-        if (this.url_edit != "") Application.OpenURL(this.url_edit);
+        if (this.act_click != null) this.act_click();
     }
 
-    public void show_edit_cm()
+    public void on_click_add()
     {
-        GameObject.Find("app").GetComponent<Command_storage>().show_edit_command(this.index);
+        if (this.act_add != null) this.act_add();
     }
 
-    public void show_add_cm()
+    public void set_act_click(UnityAction u_act)
     {
-        GameObject.Find("app").GetComponent<Command_storage>().show_new_command(this.txt_chat.text);
+        this.act_click = u_act;
     }
 
-    public void show_add_cm_whit_pater()
+    public void set_act_add(UnityAction u_act)
     {
-        string id_chat = this.idata_chat["id"].ToString();
-        GameObject.Find("app").GetComponent<Command_storage>().show_add_command_with_pater(this.txt_chat.text, id_chat);
+        this.act_add = u_act;
     }
-
-    public void btn_play_command()
-    {
-        GameObject.Find("app").GetComponent<Command_storage>().play_test_command(this.index);
-    }
-
-    public void btn_view_chat_log()
-    {
-        if (this.idata_chat != null)
-        {
-            if (idata_chat["msg"] != null)
-                GameObject.Find("app").GetComponent<Command>().act_chat(this.idata_chat);
-            else
-                GameObject.Find("app").GetComponent<App>().player_music.act_play_data(this.idata_chat);
-        }
-        else
-        {
-            GameObject.Find("app").GetComponent<Command>().act_chat(this.idata_chat);
-        }
-    }
-
 }
