@@ -728,7 +728,7 @@ public class App : MonoBehaviour
         this.get_character().get_npc().transform.localPosition = Vector3.zero;
         this.view.mouseOrbit_Improved.Reset_pos();
         this.command_voice.on_input_mode_chat();
-        this.command.stop_live();
+        this.live.off_live();
     }
 
     #region Scene Rotation

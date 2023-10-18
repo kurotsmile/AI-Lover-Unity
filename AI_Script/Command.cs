@@ -211,6 +211,14 @@ public class Command : MonoBehaviour
         item_command_chat.GetComponent<Item_command_chat>().btn_add_app.GetComponent<Image>().color=this.GetComponent<App>().carrot.color_highlight;
         if(this.GetComponent<App>().carrot.model_app==Carrot.ModelApp.Develope) item_command_chat.GetComponent<Item_command_chat>().btn_add_web.SetActive(true);
         else item_command_chat.GetComponent<Item_command_chat>().btn_add_web.SetActive(false);
+
+        IDictionary Idata = (IDictionary) Json.Deserialize("{}");
+        Idata["id"] = "chat"+this.app.carrot.generateID();
+        Idata["key"] = s_inp_command;
+        Idata["msg"] = s_inp_command;
+        Idata["status"]= "input";
+
+        item_command_chat.GetComponent<Item_command_chat>().idata_chat = Idata;
         this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
     }
 
@@ -262,7 +270,10 @@ public class Command : MonoBehaviour
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
         this.obj_btn_clear_all_log.SetActive(false);
-        this.obj_btn_play_all_log.SetActive(false);
+        if(this.app.live.get_status_active())
+            this.obj_btn_play_all_log.SetActive(true);
+        else
+            this.obj_btn_play_all_log.SetActive(false);
         this.obj_btn_more.SetActive(true);
 
         this.data_chat_cur = data_chat;
@@ -789,15 +800,18 @@ public class Command : MonoBehaviour
     #region Live Chat
     public void btn_play_all_live_chat()
     {
-        this.is_live = true;
         this.app.carrot.play_sound_click();
-        this.app.live.play();
-    }
 
-    public void stop_live()
-    {
-        this.is_live = false;
-        this.app.live.off_live();
+        if (this.is_live == false)
+        {
+            this.is_live = true;
+            this.app.live.play();
+        }
+        else
+        {
+            this.is_live = false;
+            this.app.live.stop();
+        }
     }
     #endregion
 }

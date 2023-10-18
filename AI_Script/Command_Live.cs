@@ -1,8 +1,9 @@
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class Command_Live : MonoBehaviour
 {
+
     [Header("Main Obj")]
     public App app;
 
@@ -21,6 +22,7 @@ public class Command_Live : MonoBehaviour
     {
         this.is_active = true;
         this.obj_btn_play_chat_live.SetActive(true);
+        this.app.command.clear_log_chat();
     }
 
     public void off_live()
@@ -34,6 +36,7 @@ public class Command_Live : MonoBehaviour
         this.index_cur_cm = 0;
         this.lenth_cm = this.app.command.area_body_log_command.childCount;
         this.act_live_chat(this.index_cur_cm);
+        this.img_icon_live_chat_box.sprite = this.app.player_music.icon_pause;
     }
 
     public void next()
@@ -41,6 +44,11 @@ public class Command_Live : MonoBehaviour
         this.index_cur_cm++;
         if(this.index_cur_cm >= this.lenth_cm) this.index_cur_cm = 0;
         this.act_live_chat(this.index_cur_cm);
+    }
+
+    public void stop()
+    {
+        this.img_icon_live_chat_box.sprite = this.app.player_music.icon_play;
     }
 
     private void act_live_chat(int index)
