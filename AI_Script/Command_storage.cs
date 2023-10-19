@@ -140,6 +140,20 @@ public class Command_storage : MonoBehaviour
 
     private Carrot_Box box_parameter_tag;
 
+    private void reset_all_s_data()
+    {
+        this.s_id = "";
+        this.s_pater_id = "";
+        this.s_pater_msg = "";
+        this.s_id_icon = "";
+        this.s_color = "#FFFFFF";
+        this.s_user_id = "";
+        this.s_user_lang = "";
+        this.s_user_name = "";
+        this.s_user_avatar = "";
+        this.index_cm_update = -1;
+    }
+
     public void check_load_command_storage()
     {
         this.length = PlayerPrefs.GetInt("cm_length", 0);
@@ -148,30 +162,31 @@ public class Command_storage : MonoBehaviour
 
     public void show_add_command_with_pater(string s_chat, string pater)
     {
+        this.reset_all_s_data();
         this.type_act = Command_Type_Act.add_command;
-        this.s_pater_msg = s_chat;
-        this.s_pater_id = pater;
-        this.index_cm_update = -1;
         IDictionary data_new_chat = (IDictionary)Carrot.Json.Deserialize("{}");
+        data_new_chat["key"] = "";
+        data_new_chat["pater"] = pater;
+        data_new_chat["pater_msg"] = s_chat;
         this.show_edit_by_data(data_new_chat);
     }
 
     public void show_add_command_new()
     {
+        this.reset_all_s_data();
         this.type_act = Command_Type_Act.add_command;
-        this.s_pater_msg = "";
-        this.s_pater_id = "";
-        this.index_cm_update = -1;
         IDictionary data_new_chat = (IDictionary) Carrot.Json.Deserialize("{}");
+        data_new_chat["key"] = "";
         this.show_edit_by_data(data_new_chat);
     }
 
     public void show_new_command(string s_new_keyword)
     {
+        this.reset_all_s_data();
         this.type_act = Command_Type_Act.add_command;
         IDictionary data_new_chat = (IDictionary)Carrot.Json.Deserialize("{}");
+        data_new_chat["key"] = s_new_keyword;
         this.show_edit_by_data(data_new_chat);
-        this.item_keyword.set_val(s_new_keyword);
     }
 
     public void show_edit_command(int index)
@@ -202,19 +217,16 @@ public class Command_storage : MonoBehaviour
 
     private void show_edit_by_data(IDictionary data_chat)
     {
-        this.s_id_icon = "";
-        this.s_user_id = "";
-        this.s_color = "#FFFFFF";
-
         if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
 
         this.get_list_key_block();
         if (this.box_add_chat != null) this.box_add_chat.close();
 
-        this.box_add_chat = this.GetComponent<App>().carrot.Create_Box("command_add");
+        this.box_add_chat = this.GetComponent<App>().carrot.Create_Box("command_editor");
 
         if (this.type_act == Command_Type_Act.add_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_add", "Add the command"));
         if (this.type_act == Command_Type_Act.edit_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_update", "Update command"));
+        if (this.type_act == Command_Type_Act.edit_live) box_add_chat.set_title(PlayerPrefs.GetString("brain_update", "Update command"));
         if (this.type_act == Command_Type_Act.edit_pass) box_add_chat.set_title("Update Pass Command");
 
         box_add_chat.set_icon(this.sp_icon_add_chat);
@@ -225,17 +237,20 @@ public class Command_storage : MonoBehaviour
         this.btn_model_advanced = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_advanced);
         btn_model_advanced.set_act(() => this.act_box_add_model_advanced());
         if (this.is_cm_mode_nomal == false) btn_model_advanced.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
-        Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_bug);
-        btn_list_key_block.set_act(() => this.show_list_block_key_chat());
 
-        if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
+        if (this.type_act != Command_Type_Act.edit_live)
+        {
+            Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_bug);
+            btn_list_key_block.set_act(() => this.show_list_block_key_chat());
+        }
 
         if (data_chat["pater"] != null)
         {
             if (data_chat["pater"].ToString() != "")
             {
                 this.s_pater_id = data_chat["pater"].ToString();
-                this.s_pater_msg = data_chat["pater"].ToString();
+                if (data_chat["pater_msg"]!=null) this.s_pater_msg = data_chat["pater_msg"].ToString();
+                else this.s_pater_msg= data_chat["pater_msg"].ToString();
             }
         }
 
@@ -255,8 +270,8 @@ public class Command_storage : MonoBehaviour
             btn_info_patert.set_act(() => this.app.command.show_info_chat_by_id(this.s_pater_id));
 
             Carrot.Carrot_Box_Btn_Item btn_del_patert = item_patert.create_item();
-            btn_del_patert.set_icon(this.GetComponent<App>().carrot.sp_icon_del_data);
-            btn_del_patert.set_color(this.GetComponent<App>().carrot.color_highlight);
+            btn_del_patert.set_icon(this.app.carrot.sp_icon_del_data);
+            btn_del_patert.set_color(this.app.carrot.color_highlight);
             btn_del_patert.set_act(() => act_del_patert_chat());
         }
 
@@ -719,23 +734,20 @@ public class Command_storage : MonoBehaviour
     #region Mode Test Command
     public void btn_test_command()
     {
-        chat chat_test = this.get_data_chat();
-
-        if (chat_test.msg.ToString().Trim()=="")
+        if (this.item_msg.get_val()=="")
         {
             this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("error_null_key_and_msg", "Your keywords and content can't be blank!"));
             return;
         }
 
+        IDictionary data_test = this.get_data_chat_editor();
+        data_test["status"] = "test";
         this.app.command_dev.set_all_box_active(false);
-
         this.box_add_chat.gameObject.SetActive(false);
         this.is_list_command_test_play = false;
         this.obj_button_next_command_test.SetActive(false);
         this.obj_button_prev_command_test.SetActive(false);
-
-        this.data_chat_test = (IDictionary) Carrot.Json.Deserialize(JsonConvert.SerializeObject(chat_test));
-        this.act_test_command(this.data_chat_test);
+        this.act_test_command(data_test);
     }
 
     public void play_one_test_command(IDictionary data_chat)
@@ -754,9 +766,9 @@ public class Command_storage : MonoBehaviour
         if (this.box_add_chat != null) this.box_add_chat.gameObject.SetActive(true);
         this.app.command_dev.set_all_box_active(true);
 
-        this.GetComponent<App>().panel_inp_command_test.SetActive(false);
-        this.GetComponent<App>().panel_inp_func.SetActive(false);
-        this.GetComponent<App>().panel_inp_msg.SetActive(true);
+        this.app.panel_inp_command_test.SetActive(false);
+        this.app.panel_inp_func.SetActive(false);
+        this.app.panel_inp_msg.SetActive(true);
     }
 
     public void btn_back_edit_command()
@@ -943,6 +955,22 @@ public class Command_storage : MonoBehaviour
         return c;
     }
 
+    private IDictionary get_data_chat_editor()
+    {
+        IDictionary data_chat = (IDictionary) Json.Deserialize("{}");
+        data_chat["id"] = this.s_id;
+        if(this.item_keyword!=null) data_chat["key"] = this.item_keyword.get_val();
+        data_chat["msg"] = this.item_msg.get_val();
+        data_chat["action"] = this.item_action.get_val();
+        data_chat["face"] = this.item_face.get_val();
+        data_chat["func"] = this.item_run_control.get_val();
+        data_chat["link"] = this.item_run_cmd.get_val();
+        data_chat["icon"] = this.s_id_icon;
+        data_chat["color"] = this.s_color;
+        data_chat["pater"] = this.s_pater_id;
+        return data_chat;
+    }
+
     private void act_done_submit_command()
     {
         this.app.carrot.show_loading();
@@ -1039,14 +1067,7 @@ public class Command_storage : MonoBehaviour
         if (this.type_act == Command_Type_Act.edit_live)
         {
             this.app.carrot.hide_loading();
-            IDictionary data_live = this.app.live.get_data_item_chat_live_cur();
-            data_live["msg"] = this.item_msg.get_val();
-            data_live["action"] = this.item_action.get_val();
-            data_live["face"] = this.item_face.get_val();
-            data_live["func"] = this.item_run_control.get_val();
-            data_live["link"] = this.item_run_cmd.get_val();
-            data_live["icon"] = this.s_id_icon;
-            data_live["color"] = this.s_color;
+            IDictionary data_live = this.get_data_chat_editor();
             this.app.live.update_data_item_chat_live(data_live);
         }
 

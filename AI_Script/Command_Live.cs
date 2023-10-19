@@ -49,11 +49,11 @@ public class Command_Live : MonoBehaviour
     public void next()
     {
         this.index_cur_cm++;
-        if(this.index_cur_cm >= this.lenth_cm) this.index_cur_cm = 0;
+        if(this.index_cur_cm >= this.lenth_cm-1) this.index_cur_cm = 0;
         this.act_live_chat(this.index_cur_cm);
     }
 
-    public void stop()
+    public void stop() 
     {
         this.img_icon_live_chat_box.sprite = this.app.player_music.icon_play;
     }
@@ -79,10 +79,5 @@ public class Command_Live : MonoBehaviour
     {
         this.item_live_temp.idata_chat = idata;
         this.item_live_temp.txt_chat.text = idata["msg"].ToString();
-    }
-
-    public IDictionary get_data_item_chat_live_cur()
-    {
-        return this.item_live_temp.idata_chat;
     }
 }

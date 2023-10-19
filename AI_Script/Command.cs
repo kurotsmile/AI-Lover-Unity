@@ -79,6 +79,7 @@ public class Command : MonoBehaviour
 
     public void send_chat(string s_key,bool is_log_show=false)
     {
+        this.is_live = false;
         this.s_command_chat_last = s_key;
         if(is_log_show) add_item_log_chat(s_key);
         if (this.mode == Command_Type_Mode.chat)
@@ -457,7 +458,7 @@ public class Command : MonoBehaviour
             this.is_show_text = true;
             this.panel_show_msg_chat.SetActive(true);
             this.panel_show_log_chat.SetActive(false);
-            if(this.is_test_command==false) this.GetComponent<App>().show_chat_function();
+            if(this.is_test_command==false) this.app.show_chat_function();
         }
     }
 
