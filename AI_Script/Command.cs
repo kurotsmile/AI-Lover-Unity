@@ -716,6 +716,16 @@ public class Command : MonoBehaviour
                                 Color newCol;
                                 if (ColorUtility.TryParseHtmlString(s_data_val, out newCol)) item_field.img_icon.color = newCol;
                             }
+                        }else if (s_key == "icon")
+                        {
+                            s_field_title = PlayerPrefs.GetString("setting_bubble_icon", "Icons");
+                            s_field_val = s_data_val;
+                            item_field.set_icon(this.app.setting.sp_icon_select_color);
+                            if (s_data_val != "")
+                            {
+                                Sprite sp_icon_chat = this.app.carrot.get_tool().get_sprite_to_playerPrefs(s_data_val);
+                                if (sp_icon_chat != null) item_field.set_icon_white(sp_icon_chat);
+                            }
                         }
                         else
                         {

@@ -901,7 +901,6 @@ public class Command_storage : MonoBehaviour
     {
         chat c = new chat
         {
-            key = this.item_keyword.get_val().ToLower(),
             msg = this.item_msg.get_val(),
             action = this.item_action.get_val(),
             face = this.item_face.get_val(),
@@ -916,6 +915,8 @@ public class Command_storage : MonoBehaviour
             func = this.item_run_control.get_val(),
             date_create = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ")
         };
+
+        if (this.item_keyword != null) c.key = this.item_keyword.get_val().ToLower();
 
         if (this.s_user_id != "")
         {
