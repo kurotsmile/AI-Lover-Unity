@@ -69,6 +69,7 @@ public class Command_storage : MonoBehaviour
 
     private int length;
 
+    private Carrot_Box_Item item_command_edit_temp;
     private int index_cm_update = -1;
     private bool is_cm_mode_nomal = true;
 
@@ -78,7 +79,6 @@ public class Command_storage : MonoBehaviour
 
     private string s_color = "FFFFFF";
     private string s_id_icon = "";
-    private string s_type_view_list = "0";
 
     private string s_user_id = "";
     private string s_user_name = "";
@@ -189,8 +189,9 @@ public class Command_storage : MonoBehaviour
         this.show_edit_by_data(data_new_chat);
     }
 
-    public void show_edit_command(int index)
+    public void show_edit_command(int index,Carrot_Box_Item item_edit)
     {
+        this.item_command_edit_temp = item_edit;
         this.type_act = Command_Type_Act.edit_command;
         this.show_edit(index);
     }
@@ -618,8 +619,6 @@ public class Command_storage : MonoBehaviour
 
     public void show_list_cm(string s_type)
     {
-        this.s_type_view_list = s_type;
-
         Carrot_Box box;
         if (s_type == "0")
         {
@@ -753,6 +752,7 @@ public class Command_storage : MonoBehaviour
     public void play_one_test_command(IDictionary data_chat)
     {
         this.data_chat_test = data_chat;
+        this.data_chat_test["status"] = "test";
         this.app.command_dev.set_all_box_active(false);
 
         this.is_list_command_test_play = false;
@@ -769,14 +769,6 @@ public class Command_storage : MonoBehaviour
         this.app.panel_inp_command_test.SetActive(false);
         this.app.panel_inp_func.SetActive(false);
         this.app.panel_inp_msg.SetActive(true);
-    }
-
-    public void btn_back_edit_command()
-    {
-        if (this.is_list_command_test_play)
-            this.show_edit_command(this.index_command_test_play);
-        else
-            this.app.panel_main.SetActive(false);
     }
 
     public void btn_replay_test_command()
@@ -800,6 +792,7 @@ public class Command_storage : MonoBehaviour
         this.is_list_command_test_play = true;
         this.index_command_test_play = index_comand;
         this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play));
+        this.data_chat_test["status"] = "list_test";
         this.act_test_command(this.data_chat_test);
     }
 
@@ -812,7 +805,7 @@ public class Command_storage : MonoBehaviour
         this.app.panel_chat_func.SetActive(false);
         this.app.panel_chat_msg.SetActive(true);
         if(this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.app.panel_menu_right.SetActive(false);
-        this.app.command.act_chat(data_chat, true);
+        this.app.command.act_chat(data_chat, false);
     }
 
     public void btn_play_next_command_test()
@@ -822,6 +815,7 @@ public class Command_storage : MonoBehaviour
         string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play);
         if (s_data != "") {
             this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(s_data);
+            this.data_chat_test["status"] = "list_test";
             this.act_test_command(this.data_chat_test);
         }
         else
@@ -838,6 +832,7 @@ public class Command_storage : MonoBehaviour
         if (s_data != "")
         {
             this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(s_data);
+            this.data_chat_test["status"] = "list_test";
             this.act_test_command(this.data_chat_test);
         }
         else
@@ -930,29 +925,32 @@ public class Command_storage : MonoBehaviour
 
         if (this.item_keyword != null) c.key = this.item_keyword.get_val().ToLower();
 
-        if (this.s_user_id != "")
+        c.user = this.get_user_data_editor(this.s_user_id);
+        return c;
+    }
+
+    private Carrot_Rate_user_data get_user_data_editor(string s_user_id)
+    {
+        Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
+        if (s_user_id != "")
         {
-            Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
+            
             user_login.name = this.s_user_name;
-            user_login.id = this.s_user_id;
+            user_login.id = s_user_id;
             user_login.lang = this.s_user_lang;
             user_login.avatar = this.s_user_avatar;
-            c.user = user_login;
         }
         else
         {
             if (this.app.carrot.user.get_id_user_login() != "")
             {
-                Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
                 user_login.name = this.app.carrot.user.get_data_user_login("name");
                 user_login.id = this.app.carrot.user.get_id_user_login();
                 user_login.lang = this.app.carrot.user.get_lang_user_login();
                 user_login.avatar = this.app.carrot.user.get_data_user_login("avatar");
-                c.user = user_login;
             }
         }
-
-        return c;
+        return user_login;
     }
 
     private IDictionary get_data_chat_editor()
@@ -968,6 +966,8 @@ public class Command_storage : MonoBehaviour
         data_chat["icon"] = this.s_id_icon;
         data_chat["color"] = this.s_color;
         data_chat["pater"] = this.s_pater_id;
+        data_chat["pater_msg"] = this.s_pater_msg;
+        data_chat["user"] =Json.Serialize(this.get_user_data_editor(this.s_user_id));
         return data_chat;
     }
 
@@ -1060,8 +1060,12 @@ public class Command_storage : MonoBehaviour
             c.id = this.s_id;
             string s_chat_data = JsonConvert.SerializeObject(c);
             PlayerPrefs.SetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_cm_update, s_chat_data);
+            if (this.item_command_edit_temp != null)
+            {
+                this.item_command_edit_temp.set_title(c.key);
+                this.item_command_edit_temp.set_tip(c.msg);
+            }
             this.app.carrot.hide_loading();
-            this.show_list_cm(this.s_type_view_list);
         }
 
         if (this.type_act == Command_Type_Act.edit_live)

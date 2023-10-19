@@ -47,6 +47,7 @@ public class Command : MonoBehaviour
     public GameObject obj_btn_add_chat_whith_father;
     public GameObject obj_btn_translate;
     public GameObject obj_btn_more;
+    public GameObject obj_btn_log;
 
     private float count_timer_show_text = 0;
     private float count_timer_hide_text = 0;
@@ -108,7 +109,6 @@ public class Command : MonoBehaviour
 
     private void play_chat(string s_key)
     {
-        Debug.Log("play_chat:" + s_key+" "+ this.app.carrot.lang.get_key_lang());
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
         ChatQuery=ChatQuery.WhereEqualTo("key", s_key);
 
@@ -145,11 +145,11 @@ public class Command : MonoBehaviour
                         if (list_chat.Count > 1)
                         {
                             int index_random = Random.Range(0, list_chat.Count);
-                            this.act_chat(list_chat[index_random], false);
+                            this.act_chat(list_chat[index_random]);
                         }
                         else
                         {
-                            this.act_chat(list_chat[0], false);
+                            this.act_chat(list_chat[0]);
                         }
                     }
                 }
@@ -282,6 +282,7 @@ public class Command : MonoBehaviour
 
     public void act_chat(IDictionary data_chat,bool is_add_log=true)
     {
+        this.obj_btn_log.SetActive(true);
         this.obj_btn_info_chat.SetActive(true);
         this.obj_btn_translate.SetActive(true);
         this.obj_btn_new_chat.SetActive(false);
@@ -307,6 +308,11 @@ public class Command : MonoBehaviour
             string s_status = data_chat["status"].ToString();
             if(s_status=="passed")this.obj_btn_report_chat.SetActive(true);
             if(s_status== "passed"||s_status== "pending" || s_status == "buy") this.obj_btn_add_chat_whith_father.SetActive(true);
+            if (s_status == "test" || s_status == "test_list")
+            {
+                this.is_test_command = true;
+                this.obj_btn_log.SetActive(false);
+            }
         }
 
         string s_msg_chat = "";
