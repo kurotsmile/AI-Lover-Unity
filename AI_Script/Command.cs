@@ -253,13 +253,13 @@ public class Command : MonoBehaviour
                 else if (s_status == "live")
                 {
                     comand_chat.set_icon_btn(this.app.carrot.user.icon_user_edit);
-                    comand_chat.set_act_click(() => this.act_chat(i_data, false, false));
+                    comand_chat.set_act_click(() => this.act_chat(i_data, false));
                     comand_chat.set_act_add(() => this.app.live.show_edit_item_chat_live(comand_chat));
                 }
                 else
                 {
                     comand_chat.set_act_add(() => this.app.command_storage.show_add_command_with_pater(i_data["msg"].ToString(), i_data["id"].ToString()));
-                    comand_chat.set_act_click(() => this.act_chat(i_data,false,false));
+                    comand_chat.set_act_click(() => this.act_chat(i_data,false));
                 }
             }
         }
@@ -280,7 +280,7 @@ public class Command : MonoBehaviour
         this.add_item_pc_chat(s_name, this.icon_pc_music, id_data);
     }
 
-    public void act_chat(IDictionary data_chat,bool is_test=false,bool is_add_log=true)
+    public void act_chat(IDictionary data_chat,bool is_add_log=true)
     {
         this.obj_btn_info_chat.SetActive(true);
         this.obj_btn_translate.SetActive(true);
@@ -296,12 +296,6 @@ public class Command : MonoBehaviour
 
         this.data_chat_cur = data_chat;
         this.app.panel_main.SetActive(true);
-        this.is_test_command = is_test;
-
-        if(!is_test)
-        {
-            this.obj_btn_add_chat_whith_father.SetActive(true);
-        }
 
         if (data_chat["id"] != null)
         {
@@ -310,10 +304,9 @@ public class Command : MonoBehaviour
 
         if (data_chat["status"] != null)
         {
-            if (data_chat["status"].ToString() == "passed")
-            {
-                this.obj_btn_report_chat.SetActive(true);
-            }
+            string s_status = data_chat["status"].ToString();
+            if(s_status=="passed")this.obj_btn_report_chat.SetActive(true);
+            if(s_status== "passed"||s_status== "pending" || s_status == "buy") this.obj_btn_add_chat_whith_father.SetActive(true);
         }
 
         string s_msg_chat = "";
