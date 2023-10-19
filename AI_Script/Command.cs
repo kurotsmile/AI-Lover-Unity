@@ -252,7 +252,8 @@ public class Command : MonoBehaviour
                 else if (s_status == "live")
                 {
                     comand_chat.set_icon_btn(this.app.carrot.user.icon_user_edit);
-                    comand_chat.set_act_click(() => this.app.live.show_edit_item_chat_live(comand_chat));
+                    comand_chat.set_act_click(() => this.act_chat(i_data, false, false));
+                    comand_chat.set_act_add(() => this.app.live.show_edit_item_chat_live(comand_chat));
                 }
                 else
                 {
@@ -777,9 +778,9 @@ public class Command : MonoBehaviour
         IList icons = this.app.icon.get_list_icon_name();
         this.data_chat_cur = (IDictionary)Json.Deserialize("{}");
         this.data_chat_cur["id"] = "chat"+this.app.carrot.generateID();
-        this.data_chat_cur["key"] = s_key;
         this.data_chat_cur["msg"] = s_key;
         this.data_chat_cur["action"] = Random.Range(0, 40).ToString();
+        this.data_chat_cur["face"] = Random.Range(0, 18).ToString();
         this.data_chat_cur["color"] = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f).CTToHexRGBA();
         this.data_chat_cur["status"] = "live";
 

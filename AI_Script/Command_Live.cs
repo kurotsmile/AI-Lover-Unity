@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -72,5 +73,16 @@ public class Command_Live : MonoBehaviour
     {
         this.item_live_temp = item_c;
         this.app.command_storage.show_edit_live(item_c.idata_chat);
+    }
+
+    public void update_data_item_chat_live(IDictionary idata)
+    {
+        this.item_live_temp.idata_chat = idata;
+        this.item_live_temp.txt_chat.text = idata["msg"].ToString();
+    }
+
+    public IDictionary get_data_item_chat_live_cur()
+    {
+        return this.item_live_temp.idata_chat;
     }
 }

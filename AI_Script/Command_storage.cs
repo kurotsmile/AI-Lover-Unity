@@ -235,7 +235,7 @@ public class Command_storage : MonoBehaviour
             if (data_chat["pater"].ToString() != "")
             {
                 this.s_pater_id = data_chat["pater"].ToString();
-                this.s_pater_msg= data_chat["pater"].ToString();
+                this.s_pater_msg = data_chat["pater"].ToString();
             }
         }
 
@@ -260,33 +260,34 @@ public class Command_storage : MonoBehaviour
             btn_del_patert.set_act(() => act_del_patert_chat());
         }
 
+        if (data_chat["key"] != null) { 
+            this.item_keyword = box_add_chat.create_item("item_keyword");
+            item_keyword.set_type(Carrot.Box_Item_Type.box_value_input);
+            item_keyword.check_type();
+            item_keyword.set_icon(this.sp_icon_key);
+            item_keyword.set_title("key word");
+            item_keyword.set_tip("keywords to execute the command");
+            item_keyword.set_lang_data("cm_keyword", "cm_keyword_tip");
+            item_keyword.load_lang_data();
+            this.item_keyword.set_val(data_chat["key"].ToString());
 
-        this.item_keyword = box_add_chat.create_item("item_keyword");
-        item_keyword.set_type(Carrot.Box_Item_Type.box_value_input);
-        item_keyword.check_type();
-        item_keyword.set_icon(this.sp_icon_key);
-        item_keyword.set_title("key word");
-        item_keyword.set_tip("keywords to execute the command");
-        item_keyword.set_lang_data("cm_keyword", "cm_keyword_tip");
-        item_keyword.load_lang_data();
-        if (data_chat["key"] != null) this.item_keyword.set_val(data_chat["key"].ToString());
+            Carrot_Box_Btn_Item btn_key_mic = this.item_keyword.create_item();
+            btn_key_mic.set_icon(this.app.command_voice.icon_mic_chat);
+            btn_key_mic.set_color(this.app.carrot.color_highlight);
+            btn_key_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_keyword.inp_val));
 
-        Carrot_Box_Btn_Item btn_key_mic = this.item_keyword.create_item();
-        btn_key_mic.set_icon(this.app.command_voice.icon_mic_chat);
-        btn_key_mic.set_color(this.app.carrot.color_highlight);
-        btn_key_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_keyword.inp_val));
+            if (this.app.carrot.model_app == ModelApp.Develope)
+            {
+                Carrot.Carrot_Box_Btn_Item btn_key_same = this.item_keyword.create_item();
+                btn_key_same.set_color(this.app.carrot.color_highlight);
+                btn_key_same.set_icon(this.app.command_dev.sp_icon_key_same);
+                btn_key_same.set_act(() => this.app.command_dev.show_chat_key_same(this.item_keyword.get_val()));
 
-        if (this.app.carrot.model_app == ModelApp.Develope)
-        {
-            Carrot.Carrot_Box_Btn_Item btn_key_same= this.item_keyword.create_item();
-            btn_key_same.set_color(this.app.carrot.color_highlight);
-            btn_key_same.set_icon(this.app.command_dev.sp_icon_key_same);
-            btn_key_same.set_act(() => this.app.command_dev.show_chat_key_same(this.item_keyword.get_val()));
-
-            Carrot.Carrot_Box_Btn_Item btn_translate = this.item_keyword.create_item();
-            btn_translate.set_color(this.app.carrot.color_highlight);
-            btn_translate.set_icon(this.app.command_dev.sp_icon_translate);
-            btn_translate.set_act(() =>this.act_translate(this.item_keyword.get_val()));
+                Carrot.Carrot_Box_Btn_Item btn_translate = this.item_keyword.create_item();
+                btn_translate.set_color(this.app.carrot.color_highlight);
+                btn_translate.set_icon(this.app.command_dev.sp_icon_translate);
+                btn_translate.set_act(() => this.act_translate(this.item_keyword.get_val()));
+            }
         }
 
         this.item_msg = box_add_chat.create_item("item_msg");
@@ -597,6 +598,7 @@ public class Command_storage : MonoBehaviour
         string s_title=PlayerPrefs.GetString("brain_list", "List command");
         this.app.carrot.show_msg(s_title, "Delete all command success!!!");
         this.check_load_command_storage();
+        this.app.command_dev.close_all_box();
     }
 
     public void show_list_cm(string s_type)
@@ -943,9 +945,10 @@ public class Command_storage : MonoBehaviour
     private void act_done_submit_command()
     {
         this.app.carrot.show_loading();
-        chat c = this.get_data_chat();
+        
         if (this.type_act == Command_Type_Act.add_command)
         {
+            chat c = this.get_data_chat();
             string s_error_key_block = this.check_keyblock(this.item_keyword.get_val());
 
             if(this.item_keyword.get_val().Trim().Length==0|| this.item_msg.get_val().Trim().Length == 0)
@@ -1016,8 +1019,6 @@ public class Command_storage : MonoBehaviour
                 this.add_command_offline(s_data_chat_new);
             }
 
-            if (this.box_add_chat != null) this.box_add_chat.close();
-
             if(this.app.carrot.model_app==ModelApp.Publish)
                 this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("brain_add_success", "Your chat has been published successfully!"));
             else
@@ -1026,15 +1027,30 @@ public class Command_storage : MonoBehaviour
 
         if (this.type_act == Command_Type_Act.edit_command)
         {
+            chat c = this.get_data_chat();
             c.id = this.s_id;
             string s_chat_data = JsonConvert.SerializeObject(c);
             PlayerPrefs.SetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_cm_update, s_chat_data);
             this.app.carrot.hide_loading();
-            if (this.box_add_chat != null) this.box_add_chat.close();
             this.show_list_cm(this.s_type_view_list);
         }
 
-        if(this.app.carrot.model_app==ModelApp.Publish) this.app.carrot.ads.show_ads_Interstitial();
+        if (this.type_act == Command_Type_Act.edit_live)
+        {
+            this.app.carrot.hide_loading();
+            IDictionary data_live = this.app.live.get_data_item_chat_live_cur();
+            data_live["msg"] = this.item_msg.get_val();
+            data_live["action"] = this.item_action.get_val();
+            data_live["face"] = this.item_face.get_val();
+            data_live["func"] = this.item_run_control.get_val();
+            data_live["link"] = this.item_run_cmd.get_val();
+            data_live["icon"] = this.s_id_icon;
+            data_live["color"] = this.s_color;
+            this.app.live.update_data_item_chat_live(data_live);
+        }
+
+        if (this.box_add_chat != null) this.box_add_chat.close();
+        if (this.app.carrot.model_app==ModelApp.Publish) this.app.carrot.ads.show_ads_Interstitial();
     }
 
     private void act_del_patert_chat()
