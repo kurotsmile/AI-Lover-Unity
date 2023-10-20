@@ -13,10 +13,7 @@ public enum Command_Type_Act {
     add_command,
     edit_command,
     edit_pass,
-    edit_live,
-    list_command,
-    list_pass,
-    list_pedding
+    edit_live
 }
 
 [FirestoreData]
@@ -74,10 +71,11 @@ public class Command_storage : MonoBehaviour
     private bool is_cm_mode_nomal = true;
 
     private string s_id = "";
+    private string s_status = "pending";
     private string s_pater_id = "";
     private string s_pater_msg = "";
 
-    private string s_color = "FFFFFF";
+    private string s_color = "#FFFFFF";
     private string s_id_icon = "";
 
     private string s_user_id = "";
@@ -133,7 +131,7 @@ public class Command_storage : MonoBehaviour
     private Carrot.Carrot_Box_Btn_Item btn_model_advanced;
     private Carrot.Carrot_Button_Item obj_btn_test;
 
-    private Command_Type_Act type_act = Command_Type_Act.list_command;
+    private Command_Type_Act type_act = Command_Type_Act.add_command;
 
     private IList list_key_block;
     private IDictionary data_chat_test;
@@ -143,6 +141,7 @@ public class Command_storage : MonoBehaviour
     private void reset_all_s_data()
     {
         this.s_id = "";
+        this.s_status = "pending";
         this.s_pater_id = "";
         this.s_pater_msg = "";
         this.s_id_icon = "";
@@ -191,6 +190,7 @@ public class Command_storage : MonoBehaviour
 
     public void show_edit_command(int index,Carrot_Box_Item item_edit)
     {
+        this.reset_all_s_data();
         this.item_command_edit_temp = item_edit;
         this.type_act = Command_Type_Act.edit_command;
         this.show_edit_by_index(index);
@@ -198,6 +198,7 @@ public class Command_storage : MonoBehaviour
      
     private void show_edit_by_index(int index)
     {
+        this.reset_all_s_data();
         this.index_cm_update = index;
         string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + index);
         IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
@@ -206,13 +207,23 @@ public class Command_storage : MonoBehaviour
 
     public void show_edit_dev(IDictionary data_chat,Carrot_Box_Item item_edit)
     {
+        this.reset_all_s_data();
         this.type_act = Command_Type_Act.add_command;
+        this.item_command_edit_temp = item_edit;
+        this.show_edit_by_data(data_chat);
+    }
+
+    public void show_edit_pass(IDictionary data_chat, Carrot_Box_Item item_edit)
+    {
+        this.reset_all_s_data();
+        this.type_act = Command_Type_Act.edit_pass;
         this.item_command_edit_temp = item_edit;
         this.show_edit_by_data(data_chat);
     }
 
     public void show_edit_live(IDictionary data_chat)
     {
+        this.reset_all_s_data();
         this.type_act = Command_Type_Act.edit_live;
         this.show_edit_by_data(data_chat);
     }
@@ -220,11 +231,12 @@ public class Command_storage : MonoBehaviour
     private void show_edit_by_data(IDictionary data_chat)
     {
         if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
+        if (data_chat["status"] != null) this.s_status = data_chat["status"].ToString();
 
         this.get_list_key_block();
         if (this.box_add_chat != null) this.box_add_chat.close();
 
-        this.box_add_chat = this.GetComponent<App>().carrot.Create_Box("command_editor");
+        this.box_add_chat = this.GetComponent<App>().carrot.Create_Box("box_command_editor");
 
         if (this.type_act == Command_Type_Act.add_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_add", "Add the command"));
         if (this.type_act == Command_Type_Act.edit_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_update", "Update command"));
@@ -702,10 +714,10 @@ public class Command_storage : MonoBehaviour
 
     public void download_command_offline()
     {
-        if (this.GetComponent<App>().setting.check_buy_product(4))
+        if (this.app.setting.check_buy_product(4))
             download_command_shop();
         else
-            this.GetComponent<App>().buy_product(4);
+            this.app.buy_product(4);
     }
 
     public void download_command_shop()
@@ -919,13 +931,15 @@ public class Command_storage : MonoBehaviour
             link = this.item_run_cmd.get_val(),
             color = this.s_color,
             icon = this.s_id_icon,
-            status = "pending",
+            status =this.s_status,
             func = this.item_run_control.get_val(),
             date_create = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ")
         };
 
-        if (this.item_keyword != null) c.key = this.item_keyword.get_val().ToLower();
+        if (this.s_id.Trim() == "") c.id = "chat" + this.app.carrot.generateID();
+        else c.id = this.s_id;
 
+        if (this.item_keyword != null) c.key = this.item_keyword.get_val().ToLower();
         c.user = this.get_user_data_editor(this.s_user_id);
         return c;
     }
@@ -935,7 +949,6 @@ public class Command_storage : MonoBehaviour
         Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
         if (s_user_id != "")
         {
-            
             user_login.name = this.s_user_name;
             user_login.id = s_user_id;
             user_login.lang = this.s_user_lang;
@@ -957,8 +970,12 @@ public class Command_storage : MonoBehaviour
     private IDictionary get_data_chat_editor()
     {
         IDictionary data_chat = (IDictionary) Json.Deserialize("{}");
-        data_chat["id"] = this.s_id;
-        if(this.item_keyword!=null) data_chat["key"] = this.item_keyword.get_val();
+        if(this.s_id!="")
+            data_chat["id"] = this.s_id;
+        else
+            data_chat["id"] = "chat"+this.app.carrot.generateID();
+
+        if (this.item_keyword!=null) data_chat["key"] = this.item_keyword.get_val();
         data_chat["msg"] = this.item_msg.get_val();
         data_chat["action"] = this.item_action.get_val();
         data_chat["face"] = this.item_face.get_val();
@@ -968,7 +985,13 @@ public class Command_storage : MonoBehaviour
         data_chat["color"] = this.s_color;
         data_chat["pater"] = this.s_pater_id;
         data_chat["pater_msg"] = this.s_pater_msg;
-        data_chat["user"] =Json.Serialize(this.get_user_data_editor(this.s_user_id));
+
+        IDictionary data_user = (IDictionary) Json.Deserialize(JsonConvert.SerializeObject(this.get_user_data_editor(this.s_user_id)));
+        data_chat["user"] = data_user;
+        if (this.s_status!="") 
+            data_chat["status"]=this.s_status;
+        else
+            data_chat["status"] = "pending";
         return data_chat;
     }
 
@@ -1018,31 +1041,17 @@ public class Command_storage : MonoBehaviour
                         if (task.IsFaulted) this.add_command_offline(chat_data);
                         if (task.IsCompleted) this.add_command_offline(chat_data);
                     });
-
                 }
 
                 if (this.app.carrot.model_app == ModelApp.Develope)
                 {
-                    if (this.s_id.Trim() == "")
-                    {
-                        string s_new_id= "chat" + this.app.carrot.generateID();
-                        DocumentReference chatRef = chatDbRef.Document(s_new_id);
-                        c.id = s_new_id;
-                        c.status = "passed";
-                        chatRef.SetAsync(c);
-                    }
-                    else
-                    {
-                        DocumentReference chatRef = chatDbRef.Document(this.s_id);
-                        c.id = this.s_id;
-                        c.status = "passed";
-                        chatRef.SetAsync(c);
-                    }
+                    DocumentReference chatRef = chatDbRef.Document(c.id);
+                    c.status = "passed";
+                    chatRef.SetAsync(c);
                 }
             }
             else
             {
-                c.id = "chat" + this.app.carrot.generateID();
                 string s_data_chat_new = JsonConvert.SerializeObject(c);
                 this.add_command_offline(s_data_chat_new);
             }
@@ -1056,13 +1065,22 @@ public class Command_storage : MonoBehaviour
                 this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "The chat has been published successfully! (Dev)");
                 if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
             }
-                
+        }
+
+        if (this.type_act == Command_Type_Act.edit_pass)
+        {
+            CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
+            chat c = this.get_data_chat();
+            DocumentReference chatRef = chatDbRef.Document(c.id);
+            c.status = "passed";
+            chatRef.SetAsync(c);
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "Chat update published successfully! (Dev)");
+            if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
         }
 
         if (this.type_act == Command_Type_Act.edit_command)
         {
             chat c = this.get_data_chat();
-            c.id = this.s_id;
             string s_chat_data = JsonConvert.SerializeObject(c);
             PlayerPrefs.SetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_cm_update, s_chat_data);
             if (this.item_command_edit_temp != null)

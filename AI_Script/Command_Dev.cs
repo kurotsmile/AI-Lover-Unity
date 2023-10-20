@@ -313,6 +313,15 @@ public class Command_Dev : MonoBehaviour
             item_same.set_title("Chat with the same keyword");
             item_same.set_tip("See a list of Chats that match the same keyword");
             item_same.set_act(() => show_chat_key_same(s_key));
+
+            if(s_status== "passed")
+            {
+                Carrot_Box_Item item_edit_cm_pass = box_sub_menu.create_item();
+                item_edit_cm_pass.set_icon(this.app.carrot.user.icon_user_edit);
+                item_edit_cm_pass.set_title("Edit");
+                item_edit_cm_pass.set_tip("Chat Update (Dev)");
+                item_edit_cm_pass.set_act(() => this.app.command_storage.show_edit_pass(data, obj_focus.GetComponent<Carrot_Box_Item>()));
+            }
         }
 
         if (s_status != "test" || s_status != "list_test")

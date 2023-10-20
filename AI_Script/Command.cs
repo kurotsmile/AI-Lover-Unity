@@ -82,9 +82,10 @@ public class Command : MonoBehaviour
     {
         this.is_live = false;
         this.s_command_chat_last = s_key;
-        if(is_log_show) add_item_log_chat(s_key);
+        
         if (this.mode == Command_Type_Mode.chat)
         {
+            if (is_log_show) add_item_log_chat(s_key);
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
             if (chat_offline != null)
             {
@@ -307,8 +308,8 @@ public class Command : MonoBehaviour
         {
             string s_status = data_chat["status"].ToString();
             if(s_status=="passed")this.obj_btn_report_chat.SetActive(true);
-            if(s_status== "passed"||s_status== "pending" || s_status == "buy") this.obj_btn_add_chat_whith_father.SetActive(true);
-            if (s_status == "test" || s_status == "test_list")
+            if(s_status=="passed"||s_status=="pending"||s_status == "buy") this.obj_btn_add_chat_whith_father.SetActive(true);
+            if (s_status=="test"||s_status=="test_list")
             {
                 this.is_test_command = true;
                 this.obj_btn_log.SetActive(false);
@@ -794,13 +795,11 @@ public class Command : MonoBehaviour
         this.data_chat_cur["face"] = Random.Range(0, 18).ToString();
         this.data_chat_cur["color"] = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f).CTToHexRGBA();
         this.data_chat_cur["status"] = "live";
-
         if (icons!=null)
         {
             int index_icons = Random.Range(0, icons.Count);
             this.data_chat_cur["icon"] = icons[index_icons];
         }
-
         this.act_chat(this.data_chat_cur);
     }
 
