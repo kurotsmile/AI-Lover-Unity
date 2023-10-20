@@ -312,6 +312,7 @@ public class Command : MonoBehaviour
             {
                 this.is_test_command = true;
                 this.obj_btn_log.SetActive(false);
+                this.obj_btn_more.SetActive(false);
             }
         }
 

@@ -193,10 +193,10 @@ public class Command_storage : MonoBehaviour
     {
         this.item_command_edit_temp = item_edit;
         this.type_act = Command_Type_Act.edit_command;
-        this.show_edit(index);
+        this.show_edit_by_index(index);
     }
      
-    public void show_edit(int index)
+    private void show_edit_by_index(int index)
     {
         this.index_cm_update = index;
         string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + index);
@@ -204,9 +204,10 @@ public class Command_storage : MonoBehaviour
         this.show_edit_by_data(data_chat);
     }
 
-    public void show_edit_dev(IDictionary data_chat)
+    public void show_edit_dev(IDictionary data_chat,Carrot_Box_Item item_edit)
     {
-        this.type_act= Command_Type_Act.add_command;
+        this.type_act = Command_Type_Act.add_command;
+        this.item_command_edit_temp = item_edit;
         this.show_edit_by_data(data_chat);
     }
 
@@ -1037,8 +1038,6 @@ public class Command_storage : MonoBehaviour
                         c.status = "passed";
                         chatRef.SetAsync(c);
                     }
-
-                    this.app.command_dev.close_all_box();
                 }
             }
             else
@@ -1048,10 +1047,16 @@ public class Command_storage : MonoBehaviour
                 this.add_command_offline(s_data_chat_new);
             }
 
-            if(this.app.carrot.model_app==ModelApp.Publish)
+            if (this.app.carrot.model_app == ModelApp.Publish)
+            {
                 this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("brain_add_success", "Your chat has been published successfully!"));
+            }
             else
+            {
                 this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "The chat has been published successfully! (Dev)");
+                if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
+            }
+                
         }
 
         if (this.type_act == Command_Type_Act.edit_command)

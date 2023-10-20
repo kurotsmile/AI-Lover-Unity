@@ -248,6 +248,11 @@ public class Command_Dev : MonoBehaviour
             btn_add.set_icon(this.app.command_storage.sp_icon_patert);
             btn_add.set_act(() => this.app.command_storage.show_add_command_with_pater(c["msg"].ToString(), c["id"].ToString()));
 
+            Carrot_Box_Btn_Item btn_sub_menu = item_chat.create_item();
+            btn_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
+            btn_sub_menu.set_color(this.app.carrot.color_highlight);
+            btn_sub_menu.set_act(() => this.sub_menu(c, item_chat.gameObject));
+
             if (c["index_cm"] != null)
             {
                 if (c["index_cm"].ToString() != "")
@@ -255,22 +260,21 @@ public class Command_Dev : MonoBehaviour
                     int index_cm = int.Parse(c["index_cm"].ToString());
                     item_chat.set_act(() => this.app.command_storage.show_edit_command(index_cm,item_chat));
                 }
+                else
+                {
+                    if(this.app.carrot.model_app==ModelApp.Develope) 
+                        item_chat.set_act(() => this.app.command_storage.show_edit_dev(c,item_chat));
+                    else
+                        item_chat.set_act(() => this.app.command.box_info_chat(c));
+                }
             }
-
-            if (this.app.carrot.model_app == ModelApp.Develope)
+            else
             {
-                Carrot_Box_Btn_Item btn_same = item_chat.create_item();
-                btn_same.set_icon(this.sp_icon_key_same);
-                btn_same.set_color(this.app.carrot.color_highlight);
-                btn_same.set_act(() => show_chat_key_same(key_chat));
-
-                item_chat.set_act(() => this.app.command_storage.show_edit_dev(c));
+                if(this.app.carrot.model_app==ModelApp.Develope) 
+                    item_chat.set_act(() => this.app.command_storage.show_edit_dev(c,item_chat));
+                else
+                    item_chat.set_act(() => this.app.command.box_info_chat(c));
             }
-
-            Carrot_Box_Btn_Item btn_sub_menu = item_chat.create_item();
-            btn_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
-            btn_sub_menu.set_color(this.app.carrot.color_highlight);
-            btn_sub_menu.set_act(() => this.sub_menu(c,item_chat.gameObject));
         }
         return box;
     }
@@ -278,10 +282,16 @@ public class Command_Dev : MonoBehaviour
     public void sub_menu(IDictionary data,GameObject obj_focus=null)
     {
         string s_status = "";
+        string s_key = "";
+
         if (data["status"] != null) s_status = data["status"].ToString();
         Carrot_Box box_sub_menu = this.app.carrot.Create_Box("sub_menu");
         box_sub_menu.set_icon(this.app.carrot.icon_carrot_all_category);
-        if (data["key"]!=null) box_sub_menu.set_title(data["key"].ToString());
+        if (data["key"] != null)
+        {
+            s_key = data["key"].ToString();
+            box_sub_menu.set_title(s_key);
+        }
         this.list_obj_box.Add(box_sub_menu.gameObject);
 
         Carrot_Box_Item item_info = box_sub_menu.create_item();
@@ -295,6 +305,15 @@ public class Command_Dev : MonoBehaviour
         item_add.set_title(PlayerPrefs.GetString("brain_add", "Create a new command"));
         item_add.set_tip("Create a conversation with content that continues this conversation");
         item_add.set_act(() => this.app.command_storage.show_add_command_with_pater(data["msg"].ToString(), data["id"].ToString()));
+
+        if (this.app.carrot.model_app == ModelApp.Develope)
+        {
+            Carrot_Box_Item item_same = box_sub_menu.create_item();
+            item_same.set_icon(this.sp_icon_key_same);
+            item_same.set_title("Chat with the same keyword");
+            item_same.set_tip("See a list of Chats that match the same keyword");
+            item_same.set_act(() => show_chat_key_same(s_key));
+        }
 
         if (s_status != "test" || s_status != "list_test")
         {

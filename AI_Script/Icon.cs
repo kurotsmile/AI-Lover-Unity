@@ -161,8 +161,6 @@ public class Icon : MonoBehaviour
 
             item_icon.set_act(() => this.set_icon_and_emoji(Color.red, item_icon.img_icon.sprite, s_color, id_icon));
         }
-
-        Debug.Log(Json.Serialize(this.list_icon_name));
         PlayerPrefs.SetString("s_data_icon_temp",Json.Serialize(this.list_icon_name));
     }
 
