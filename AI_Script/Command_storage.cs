@@ -177,6 +177,17 @@ public class Command_storage : MonoBehaviour
         this.show_edit_by_data(data_new_chat);
     }
 
+    public void show_add_command_with_pater_and_keyword(string s_key,string s_chat, string pater)
+    {
+        this.reset_all_s_data();
+        this.type_act = Command_Type_Act.add_command;
+        IDictionary data_new_chat = (IDictionary)Carrot.Json.Deserialize("{}");
+        data_new_chat["key"] = s_key;
+        data_new_chat["pater"] = pater;
+        data_new_chat["pater_msg"] = s_chat;
+        this.show_edit_by_data(data_new_chat);
+    }
+
     public void show_add_command_new()
     {
         this.reset_all_s_data();
@@ -486,6 +497,10 @@ public class Command_storage : MonoBehaviour
         item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
         item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
         item_user_sex.set_act(() => this.show_select_sex_chat(this.item_user_sex));
+        if (this.is_cm_mode_nomal)
+            this.item_user_sex.gameObject.SetActive(false);
+        else
+            this.item_user_sex.gameObject.SetActive(true);
         if (this.s_sex_user == "0")
             item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
         else
@@ -500,6 +515,10 @@ public class Command_storage : MonoBehaviour
         item_character_sex.set_icon(this.app.setting.sp_icon_sex_character);
         item_character_sex.set_title(PlayerPrefs.GetString("setting_char_sex", "Character gender"));
         item_character_sex.set_act(() => this.show_select_sex_chat(this.item_character_sex));
+        if (this.is_cm_mode_nomal)
+            this.item_character_sex.gameObject.SetActive(false);
+        else
+            this.item_character_sex.gameObject.SetActive(true);
         if (this.s_sex_character == "0")
             item_character_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
         else
@@ -571,6 +590,11 @@ public class Command_storage : MonoBehaviour
 
     private void show_select_sex_chat(Carrot_Box_Item item_sex_sel)
     {
+        string s_val_sex = "";
+
+        if (item_sex_sel.name == "item_character_sex") s_val_sex=this.s_sex_character;
+        if (item_sex_sel.name == "item_user_sex") s_val_sex=this.s_sex_user;
+
         this.box_sex_sel_chat = this.app.carrot.Create_Box("sel_sex");
         this.box_sex_sel_chat.set_title(item_sex_sel.txt_name.text);
         this.box_sex_sel_chat.set_icon(item_sex_sel.img_icon.sprite);
@@ -581,16 +605,40 @@ public class Command_storage : MonoBehaviour
         item_sex_boy.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
         item_sex_boy.set_act(() => this.act_sel_sex_chat(item_sex_sel, "0"));
 
+        if (s_val_sex == "0")
+        {
+            Carrot_Box_Btn_Item btn_sel=item_sex_boy.create_item();
+            btn_sel.set_icon(this.app.carrot.icon_carrot_done);
+            btn_sel.set_icon_color(this.app.carrot.color_highlight);
+            btn_sel.set_color(Color.white);
+        }
+
         Carrot.Carrot_Box_Item item_sex_girl= this.box_sex_sel_chat.create_item("item_sex_girl");
         item_sex_girl.set_icon(this.app.setting.sp_icon_sex_girl);
         item_sex_girl.set_title(PlayerPrefs.GetString("user_sex_girl", "Girl"));
         item_sex_girl.set_tip(PlayerPrefs.GetString("user_sex_girl", "Female"));
         item_sex_girl.set_act(() => this.act_sel_sex_chat(item_sex_sel, "1"));
+
+        if (s_val_sex == "1")
+        {
+            Carrot_Box_Btn_Item btn_sel = item_sex_girl.create_item();
+            btn_sel.set_icon(this.app.carrot.icon_carrot_done);
+            btn_sel.set_icon_color(this.app.carrot.color_highlight);
+            btn_sel.set_color(Color.white);
+        }
     }
 
     private void act_sel_sex_chat(Carrot_Box_Item item_sex_sel, string s_val_sex)
     {
-        item_sex_sel.set_tip(s_val_sex);
+        this.app.carrot.play_sound_click();
+        if(item_sex_sel.name== "item_character_sex") this.s_sex_character = s_val_sex;
+        if(item_sex_sel.name == "item_user_sex") this.s_sex_user = s_val_sex;
+
+        if (s_val_sex=="0")
+            item_sex_sel.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
+        else
+            item_sex_sel.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
+
         if (this.box_sex_sel_chat != null) this.box_sex_sel_chat.close();
     }
 

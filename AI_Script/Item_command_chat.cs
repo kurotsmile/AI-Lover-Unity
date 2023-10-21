@@ -8,6 +8,7 @@ public class Item_command_chat : MonoBehaviour
     public Image icon;
     public Text txt_chat;
     public GameObject btn_add_app;
+    public Button btn_extension;
     public IDictionary idata_chat;
 
     private UnityAction act_click;
@@ -22,6 +23,7 @@ public class Item_command_chat : MonoBehaviour
     {
         if (this.act_add != null) this.act_add();
     }
+
 
     public void set_act_click(UnityAction u_act)
     {

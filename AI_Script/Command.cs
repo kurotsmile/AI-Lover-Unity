@@ -86,6 +86,7 @@ public class Command : MonoBehaviour
         if (this.mode == Command_Type_Mode.chat)
         {
             if (is_log_show) add_item_log_chat(s_key);
+
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
             if (chat_offline != null)
             {
@@ -184,6 +185,7 @@ public class Command : MonoBehaviour
 
     private void show_msg_no_chat()
     {
+        this.data_chat_cur = null;
         this.hide_all_obj_msg();
         this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
     }
@@ -224,6 +226,18 @@ public class Command : MonoBehaviour
         c_chat.idata_chat = Idata;
         c_chat.set_act_click(()=>this.app.command_storage.show_new_command(s_inp_command));
         c_chat.set_act_add(() => this.app.command_storage.show_new_command(s_inp_command));
+
+        if (data_chat_cur != null)
+        {
+            c_chat.btn_extension.onClick.RemoveAllListeners();
+            string s_id = data_chat_cur["id"].ToString();
+            string s_msg = data_chat_cur["msg"].ToString();
+            c_chat.btn_extension.onClick.AddListener(() => this.app.command_storage.show_add_command_with_pater_and_keyword(s_inp_command,s_msg,s_id));
+        }
+        else
+        {
+            c_chat.btn_extension.gameObject.SetActive(false);
+        }
     }
 
     public Item_command_chat add_item_pc_chat(string s_txt_show,Sprite icon, IDictionary i_data=null)
@@ -281,7 +295,7 @@ public class Command : MonoBehaviour
         this.add_item_pc_chat(s_name, this.icon_pc_music, id_data);
     }
 
-    public void act_chat(IDictionary data_chat,bool is_add_log=true)
+    public void act_chat(IDictionary data_chat, bool is_add_log = true)
     {
         this.obj_btn_log.SetActive(true);
         this.obj_btn_info_chat.SetActive(true);
@@ -290,7 +304,7 @@ public class Command : MonoBehaviour
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
         this.obj_btn_clear_all_log.SetActive(false);
-        if(this.app.live.get_status_active())
+        if (this.app.live.get_status_active())
             this.obj_btn_play_all_log.SetActive(true);
         else
             this.obj_btn_play_all_log.SetActive(false);
@@ -307,9 +321,9 @@ public class Command : MonoBehaviour
         if (data_chat["status"] != null)
         {
             string s_status = data_chat["status"].ToString();
-            if(s_status=="passed")this.obj_btn_report_chat.SetActive(true);
-            if(s_status=="passed"||s_status=="pending"||s_status == "buy") this.obj_btn_add_chat_whith_father.SetActive(true);
-            if (s_status=="test"||s_status=="test_list")
+            if (s_status == "passed") this.obj_btn_report_chat.SetActive(true);
+            if (s_status == "passed" || s_status == "pending" || s_status == "buy") this.obj_btn_add_chat_whith_father.SetActive(true);
+            if (s_status == "test" || s_status == "test_list")
             {
                 this.is_test_command = true;
                 this.obj_btn_log.SetActive(false);
@@ -326,9 +340,9 @@ public class Command : MonoBehaviour
             if (this.app.setting.get_status_sound_voice()) this.play_text_audio(s_msg_chat);
         }
 
-        if (data_chat["action"]!= null) this.play_act(data_chat["action"].ToString());
-        if (data_chat["face"]!= null) this.act_cm_face(data_chat["face"].ToString());
-        if (data_chat["color"]!= null) this.set_color_by_string(data_chat["color"].ToString());
+        if (data_chat["action"] != null) this.play_act(data_chat["action"].ToString());
+        if (data_chat["face"] != null) this.act_cm_face(data_chat["face"].ToString());
+        if (data_chat["color"] != null) this.set_color_by_string(data_chat["color"].ToString());
 
         if (this.app.setting.get_status_sound_voice())
         {
@@ -336,12 +350,12 @@ public class Command : MonoBehaviour
             {
                 if (data_chat["mp3"] != null)
                 {
-                    if(data_chat["mp3"].ToString()!="") StartCoroutine(get_audio_chat_form_url(data_chat["mp3"].ToString()));
+                    if (data_chat["mp3"].ToString() != "") StartCoroutine(get_audio_chat_form_url(data_chat["mp3"].ToString()));
                 }
             }
         }
 
-        if (data_chat["link"]!= null) if(data_chat["link"].ToString().Trim()!="") Application.OpenURL(data_chat["link"].ToString());
+        if (data_chat["link"] != null) if (data_chat["link"].ToString().Trim() != "") Application.OpenURL(data_chat["link"].ToString());
         if (data_chat["func"] != null)
         {
             string index_func = data_chat["func"].ToString();
@@ -356,9 +370,9 @@ public class Command : MonoBehaviour
             if (index_func == "9") this.app.player_music.playlist.show_list_radio();
             if (index_func == "10") this.app.carrot.show_rate();
             if (index_func == "11") this.app.carrot.show_share();
-            if (index_func == "12") this.app.carrot.delay_function(3.6f,this.app.exit_app);
-        } 
-        if (data_chat["icon"]!= null)
+            if (index_func == "12") this.app.carrot.delay_function(3.6f, this.app.exit_app);
+        }
+        if (data_chat["icon"] != null)
         {
             if (data_chat["icon"].ToString() != "")
             {
@@ -375,7 +389,10 @@ public class Command : MonoBehaviour
             }
         }
 
-        if(is_add_log) this.add_item_pc_chat(s_msg_chat, this.app.get_character().icon_sex, data_chat);
+        if (is_add_log)
+        {
+            this.add_item_pc_chat(s_msg_chat, this.app.get_character().icon_sex, data_chat);
+        }
         this.app.carrot.ads.show_ads_Interstitial();
     }
 
