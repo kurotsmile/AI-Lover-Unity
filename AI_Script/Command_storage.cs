@@ -74,6 +74,8 @@ public class Command_storage : MonoBehaviour
     private string s_status = "pending";
     private string s_pater_id = "";
     private string s_pater_msg = "";
+    private string s_sex_user = "";
+    private string s_sex_character = "";
 
     private string s_color = "#FFFFFF";
     private string s_id_icon = "";
@@ -126,6 +128,8 @@ public class Command_storage : MonoBehaviour
     private Carrot.Carrot_Box_Item item_action;
     private Carrot.Carrot_Box_Item item_face;
     private Carrot.Carrot_Box_Item item_user_create;
+    private Carrot.Carrot_Box_Item item_user_sex;
+    private Carrot.Carrot_Box_Item item_character_sex;
 
     private Carrot.Carrot_Box_Btn_Item btn_model_nomal;
     private Carrot.Carrot_Box_Btn_Item btn_model_advanced;
@@ -151,6 +155,8 @@ public class Command_storage : MonoBehaviour
         this.s_user_name = "";
         this.s_user_avatar = "";
         this.index_cm_update = -1;
+        this.s_sex_character = "";
+        this.s_sex_user = "";
     }
 
     public void check_load_command_storage()
@@ -233,6 +239,24 @@ public class Command_storage : MonoBehaviour
         if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
         if (data_chat["status"] != null) this.s_status = data_chat["status"].ToString();
 
+        if (data_chat["sex_character"] != null)
+        {
+            this.s_sex_character = data_chat["sex_character"].ToString();
+        }
+        else
+        {
+            this.s_sex_character = this.app.setting.get_character_sex();
+        }
+
+        if (data_chat["sex_user"] != null)
+        {
+            this.s_sex_user = data_chat["sex_user"].ToString();
+        }
+        else
+        {
+            this.s_sex_user = this.app.setting.get_user_sex();
+        }
+
         this.get_list_key_block();
         if (this.box_add_chat != null) this.box_add_chat.close();
 
@@ -263,12 +287,13 @@ public class Command_storage : MonoBehaviour
             if (data_chat["pater"].ToString() != "")
             {
                 this.s_pater_id = data_chat["pater"].ToString();
-                if (data_chat["pater_msg"]!=null) this.s_pater_msg = data_chat["pater_msg"].ToString();
-                else this.s_pater_msg= data_chat["pater_msg"].ToString();
+                if (data_chat["pater_msg"] != null) this.s_pater_msg = data_chat["pater_msg"].ToString();
+                else this.s_pater_msg = data_chat["pater_msg"].ToString();
             }
         }
 
-        if (this.s_pater_id != "") {
+        if (this.s_pater_id != "")
+        {
             this.item_patert = this.box_add_chat.create_item("item_patert");
             item_patert.set_type(Carrot.Box_Item_Type.box_value_txt);
             item_patert.set_icon(this.sp_icon_patert);
@@ -289,7 +314,8 @@ public class Command_storage : MonoBehaviour
             btn_del_patert.set_act(() => act_del_patert_chat());
         }
 
-        if (data_chat["key"] != null) { 
+        if (data_chat["key"] != null)
+        {
             this.item_keyword = box_add_chat.create_item("item_keyword");
             item_keyword.set_type(Carrot.Box_Item_Type.box_value_input);
             item_keyword.check_type();
@@ -332,7 +358,7 @@ public class Command_storage : MonoBehaviour
         Carrot_Box_Btn_Item btn_msg_mic = this.item_msg.create_item();
         btn_msg_mic.set_icon(this.app.command_voice.icon_mic_chat);
         btn_msg_mic.set_color(this.app.carrot.color_highlight);
-        btn_msg_mic.set_act(()=>this.app.command_voice.start_inp_mic(this.item_msg.inp_val));
+        btn_msg_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_msg.inp_val));
 
         if (this.app.carrot.model_app == ModelApp.Develope)
         {
@@ -454,32 +480,34 @@ public class Command_storage : MonoBehaviour
             if (sp_icon != null) this.item_icon.set_icon_white(sp_icon);
         }
 
-        if (this.app.carrot.model_app == ModelApp.Develope)
-        {
-            if (data_chat["sex_user"] != null)
-            {
-                Carrot_Box_Item item_user_sex = box_add_chat.create_item("item_user_sex");
-                item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
-                item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
 
-                if (data_chat["sex_user"].ToString() == "0")
-                    item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
-                else
-                    item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
-            }
+        this.item_user_sex = box_add_chat.create_item("item_user_sex");
+        item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
+        item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
+        item_user_sex.set_act(() => this.show_select_sex_chat());
+        if (this.s_sex_user == "0")
+            item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
+        else
+            item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
 
-            if (data_chat["sex_character"] != null)
-            {
-                Carrot_Box_Item item_npc_sex = box_add_chat.create_item("item_npc_sex");
-                item_npc_sex.set_icon(this.app.setting.sp_icon_sex_character);
-                item_npc_sex.set_title(PlayerPrefs.GetString("setting_char_sex", "Character gender"));
+        Carrot_Box_Btn_Item btn_user_sex_edit = item_user_sex.create_item();
+        btn_user_sex_edit.set_icon(this.app.carrot.user.icon_user_edit);
+        btn_user_sex_edit.set_color(this.app.carrot.color_highlight);
+        Destroy(btn_user_sex_edit.GetComponent<Button>());
 
-                if (data_chat["sex_character"].ToString() == "0")
-                    item_npc_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
-                else
-                    item_npc_sex.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
-            }
-        }
+        this.item_character_sex = box_add_chat.create_item("item_npc_sex");
+        item_character_sex.set_icon(this.app.setting.sp_icon_sex_character);
+        item_character_sex.set_title(PlayerPrefs.GetString("setting_char_sex", "Character gender"));
+        item_character_sex.set_act(() => this.show_select_sex_chat());
+        if (this.s_sex_character == "0")
+            item_character_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
+        else
+            item_character_sex.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
+
+        Carrot_Box_Btn_Item btn_user_character_edit = item_character_sex.create_item();
+        btn_user_character_edit.set_icon(this.app.carrot.user.icon_user_edit);
+        btn_user_character_edit.set_color(this.app.carrot.color_highlight);
+        Destroy(btn_user_character_edit.GetComponent<Button>());
 
         if (data_chat["user"] != null)
         {
@@ -490,7 +518,7 @@ public class Command_storage : MonoBehaviour
                 {
                     string user_id = data_user_create["id"].ToString();
                     string user_lang = data_user_create["lang"].ToString();
-                    this.item_user_create= this.box_add_chat.create_item("item_user");
+                    this.item_user_create = this.box_add_chat.create_item("item_user");
                     this.item_user_create.set_title(PlayerPrefs.GetString("chat_creator", "Creator"));
                     this.item_user_create.set_icon(this.app.carrot.user.icon_user_info);
                     this.item_user_create.set_tip(data_user_create["name"].ToString());
@@ -508,9 +536,9 @@ public class Command_storage : MonoBehaviour
                     else
                         this.item_user_create.gameObject.SetActive(true);
 
-                    this.s_user_id=data_user_create["id"].ToString();
+                    this.s_user_id = data_user_create["id"].ToString();
                     this.s_user_name = data_user_create["name"].ToString();
-                    this.s_user_lang= data_user_create["lang"].ToString();
+                    this.s_user_lang = data_user_create["lang"].ToString();
                     if (data_user_create["avatar"] != null) this.s_user_avatar = data_user_create["avatar"].ToString();
 
                     Carrot_Box_Btn_Item btn_del_user = this.item_user_create.create_item();
@@ -540,6 +568,20 @@ public class Command_storage : MonoBehaviour
         obj_btn_test.set_icon(this.app.carrot.game.icon_play_music_game);
 
         box_add_chat.set_act_before_closing(act_close_box);
+    }
+
+    private void show_select_sex_chat()
+    {
+        Carrot_Box box_sel_sex = this.app.carrot.Create_Box("sel_sex");
+        box_sel_sex.set_title("Select Sex for chat");
+
+        Carrot.Carrot_Box_Item item_sex_boy=box_sel_sex.create_item("item_sex_boy");
+        item_sex_boy.set_title("Boy");
+        item_sex_boy.set_tip("Male");
+
+        Carrot.Carrot_Box_Item item_sex_girl=box_sel_sex.create_item("item_sex_girl");
+        item_sex_girl.set_title("Girl");
+        item_sex_girl.set_tip("Female");
     }
 
     private void btn_del_user_create()
@@ -864,6 +906,8 @@ public class Command_storage : MonoBehaviour
         this.item_icon.gameObject.SetActive(false);
         this.item_run_cmd.gameObject.SetActive(false);
         this.item_run_control.gameObject.SetActive(false);
+        this.item_character_sex.gameObject.SetActive(false);
+        this.item_user_sex.gameObject.SetActive(false);
         if(this.item_user_create!=null) this.item_user_create.gameObject.SetActive(false);
     }
 
@@ -876,6 +920,8 @@ public class Command_storage : MonoBehaviour
         this.item_icon.gameObject.SetActive(true);
         this.item_run_cmd.gameObject.SetActive(true);
         this.item_run_control.gameObject.SetActive(true);
+        this.item_character_sex.gameObject.SetActive(true);
+        this.item_user_sex.gameObject.SetActive(true);
         if (this.item_user_create != null) this.item_user_create.gameObject.SetActive(true);
     }
 
@@ -925,8 +971,8 @@ public class Command_storage : MonoBehaviour
             action = this.item_action.get_val(),
             face = this.item_face.get_val(),
             limit = "1",
-            sex_character = this.app.setting.get_character_sex(),
-            sex_user = this.app.setting.get_user_sex(),
+            sex_character = this.s_sex_character,
+            sex_user = this.s_sex_user,
             pater = this.s_pater_id,
             link = this.item_run_cmd.get_val(),
             color = this.s_color,
@@ -985,6 +1031,8 @@ public class Command_storage : MonoBehaviour
         data_chat["color"] = this.s_color;
         data_chat["pater"] = this.s_pater_id;
         data_chat["pater_msg"] = this.s_pater_msg;
+        data_chat["sex_character"] = this.s_sex_character;
+        data_chat["sex_user"] = this.s_sex_user;
 
         IDictionary data_user = (IDictionary) Json.Deserialize(JsonConvert.SerializeObject(this.get_user_data_editor(this.s_user_id)));
         data_chat["user"] = data_user;

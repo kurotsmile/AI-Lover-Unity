@@ -2391,7 +2391,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.8, y: 47}
+  m_AnchoredPosition: {x: -0.80000305, y: 47}
   m_SizeDelta: {x: 250, y: 46.9}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &6063772940580353966
@@ -24878,6 +24878,7 @@ MonoBehaviour:
   icon_genre: {fileID: 21300000, guid: b16cff1e78fc0b64b95f17cddb692573, type: 3}
   icon_radio: {fileID: 21300000, guid: cbf3fe3f708a3e340bd5210586ed7aa2, type: 3}
   icon_music_online: {fileID: 21300000, guid: 96ba5e279fa55d940b8c504e0a405161, type: 3}
+  icon_mp3_file: {fileID: 21300000, guid: 2089b6be8a837e745b2dd5282a8cb533, type: 3}
   btn_show_playlist: {fileID: 2755477470961594053}
   btn_show_playlist_home: {fileID: 5765707291263471236}
 --- !u!82 &4927740781218623142
@@ -37379,7 +37380,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.00011444092}
+  m_AnchoredPosition: {x: -3, y: 0.0007095337}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004
@@ -41349,8 +41350,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1334967823943002200}
   m_HandleRect: {fileID: 2440126133283484171}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.517446
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

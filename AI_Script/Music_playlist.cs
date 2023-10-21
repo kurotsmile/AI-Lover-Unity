@@ -25,6 +25,7 @@ public class Music_playlist : MonoBehaviour
     public Sprite icon_genre;
     public Sprite icon_radio;
     public Sprite icon_music_online;
+    public Sprite icon_mp3_file;
     private int length;
 
     [Header("Obj Other")]
@@ -34,6 +35,9 @@ public class Music_playlist : MonoBehaviour
     private Carrot.Carrot_Box box_list;
     private Carrot.Carrot_Window_Input box_search_inp;
     private Playlist_Type type;
+
+    private string s_buy_id_song = "";
+    private string s_buy_link_mp3_song="";
 
     void Start()
     {
@@ -298,6 +302,21 @@ public class Music_playlist : MonoBehaviour
                         btn_share.set_icon(this.app.carrot.sp_icon_share);
                         btn_share.set_color(this.app.carrot.color_highlight);
                         btn_share.set_act(() => this.app.carrot.show_share(link_song_share, PlayerPrefs.GetString("share_song", "Share this song so everyone can hear it!")));
+
+                        if (PlayerPrefs.GetInt("is_buy_song_" + s_id_song, 0) == 1)
+                        {
+                            Carrot.Carrot_Box_Btn_Item btn_download = item_song.create_item();
+                            btn_download.set_icon(this.app.carrot.icon_carrot_download);
+                            btn_download.set_color(this.app.carrot.color_highlight);
+                            btn_download.set_act(() =>Application.OpenURL(data_song["mp3"].ToString()));
+                        }
+                        else
+                        {
+                            Carrot.Carrot_Box_Btn_Item btn_buy = item_song.create_item();
+                            btn_buy.set_icon(this.icon_mp3_file);
+                            btn_buy.set_color(this.app.carrot.color_highlight);
+                            btn_buy.set_act(() => this.act_buy_mp3(s_id_song, data_song["mp3"].ToString()));
+                        }
                     }
 
                     if (this.type == Playlist_Type.offline)
@@ -443,5 +462,23 @@ public class Music_playlist : MonoBehaviour
                 }
             }
         });
+    }
+
+    private void act_buy_mp3(string s_id_song,string s_link_mp3)
+    {
+        this.s_buy_id_song = s_id_song;
+        this.s_buy_link_mp3_song = s_link_mp3;
+        this.app.carrot.shop.buy_product(1);
+    }
+
+    public void on_pay_success()
+    {
+        if (this.s_buy_id_song != "")
+        {
+            Application.OpenURL(this.s_buy_link_mp3_song);
+            PlayerPrefs.SetInt("is_buy_song_" + this.s_buy_id_song, 1);
+            this.s_buy_id_song = "";
+            this.s_buy_link_mp3_song = "";
+        }
     }
 }

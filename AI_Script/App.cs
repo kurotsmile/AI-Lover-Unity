@@ -807,7 +807,7 @@ public class App : MonoBehaviour
         {
             this.carrot.show_msg(PlayerPrefs.GetString("shop_data", "Use chat data offline"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
             PlayerPrefs.SetInt("is_buy_4", 1);
-            GameObject.Find("app").GetComponent<Command_storage>().download_command_shop();
+           this.command_storage.download_command_shop();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(0))
@@ -819,7 +819,8 @@ public class App : MonoBehaviour
         if (id_product == this.carrot.shop.get_id_by_index(1))
         {
             this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
-            GameObject.Find("app").GetComponent<App>().player_music.act_download_mp3_form_shop();
+            this.player_music.act_download_mp3_form_shop();
+            this.player_music.playlist.on_pay_success();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(3))
