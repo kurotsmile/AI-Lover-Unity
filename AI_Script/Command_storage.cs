@@ -141,6 +141,7 @@ public class Command_storage : MonoBehaviour
     private IDictionary data_chat_test;
 
     private Carrot_Box box_parameter_tag;
+    private Carrot_Box box_sex_sel_chat;
 
     private void reset_all_s_data()
     {
@@ -484,7 +485,7 @@ public class Command_storage : MonoBehaviour
         this.item_user_sex = box_add_chat.create_item("item_user_sex");
         item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
         item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
-        item_user_sex.set_act(() => this.show_select_sex_chat());
+        item_user_sex.set_act(() => this.show_select_sex_chat(this.item_user_sex));
         if (this.s_sex_user == "0")
             item_user_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
         else
@@ -495,10 +496,10 @@ public class Command_storage : MonoBehaviour
         btn_user_sex_edit.set_color(this.app.carrot.color_highlight);
         Destroy(btn_user_sex_edit.GetComponent<Button>());
 
-        this.item_character_sex = box_add_chat.create_item("item_npc_sex");
+        this.item_character_sex = box_add_chat.create_item("item_character_sex");
         item_character_sex.set_icon(this.app.setting.sp_icon_sex_character);
         item_character_sex.set_title(PlayerPrefs.GetString("setting_char_sex", "Character gender"));
-        item_character_sex.set_act(() => this.show_select_sex_chat());
+        item_character_sex.set_act(() => this.show_select_sex_chat(this.item_character_sex));
         if (this.s_sex_character == "0")
             item_character_sex.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
         else
@@ -566,22 +567,31 @@ public class Command_storage : MonoBehaviour
         obj_btn_test.set_label_color(Color.white);
         obj_btn_test.set_label(PlayerPrefs.GetString("cm_test", "Test"));
         obj_btn_test.set_icon(this.app.carrot.game.icon_play_music_game);
-
-        box_add_chat.set_act_before_closing(act_close_box);
     }
 
-    private void show_select_sex_chat()
+    private void show_select_sex_chat(Carrot_Box_Item item_sex_sel)
     {
-        Carrot_Box box_sel_sex = this.app.carrot.Create_Box("sel_sex");
-        box_sel_sex.set_title("Select Sex for chat");
+        this.box_sex_sel_chat = this.app.carrot.Create_Box("sel_sex");
+        this.box_sex_sel_chat.set_title(item_sex_sel.txt_name.text);
+        this.box_sex_sel_chat.set_icon(item_sex_sel.img_icon.sprite);
 
-        Carrot.Carrot_Box_Item item_sex_boy=box_sel_sex.create_item("item_sex_boy");
-        item_sex_boy.set_title("Boy");
-        item_sex_boy.set_tip("Male");
+        Carrot.Carrot_Box_Item item_sex_boy= this.box_sex_sel_chat.create_item("item_sex_boy");
+        item_sex_boy.set_icon(this.app.setting.sp_icon_sex_boy);
+        item_sex_boy.set_title(PlayerPrefs.GetString("user_sex_boy","Boy"));
+        item_sex_boy.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
+        item_sex_boy.set_act(() => this.act_sel_sex_chat(item_sex_sel, "0"));
 
-        Carrot.Carrot_Box_Item item_sex_girl=box_sel_sex.create_item("item_sex_girl");
-        item_sex_girl.set_title("Girl");
-        item_sex_girl.set_tip("Female");
+        Carrot.Carrot_Box_Item item_sex_girl= this.box_sex_sel_chat.create_item("item_sex_girl");
+        item_sex_girl.set_icon(this.app.setting.sp_icon_sex_girl);
+        item_sex_girl.set_title(PlayerPrefs.GetString("user_sex_girl", "Girl"));
+        item_sex_girl.set_tip(PlayerPrefs.GetString("user_sex_girl", "Female"));
+        item_sex_girl.set_act(() => this.act_sel_sex_chat(item_sex_sel, "1"));
+    }
+
+    private void act_sel_sex_chat(Carrot_Box_Item item_sex_sel, string s_val_sex)
+    {
+        item_sex_sel.set_tip(s_val_sex);
+        if (this.box_sex_sel_chat != null) this.box_sex_sel_chat.close();
     }
 
     private void btn_del_user_create()
@@ -923,15 +933,6 @@ public class Command_storage : MonoBehaviour
         this.item_character_sex.gameObject.SetActive(true);
         this.item_user_sex.gameObject.SetActive(true);
         if (this.item_user_create != null) this.item_user_create.gameObject.SetActive(true);
-    }
-
-    private void act_close_box()
-    {
-        this.s_id_icon = "";
-        this.s_color = "";
-        this.s_pater_id = "";
-        this.s_pater_msg = "";
-        this.app.show_func_function();
     }
 
     private void get_list_key_block()
