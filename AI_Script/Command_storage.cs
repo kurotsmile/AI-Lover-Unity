@@ -300,7 +300,7 @@ public class Command_storage : MonoBehaviour
             {
                 this.s_pater_id = data_chat["pater"].ToString();
                 if (data_chat["pater_msg"] != null) this.s_pater_msg = data_chat["pater_msg"].ToString();
-                else this.s_pater_msg = data_chat["pater_msg"].ToString();
+                else this.s_pater_msg = this.s_pater_id;
             }
         }
 

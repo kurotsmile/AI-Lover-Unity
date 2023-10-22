@@ -8,7 +8,7 @@ public class Item_command_chat : MonoBehaviour
     public Image icon;
     public Text txt_chat;
     public GameObject btn_add_app;
-    public Button btn_extension;
+    public GameObject btn_extension;
     public IDictionary idata_chat;
 
     private UnityAction act_click;

@@ -229,14 +229,14 @@ public class Command : MonoBehaviour
 
         if (data_chat_cur != null)
         {
-            c_chat.btn_extension.onClick.RemoveAllListeners();
+            c_chat.btn_extension.GetComponent<Button>().onClick.RemoveAllListeners();
             string s_id = data_chat_cur["id"].ToString();
             string s_msg = data_chat_cur["msg"].ToString();
-            c_chat.btn_extension.onClick.AddListener(() => this.app.command_storage.show_add_command_with_pater_and_keyword(s_inp_command,s_msg,s_id));
+            c_chat.btn_extension.GetComponent<Button>().onClick.AddListener(() => this.app.command_storage.show_add_command_with_pater_and_keyword(s_inp_command,s_msg,s_id));
         }
         else
         {
-            c_chat.btn_extension.gameObject.SetActive(false);
+            c_chat.btn_extension.SetActive(false);
         }
     }
 
