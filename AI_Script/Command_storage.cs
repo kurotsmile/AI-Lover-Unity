@@ -252,22 +252,14 @@ public class Command_storage : MonoBehaviour
         if (data_chat["status"] != null) this.s_status = data_chat["status"].ToString();
 
         if (data_chat["sex_character"] != null)
-        {
             this.s_sex_character = data_chat["sex_character"].ToString();
-        }
         else
-        {
             this.s_sex_character = this.app.setting.get_character_sex();
-        }
 
         if (data_chat["sex_user"] != null)
-        {
             this.s_sex_user = data_chat["sex_user"].ToString();
-        }
         else
-        {
             this.s_sex_user = this.app.setting.get_user_sex();
-        }
 
         this.get_list_key_block();
         if (this.box_add_chat != null) this.box_add_chat.close();

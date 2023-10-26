@@ -639,6 +639,12 @@ public class Command : MonoBehaviour
 
     public void box_info_chat(IDictionary data_chat)
     {
+        if (data_chat == null)
+        {
+            this.app.carrot.show_msg(PlayerPrefs.GetString("command_pass", "Published chat"), "There is no data for this chat!");
+            return;
+        }
+
         if (this.box_list != null) this.box_list.close();
         this.box_list = this.app.carrot.Create_Box("info_chat");
         this.box_list.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));

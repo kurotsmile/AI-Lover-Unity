@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Command_Dev_Type {pending,by_user,same_key}
+public enum Command_Dev_Type {pending,by_user,by_father,same_key}
 
 public class Command_Dev : MonoBehaviour
 {
@@ -179,6 +179,47 @@ public class Command_Dev : MonoBehaviour
         });
     }
 
+    public void show_chat_by_father(string s_id_fathe)
+    {
+        this.type = Command_Dev_Type.by_father;
+        this.app.carrot.play_sound_click();
+        this.app.carrot.show_loading();
+        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
+        ChatQuery = ChatQuery.WhereEqualTo("pater", s_id_fathe);
+        ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
+            QuerySnapshot capitalQuerySnapshot = task.Result;
+            if (task.IsFaulted)
+            {
+                this.app.carrot.hide_loading();
+            }
+
+            if (task.IsCompleted)
+            {
+                this.app.carrot.hide_loading();
+
+                if (capitalQuerySnapshot.Count > 0)
+                {
+
+                    List<IDictionary> list_chat = new List<IDictionary>();
+                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
+                    {
+                        IDictionary chat_data = documentSnapshot.ToDictionary();
+                        chat_data["id"] = documentSnapshot.Id;
+                        list_chat.Add(chat_data);
+                    }
+                    Carrot_Box box = this.box_list(list_chat);
+                    box.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
+                    box.set_icon(this.sp_icon_chat_passed);
+                }
+                else
+                {
+                    this.app.carrot.hide_loading();
+                    this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+                }
+            }
+        });
+    }
+
     public Carrot_Box box_list(IList<IDictionary> list_data)
     {
         if (list_data.Count == 0)
@@ -321,6 +362,26 @@ public class Command_Dev : MonoBehaviour
                 item_edit_cm_pass.set_title("Edit");
                 item_edit_cm_pass.set_tip("Chat Update (Dev)");
                 item_edit_cm_pass.set_act(() => this.app.command_storage.show_edit_pass(data, obj_focus.GetComponent<Carrot_Box_Item>()));
+            }
+
+            if (data["id"].ToString() != "")
+            {
+                Carrot_Box_Item item_child = box_sub_menu.create_item();
+                item_child.set_icon(this.app.carrot.icon_carrot_database);
+                item_child.set_title("List child chat");
+                item_child.set_tip("List of child chat sentences of parent chat");
+                item_child.set_act(() => show_chat_by_father(data["id"].ToString()));
+            }
+
+            if (data["pater"] != null)
+            {
+                if (data["pater"].ToString() != "")
+                {
+                    string s_id_chat_father = data["pater"].ToString();
+                    Carrot_Box_Item item_father = box_sub_menu.create_item();
+                    item_father.set_icon(this.app.command_storage.sp_icon_father);
+                    item_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
+                }
             }
         }
 

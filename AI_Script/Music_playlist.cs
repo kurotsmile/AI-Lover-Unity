@@ -249,16 +249,16 @@ public class Music_playlist : MonoBehaviour
                 string s_id_song = data_song["id"].ToString();
                 string s_name_m = data_song["name"].ToString().Trim();
                 var int_index_m = i;
-                Carrot.Carrot_Box_Item item_song = this.box_list.create_item("song_" + s_id_song);
 
-                if (data_song["type"].ToString()== "radio")
+                if (data_song["type"].ToString() == "radio")
                 {
+                    Carrot.Carrot_Box_Item item_song = this.box_list.create_item("song_" + s_id_song);
                     var s_url_radio = data_song["url"].ToString();
                     item_song.set_icon(this.icon_radio);
                     item_song.set_title(s_name_m);
                     item_song.set_tip(s_url_radio);
 
-                    string id_sp_radio = "radio_avatar_"+s_id_song;
+                    string id_sp_radio = "radio_avatar_" + s_id_song;
                     Sprite sp_radio = this.app.carrot.get_tool().get_sprite_to_playerPrefs(id_sp_radio);
                     if (sp_radio != null)
                     {
@@ -273,76 +273,86 @@ public class Music_playlist : MonoBehaviour
                 }
                 else
                 {
-                    Sprite sp_avatar = this.app.player_music.get_avatar_music(s_id_song);
-                    if (sp_avatar != null)
-                    {
-                        item_song.set_icon_white(sp_avatar);
-                    }
-                    else
-                    {
-                        string s_avatar = data_song["avatar"].ToString();
-                        string id_sp_avatar_music = "music_avatar" + data_song["id"].ToString();
-                        if (s_avatar != "")
-                        {
-                            this.app.carrot.get_img_and_save_playerPrefs(data_song["avatar"].ToString(), item_song.img_icon, id_sp_avatar_music);
-                        }
-                        else
-                        {
-                            item_song.set_icon(this.icon_song);
-                        }
-                    }
-
-                    item_song.set_tip(data_song["artist"].ToString());
-                    item_song.set_title(data_song["name"].ToString());
-
-                    if (this.app.carrot.is_online())
-                    {
-                        var link_song_share = "https://carrotstore.web.app/?p=song&id=" + s_id_song;
-                        Carrot.Carrot_Box_Btn_Item btn_share = item_song.create_item();
-                        btn_share.set_icon(this.app.carrot.sp_icon_share);
-                        btn_share.set_color(this.app.carrot.color_highlight);
-                        btn_share.set_act(() => this.app.carrot.show_share(link_song_share, PlayerPrefs.GetString("share_song", "Share this song so everyone can hear it!")));
-
-                        if (PlayerPrefs.GetInt("is_buy_song_" + s_id_song, 0) == 1)
-                        {
-                            Carrot.Carrot_Box_Btn_Item btn_download = item_song.create_item();
-                            btn_download.set_icon(this.app.carrot.icon_carrot_download);
-                            btn_download.set_color(this.app.carrot.color_highlight);
-                            btn_download.set_act(() =>Application.OpenURL(data_song["mp3"].ToString()));
-                        }
-                        else
-                        {
-                            Carrot.Carrot_Box_Btn_Item btn_buy = item_song.create_item();
-                            btn_buy.set_icon(this.icon_mp3_file);
-                            btn_buy.set_color(this.app.carrot.color_highlight);
-                            btn_buy.set_act(() => this.act_buy_mp3(s_id_song, data_song["mp3"].ToString()));
-                        }
-                    }
-
-                    if (this.type == Playlist_Type.offline)
-                    {
-                        Carrot.Carrot_Box_Btn_Item btn_del = item_song.create_item();
-                        btn_del.set_icon(this.app.carrot.sp_icon_del_data);
-                        btn_del.set_color(this.app.carrot.color_highlight);
-                        btn_del.set_act(() => this.app.player_music.playlist.delete_item(int.Parse(data_song["index_del"].ToString())));
-                    }
+                    this.item_song(data_song);
                 }
-
-                if (this.app.player_music.get_id_song_current() == s_id_song)
-                {
-                    item_song.GetComponent<Image>().color = this.app.carrot.color_highlight;
-                    item_song.txt_tip.color = Color.white;
-                }
-
-                item_song.set_act(() => this.act_play_song(data_song));
             }
 
+            if (this.app.carrot.is_online())
+            {
+                if (this.type == Playlist_Type.online)
+                {
+                    Carrot_Box_Item item_more_music = this.box_list.create_item();
+                    item_more_music.set_title("Get more songs");
+                    item_more_music.set_tip("Get more songs into playlists");
+                    item_more_music.set_icon(this.icon);
+                    item_more_music.set_act(() => this.act_get_more_song(item_more_music.gameObject));
+                }
+            }
             this.box_list.update_color_table_row();
         }
         else
         {
             if (this.box_search_inp != null) this.box_search_inp.close();
             this.app.carrot.show_msg(PlayerPrefs.GetString("search_results", "Search Results"), "No songs found!", Carrot.Msg_Icon.Alert);
+        }
+    }
+
+    private void item_song(IDictionary data_song)
+    {
+        string s_id_song = data_song["id"].ToString();
+        Carrot.Carrot_Box_Item item_song = this.box_list.create_item("song_" + s_id_song);
+        Sprite sp_avatar = this.app.player_music.get_avatar_music(s_id_song);
+        if (sp_avatar != null)
+        {
+            item_song.set_icon_white(sp_avatar);
+        }
+        else
+        {
+            string s_avatar = data_song["avatar"].ToString();
+            string id_sp_avatar_music = "music_avatar" + data_song["id"].ToString();
+            if (s_avatar != "")
+            {
+                this.app.carrot.get_img_and_save_playerPrefs(data_song["avatar"].ToString(), item_song.img_icon, id_sp_avatar_music);
+            }
+            else
+            {
+                item_song.set_icon(this.icon_song);
+            }
+        }
+
+        item_song.set_tip(data_song["artist"].ToString());
+        item_song.set_title(data_song["name"].ToString());
+
+        if (this.app.carrot.is_online())
+        {
+            var link_song_share = this.app.carrot.mainhost+"/?p=song&id="+s_id_song;
+            Carrot.Carrot_Box_Btn_Item btn_share = item_song.create_item();
+            btn_share.set_icon(this.app.carrot.sp_icon_share);
+            btn_share.set_color(this.app.carrot.color_highlight);
+            btn_share.set_act(() => this.app.carrot.show_share(link_song_share, PlayerPrefs.GetString("share_song", "Share this song so everyone can hear it!")));
+
+            if (PlayerPrefs.GetInt("is_buy_song_" + s_id_song, 0) == 1)
+            {
+                Carrot.Carrot_Box_Btn_Item btn_download = item_song.create_item();
+                btn_download.set_icon(this.app.carrot.icon_carrot_download);
+                btn_download.set_color(this.app.carrot.color_highlight);
+                btn_download.set_act(() => Application.OpenURL(data_song["mp3"].ToString()));
+            }
+            else
+            {
+                Carrot.Carrot_Box_Btn_Item btn_buy = item_song.create_item();
+                btn_buy.set_icon(this.icon_mp3_file);
+                btn_buy.set_color(this.app.carrot.color_highlight);
+                btn_buy.set_act(() => this.act_buy_mp3(s_id_song, data_song["mp3"].ToString()));
+            }
+        }
+
+        if (this.type == Playlist_Type.offline)
+        {
+            Carrot.Carrot_Box_Btn_Item btn_del = item_song.create_item();
+            btn_del.set_icon(this.app.carrot.sp_icon_del_data);
+            btn_del.set_color(this.app.carrot.color_highlight);
+            btn_del.set_act(() => this.app.player_music.playlist.delete_item(int.Parse(data_song["index_del"].ToString())));
         }
     }
 
@@ -480,5 +490,39 @@ public class Music_playlist : MonoBehaviour
             this.s_buy_id_song = "";
             this.s_buy_link_mp3_song = "";
         }
+    }
+
+    private void act_get_more_song(GameObject obj_item_more)
+    {
+        this.app.carrot.play_sound_click();
+        this.app.carrot.show_loading();
+        Query SongQuery = this.app.carrot.db.Collection("song");
+        SongQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
+            QuerySnapshot songQuerySnapshot = task.Result;
+
+            if (task.IsFaulted)
+            {
+                this.app.carrot.hide_loading();
+                Destroy(obj_item_more);
+            }
+
+            if (task.IsCompleted)
+            {
+                this.app.carrot.hide_loading();
+                if (songQuerySnapshot.Count > 0)
+                {
+                    IList list_song = (IList)Json.Deserialize("[]");
+                    foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
+                    {
+                        IDictionary data_music = SongSnapshot.ToDictionary();
+                        data_music["id"] = SongSnapshot.Id;
+                        data_music["type"] = "online";
+                        this.item_song(data_music);
+                    }
+                    
+                }
+                Destroy(obj_item_more.gameObject);
+            }
+        });
     }
 }
