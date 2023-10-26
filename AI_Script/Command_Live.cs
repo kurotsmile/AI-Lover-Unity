@@ -49,7 +49,7 @@ public class Command_Live : MonoBehaviour
     public void next()
     {
         this.index_cur_cm++;
-        if(this.index_cur_cm >= this.lenth_cm-2) this.index_cur_cm = 0;
+        if(this.index_cur_cm > this.lenth_cm-1) this.index_cur_cm = 0;
         this.act_live_chat(this.index_cur_cm);
     }
 
