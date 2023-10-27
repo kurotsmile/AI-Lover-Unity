@@ -5,9 +5,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 public enum Playlist_Type {online,offline,radio,music_search_result}
+public enum OrderBy_Type {date_asc,date_desc,name_asc,name_desc}
+
 public class Music_playlist : MonoBehaviour
 {
     [Header("Obj Main")]
@@ -270,6 +271,7 @@ public class Music_playlist : MonoBehaviour
                         if (data_song["icon"] != null) s_url_icon = data_song["icon"].ToString();
                         if (s_url_icon != "") this.app.carrot.get_img_and_save_playerPrefs(s_url_icon, item_song.img_icon, id_sp_radio);
                     }
+                    item_song.set_act(() => this.act_play_song(data_song));
                 }
                 else
                 {
@@ -311,13 +313,9 @@ public class Music_playlist : MonoBehaviour
             string s_avatar = data_song["avatar"].ToString();
             string id_sp_avatar_music = "music_avatar" + data_song["id"].ToString();
             if (s_avatar != "")
-            {
                 this.app.carrot.get_img_and_save_playerPrefs(data_song["avatar"].ToString(), item_song.img_icon, id_sp_avatar_music);
-            }
             else
-            {
                 item_song.set_icon(this.icon_song);
-            }
         }
 
         item_song.set_tip(data_song["artist"].ToString());
@@ -354,6 +352,8 @@ public class Music_playlist : MonoBehaviour
             btn_del.set_color(this.app.carrot.color_highlight);
             btn_del.set_act(() => this.app.player_music.playlist.delete_item(int.Parse(data_song["index_del"].ToString())));
         }
+
+        item_song.set_act(() => this.act_play_song(data_song));
     }
 
     private IList get_list_song_online_by_search_key(string s_key)
