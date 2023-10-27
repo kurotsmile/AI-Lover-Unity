@@ -36,9 +36,11 @@ public class Music_playlist : MonoBehaviour
     private Carrot.Carrot_Box box_list;
     private Carrot.Carrot_Window_Input box_search_inp;
     private Playlist_Type type;
+    private OrderBy_Type type_order = OrderBy_Type.date_asc;
 
     private string s_buy_id_song = "";
     private string s_buy_link_mp3_song="";
+    private string s_lang_cur = "";
 
     void Start()
     {
@@ -284,10 +286,16 @@ public class Music_playlist : MonoBehaviour
                 if (this.type == Playlist_Type.online)
                 {
                     Carrot_Box_Item item_more_music = this.box_list.create_item();
+                    item_more_music.set_icon(this.icon);
                     item_more_music.set_title("Get more songs");
                     item_more_music.set_tip("Get more songs into playlists");
-                    item_more_music.set_icon(this.icon);
                     item_more_music.set_act(() => this.act_get_more_song(item_more_music.gameObject));
+
+                    Carrot_Box_Item item_order_music = this.box_list.create_item();
+                    item_order_music.set_icon(this.icon);
+                    item_order_music.set_title("Sort");
+                    item_order_music.set_tip("Randomize the order of songs in the list");
+                    item_order_music.set_act(() => this.show_list_song_by_random_order());
                 }
             }
             this.box_list.update_color_table_row();
@@ -428,23 +436,17 @@ public class Music_playlist : MonoBehaviour
     public void get_data_list_playlist(string lang="",UnityAction act_done=null)
     {
         this.app.carrot.show_loading();
+        this.s_lang_cur = lang;
         Query ChatQuery = null;
         if (lang=="")
-        {
             ChatQuery = this.app.carrot.db.Collection("song").OrderByDescending("publishedAt").Limit(20);
-        }
         else
-        {
             ChatQuery = this.app.carrot.db.Collection("song").WhereEqualTo("lang", lang).OrderByDescending("publishedAt").Limit(20);
-        }
 
         ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot songQuerySnapshot = task.Result;
 
-            if (task.IsFaulted)
-            {
-                this.app.carrot.hide_loading();
-            }
+            if (task.IsFaulted) this.app.carrot.hide_loading();
 
             if (task.IsCompleted)
             {
@@ -519,9 +521,68 @@ public class Music_playlist : MonoBehaviour
                         data_music["type"] = "online";
                         this.item_song(data_music);
                     }
-                    
                 }
                 Destroy(obj_item_more.gameObject);
+            }
+        });
+    }
+
+    private void show_list_song_by_random_order()
+    {
+        if (this.type_order == OrderBy_Type.date_asc) this.type_order = OrderBy_Type.date_desc;
+        if (this.type_order == OrderBy_Type.date_desc) this.type_order = OrderBy_Type.name_desc;
+        if (this.type_order == OrderBy_Type.name_desc) this.type_order = OrderBy_Type.name_asc;
+        if (this.type_order == OrderBy_Type.name_asc) this.type_order = OrderBy_Type.date_asc;
+        this.get_data_list_by_order(this.s_lang_cur);
+    }
+
+    private void get_data_list_by_order(string lang = "")
+    {
+        this.app.carrot.show_loading();
+        Query ChatQuery = null;
+        if (lang == "")
+            ChatQuery = this.app.carrot.db.Collection("song").OrderByDescending("publishedAt").Limit(20);
+        else
+            ChatQuery = this.app.carrot.db.Collection("song").WhereEqualTo("lang", lang);
+
+        if(this.type_order==OrderBy_Type.date_desc)
+            ChatQuery=ChatQuery.OrderByDescending("publishedAt");
+        else if(this.type_order==OrderBy_Type.date_asc)
+            ChatQuery=ChatQuery.OrderBy("publishedAt");
+        else if(this.type_order==OrderBy_Type.name_desc)
+            ChatQuery=ChatQuery.OrderByDescending("name");
+        else
+            ChatQuery=ChatQuery.OrderBy("name");
+
+        ChatQuery=ChatQuery.Limit(20);
+        ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
+            QuerySnapshot songQuerySnapshot = task.Result;
+
+            if (task.IsFaulted)
+            {
+                this.app.carrot.hide_loading();
+            }
+
+            if (task.IsCompleted)
+            {
+                this.app.carrot.hide_loading();
+                if (songQuerySnapshot.Count > 0)
+                {
+                    this.list_music_online = new List<IDictionary>();
+                    int index_song = 0;
+                    foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
+                    {
+                        IDictionary data_music = SongSnapshot.ToDictionary();
+                        data_music["id"] = SongSnapshot.Id;
+                        data_music["type"] = "online";
+                        data_music["index"] = index_song;
+                        this.list_music_online.Add(data_music);
+                        index_song++;
+                    };
+
+                    this.list_music_cur = this.list_music_online;
+                    this.box_list_song(this.list_music_cur);
+                }
             }
         });
     }

@@ -7983,13 +7983,15 @@ ParticleSystemRenderer:
   m_RenderAlignment: 0
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
-  m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 0
   m_ApplyActiveColorSpace: 0
   m_AllowRoll: 1
   m_FreeformStretching: 0
   m_RotateWithStretchDirection: 1
+  m_UseCustomVertexStreams: 0
   m_VertexStreams: 0001030405
+  m_UseCustomTrailVertexStreams: 0
+  m_TrailVertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
@@ -14099,13 +14101,15 @@ ParticleSystemRenderer:
   m_RenderAlignment: 0
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
-  m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 0
   m_ApplyActiveColorSpace: 0
   m_AllowRoll: 1
   m_FreeformStretching: 0
   m_RotateWithStretchDirection: 1
+  m_UseCustomVertexStreams: 0
   m_VertexStreams: 0001030405
+  m_UseCustomTrailVertexStreams: 0
+  m_TrailVertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
@@ -30014,13 +30018,15 @@ ParticleSystemRenderer:
   m_RenderAlignment: 0
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
-  m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 0
   m_ApplyActiveColorSpace: 0
   m_AllowRoll: 1
   m_FreeformStretching: 0
   m_RotateWithStretchDirection: 1
+  m_UseCustomVertexStreams: 0
   m_VertexStreams: 0001030405
+  m_UseCustomTrailVertexStreams: 0
+  m_TrailVertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
@@ -33414,6 +33420,7 @@ MonoBehaviour:
   sp_icon_parameter_tag: {fileID: 21300000, guid: 66879d05effcc93469b99d23b36f8a88, type: 3}
   sp_icon_key_same: {fileID: 21300000, guid: c0ebbe56a8045914080a5f436c3eb87f, type: 3}
   sp_icon_father: {fileID: 21300000, guid: 6772418e55753bb4caa853eda64adeca, type: 3}
+  sp_icon_random: {fileID: 21300000, guid: 55ac0307352b6eb47b73130ca88711fb, type: 3}
   icon_command_pass: {fileID: 21300000, guid: d5c0c8535297e774bbd02d44384bc444, type: 3}
   sp_icon_translation: {fileID: 21300000, guid: 6e9141f39a1f16745ae28da56bc77fc3, type: 3}
 --- !u!114 &2755477471257207458
@@ -37380,7 +37387,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.0007095337}
+  m_AnchoredPosition: {x: -3, y: 0.000289917}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004
@@ -41350,8 +41357,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1334967823943002200}
   m_HandleRect: {fileID: 2440126133283484171}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.517446
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

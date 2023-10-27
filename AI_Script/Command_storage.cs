@@ -115,6 +115,7 @@ public class Command_storage : MonoBehaviour
     public Sprite sp_icon_parameter_tag;
     public Sprite sp_icon_key_same;
     public Sprite sp_icon_father;
+    public Sprite sp_icon_random;
     public Sprite icon_command_pass;
     public Sprite sp_icon_translation;
 
@@ -142,6 +143,9 @@ public class Command_storage : MonoBehaviour
 
     private Carrot_Box box_parameter_tag;
     private Carrot_Box box_sex_sel_chat;
+
+    private int c_length_act = 41;
+    private int c_length_face = 18;
 
     private void reset_all_s_data()
     {
@@ -386,12 +390,17 @@ public class Command_storage : MonoBehaviour
         item_action.set_lang_data("act", "act_tip");
         item_action.load_lang_data();
         item_action.dropdown_val.ClearOptions();
-        for (int i = 0; i <= 41; i++)
+        for (int i = 0; i <= this.c_length_act; i++)
         {
             string s_name_action = PlayerPrefs.GetString("act", "Action") + " " + (i + 1);
             item_action.dropdown_val.options.Add(new Dropdown.OptionData(s_name_action));
         }
         if (data_chat["action"] != null) this.item_action.set_val(data_chat["action"].ToString());
+
+        Carrot.Carrot_Box_Btn_Item btn_act_random = this.item_action.create_item();
+        btn_act_random.set_icon(this.sp_icon_random);
+        btn_act_random.set_color(this.app.carrot.color_highlight);
+        btn_act_random.set_act(() => this.change_act_random());
 
         this.item_face = box_add_chat.create_item("item_face");
         item_face.set_type(Carrot.Box_Item_Type.box_value_dropdown);
@@ -402,12 +411,17 @@ public class Command_storage : MonoBehaviour
         item_face.set_lang_data("face", "face_tip");
         item_face.load_lang_data();
         item_face.dropdown_val.ClearOptions();
-        for (int i = 0; i <= 18; i++)
+        for (int i = 0; i <= this.c_length_face; i++)
         {
             string s_name_face = PlayerPrefs.GetString("face", "Face") + " " + (i + 1);
             item_face.dropdown_val.options.Add(new Dropdown.OptionData(s_name_face));
         }
         if (data_chat["face"] != null) this.item_face.set_val(data_chat["face"].ToString());
+
+        Carrot.Carrot_Box_Btn_Item btn_face_random = this.item_face.create_item();
+        btn_face_random.set_icon(this.sp_icon_random);
+        btn_face_random.set_color(this.app.carrot.color_highlight);
+        btn_face_random.set_act(() => this.change_face_random());
 
         this.item_run_cmd = box_add_chat.create_item("item_run_cmd");
         item_run_cmd.set_type(Carrot.Box_Item_Type.box_value_input);
@@ -483,7 +497,6 @@ public class Command_storage : MonoBehaviour
             Sprite sp_icon = this.app.carrot.get_tool().get_sprite_to_playerPrefs(this.s_id_icon);
             if (sp_icon != null) this.item_icon.set_icon_white(sp_icon);
         }
-
 
         this.item_user_sex = box_add_chat.create_item("item_user_sex");
         item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
@@ -578,6 +591,20 @@ public class Command_storage : MonoBehaviour
         obj_btn_test.set_label_color(Color.white);
         obj_btn_test.set_label(PlayerPrefs.GetString("cm_test", "Test"));
         obj_btn_test.set_icon(this.app.carrot.game.icon_play_music_game);
+    }
+
+    private void change_act_random()
+    {
+        this.app.carrot.play_sound_click();
+        int index_act =UnityEngine.Random.Range(0,this.c_length_act);
+        this.item_action.set_val(index_act.ToString());
+    }
+
+    private void change_face_random()
+    {
+        this.app.carrot.play_sound_click();
+        int index_act = UnityEngine.Random.Range(0, this.c_length_face);
+        this.item_face.set_val(index_act.ToString());
     }
 
     private void show_select_sex_chat(Carrot_Box_Item item_sex_sel)
