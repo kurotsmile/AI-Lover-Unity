@@ -359,7 +359,7 @@ public class Command_Dev : MonoBehaviour
             {
                 Carrot_Box_Item item_edit_cm_pass = box_sub_menu.create_item();
                 item_edit_cm_pass.set_icon(this.app.carrot.user.icon_user_edit);
-                item_edit_cm_pass.set_title("Edit");
+                item_edit_cm_pass.set_title("Edit Passed");
                 item_edit_cm_pass.set_tip("Chat Update (Dev)");
                 if(obj_focus!=null)
                     item_edit_cm_pass.set_act(() => this.app.command_storage.show_edit_pass(data, obj_focus.GetComponent<Carrot_Box_Item>()));
@@ -405,6 +405,19 @@ public class Command_Dev : MonoBehaviour
             if (data["index_cm"].ToString() != "")
             {
                 int index_cm = int.Parse(data["index_cm"].ToString());
+
+                if (this.app.carrot.model_app == ModelApp.Develope)
+                {
+                    Carrot_Box_Item item_edit_cm_pending = box_sub_menu.create_item();
+                    item_edit_cm_pending.set_icon(this.app.carrot.user.icon_user_edit);
+                    item_edit_cm_pending.set_title("Edit Pending to Passed");
+                    item_edit_cm_pending.set_tip("Edit the draft and publish this chat (Dev)");
+                    if (obj_focus != null)
+                        item_edit_cm_pending.set_act(() => this.app.command_storage.show_edit_pending_to_pass(index_cm, obj_focus.GetComponent<Carrot_Box_Item>()));
+                    else
+                        item_edit_cm_pending.set_act(() => this.app.command_storage.show_edit_pending_to_pass(index_cm, null));
+                }
+
                 if (s_status != "test" || s_status != "list_test")
                 {
                     Carrot_Box_Item item_play_list = box_sub_menu.create_item();

@@ -7,14 +7,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.Rendering.LookDev;
 using UnityEngine.UI;
 
 public enum Command_Type_Act {
     add_command,
     edit_command,
     edit_pass,
-    edit_live
+    edit_live,
+    edit_pending_to_pass,
 }
 
 [FirestoreData]
@@ -244,6 +244,17 @@ public class Command_storage : MonoBehaviour
         this.show_edit_by_data(data_chat);
     }
 
+    public void show_edit_pending_to_pass(int index_pending, Carrot_Box_Item item_edit)
+    {
+        this.reset_all_s_data();
+        this.type_act = Command_Type_Act.edit_pending_to_pass;
+        this.index_cm_update = index_pending;
+        this.item_command_edit_temp = item_edit;
+        string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + index_pending);
+        IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
+        this.show_edit_by_data(data_chat);
+    }
+
     public void show_edit_live(IDictionary data_chat)
     {
         this.reset_all_s_data();
@@ -274,7 +285,8 @@ public class Command_storage : MonoBehaviour
         if (this.type_act == Command_Type_Act.add_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_add", "Add the command"));
         if (this.type_act == Command_Type_Act.edit_command) box_add_chat.set_title(PlayerPrefs.GetString("brain_update", "Update command"));
         if (this.type_act == Command_Type_Act.edit_live) box_add_chat.set_title(PlayerPrefs.GetString("brain_update", "Update command"));
-        if (this.type_act == Command_Type_Act.edit_pass) box_add_chat.set_title("Update Pass Command");
+        if (this.type_act == Command_Type_Act.edit_pass) box_add_chat.set_title("Update Pass Command (Dev)");
+        if (this.type_act == Command_Type_Act.edit_pending_to_pass) box_add_chat.set_title("Update Pending To Pass Command (Dev)");
 
         box_add_chat.set_icon(this.sp_icon_add_chat);
 
@@ -1227,6 +1239,19 @@ public class Command_storage : MonoBehaviour
             chatRef.SetAsync(c);
             this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "Chat update published successfully! (Dev)");
             if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
+        }
+
+        if (this.type_act == Command_Type_Act.edit_pending_to_pass)
+        {
+            this.app.carrot.hide_loading();
+            CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
+            chat c = this.get_data_chat();
+            DocumentReference chatRef = chatDbRef.Document(c.id);
+            c.status = "passed";
+            chatRef.SetAsync(c);
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "Convert draft dialogue into successfully published conversation! (Dev)");
+            if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
+            this.act_delete_cm(this.index_cm_update);
         }
 
         if (this.type_act == Command_Type_Act.edit_command)
