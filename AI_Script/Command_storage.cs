@@ -1219,6 +1219,7 @@ public class Command_storage : MonoBehaviour
 
         if (this.type_act == Command_Type_Act.edit_pass)
         {
+            this.app.carrot.hide_loading();
             CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
             chat c = this.get_data_chat();
             DocumentReference chatRef = chatDbRef.Document(c.id);

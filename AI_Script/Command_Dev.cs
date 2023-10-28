@@ -361,7 +361,10 @@ public class Command_Dev : MonoBehaviour
                 item_edit_cm_pass.set_icon(this.app.carrot.user.icon_user_edit);
                 item_edit_cm_pass.set_title("Edit");
                 item_edit_cm_pass.set_tip("Chat Update (Dev)");
-                item_edit_cm_pass.set_act(() => this.app.command_storage.show_edit_pass(data, obj_focus.GetComponent<Carrot_Box_Item>()));
+                if(obj_focus!=null)
+                    item_edit_cm_pass.set_act(() => this.app.command_storage.show_edit_pass(data, obj_focus.GetComponent<Carrot_Box_Item>()));
+                else
+                    item_edit_cm_pass.set_act(() => this.app.command_storage.show_edit_pass(data, null));
             }
 
             if (data["id"].ToString() != "")
@@ -380,6 +383,8 @@ public class Command_Dev : MonoBehaviour
                     string s_id_chat_father = data["pater"].ToString();
                     Carrot_Box_Item item_father = box_sub_menu.create_item();
                     item_father.set_icon(this.app.command_storage.sp_icon_father);
+                    item_father.set_title("Dad chat");
+                    item_father.set_tip("View this chat's parent chat information");
                     item_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
                 }
             }

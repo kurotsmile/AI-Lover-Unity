@@ -99,7 +99,6 @@ public class Icon : MonoBehaviour
         if (this.box_list_icon_category != null) this.box_list_icon_category.close();
     }
 
-
     public void btn_show_list_emoji_and_color(Carrot_Box_Item item_icon_change)
     {
         this.item_icon=item_icon_change;
