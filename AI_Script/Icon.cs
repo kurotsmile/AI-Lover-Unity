@@ -25,11 +25,7 @@ public class Icon : MonoBehaviour
     public void load()
     {
         this.s_data_cache=PlayerPrefs.GetString("s_data_icon_temp","");
-        if (this.s_data_cache != "")
-        {
-            this.list_icon_name =(IList) Json.Deserialize(this.s_data_cache);
-            Debug.Log("list_icon_name:"+this.list_icon_name.Count);
-        }
+        if (this.s_data_cache != "") this.list_icon_name =(IList) Json.Deserialize(this.s_data_cache);
     }
 
     private void list_category_icon()
@@ -167,5 +163,13 @@ public class Icon : MonoBehaviour
     public IList get_list_icon_name()
     {
         return this.list_icon_name;
+    }
+
+    public int count_icon_name()
+    {
+        if (this.list_icon_name == null)
+            return 0;
+        else
+            return this.list_icon_name.Count;
     }
 }

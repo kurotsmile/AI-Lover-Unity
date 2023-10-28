@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Rendering.LookDev;
 using UnityEngine.UI;
 
 public enum Command_Type_Act {
@@ -498,6 +499,14 @@ public class Command_storage : MonoBehaviour
             if (sp_icon != null) this.item_icon.set_icon_white(sp_icon);
         }
 
+        if (this.app.icon.count_icon_name()>0)
+        {
+            Carrot_Box_Btn_Item btn_icon_random = this.item_icon.create_item();
+            btn_icon_random.set_icon(this.sp_icon_random);
+            btn_icon_random.set_color(this.app.carrot.color_highlight);
+            btn_icon_random.set_act(() => this.change_icon_random());
+        }
+
         this.item_user_sex = box_add_chat.create_item("item_user_sex");
         item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
         item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
@@ -605,6 +614,31 @@ public class Command_storage : MonoBehaviour
         this.app.carrot.play_sound_click();
         int index_act = UnityEngine.Random.Range(0, this.c_length_face);
         this.item_face.set_val(index_act.ToString());
+    }
+
+    private void change_icon_random()
+    {
+        this.app.carrot.play_sound_click();
+        IList icons = this.app.icon.get_list_icon_name();
+        if (icons != null)
+        {
+            Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+            int index_icons = UnityEngine.Random.Range(0, icons.Count);
+            this.s_id_icon = icons[index_icons].ToString();
+            this.item_icon.set_val(this.s_id_icon);
+            Sprite sp_icon_chat = this.app.carrot.get_tool().get_sprite_to_playerPrefs(s_id_icon);
+            if (sp_icon_chat != null)
+            {
+                this.item_icon.set_icon_white(sp_icon_chat);
+            }
+            else
+            {
+                this.item_icon.set_icon(this.app.setting.sp_icon_chat_bubble);
+                this.item_icon.img_icon.color = Color.black;
+            }
+            this.item_icon.txt_val.color = color_icon;
+            this.s_color = ColorUtility.ToHtmlStringRGBA(color_icon);
+        }
     }
 
     private void show_select_sex_chat(Carrot_Box_Item item_sex_sel)
