@@ -758,7 +758,11 @@ public class Command : MonoBehaviour
                             s_field_title = PlayerPrefs.GetString("report_title", "Report");
                             s_field_val = list_report.Count + " Report";
                             item_field.set_icon(this.sp_icon_info_report_chat);
-                            //item_field.set_act(() => thís.show_);
+                            item_field.set_act(() => this.app.report.show_list_report(list_report));
+
+                            Carrot_Box_Btn_Item btn_list_report = item_field.create_item();
+                            btn_list_report.set_icon(this.app.carrot.icon_carrot_bug);
+                            btn_list_report.set_color(this.app.carrot.color_highlight);
                         }
                         else
                         {
@@ -791,13 +795,6 @@ public class Command : MonoBehaviour
                 btn_share.set_act_click(()=>this.share_chat(s_link_share));
             }
         }
-    }
-
-    private void show_list_report(IList list_report)
-    {
-        Carrot_Box box_list_report=this.app.carrot.Create_Box("report_list");
-        box_list_report.set_icon(this.sp_icon_info_report_chat);
-        box_list_report.set_title(PlayerPrefs.GetString("report_title","Report"));
     }
 
     public void btn_new_chat_with_fater()

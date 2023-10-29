@@ -126,7 +126,21 @@ public class Report : MonoBehaviour
                 if (this.box_report != null) this.box_report.close();
             }
         });
-
     }
 
+    public void show_list_report(IList list_report)
+    {
+        Carrot_Box box_list_report = this.app.carrot.Create_Box("report_list");
+        box_list_report.set_icon(this.app.command.sp_icon_info_report_chat);
+        box_list_report.set_title(PlayerPrefs.GetString("report_title", "Report"));
+
+        for (int i = 0; i < list_report.Count; i++)
+        {
+            IDictionary report_data = (IDictionary)list_report[i];
+            Carrot_Box_Item item_report = box_list_report.create_item("report_" + i);
+            item_report.set_icon(this.app.carrot.icon_carrot_bug);
+            if (report_data["comment"] != null) item_report.set_title(report_data["comment"].ToString());
+            if (report_data["date"] != null) item_report.set_tip(report_data["date"].ToString());
+        }
+    }
 }

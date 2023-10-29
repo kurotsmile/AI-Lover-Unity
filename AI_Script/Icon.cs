@@ -25,7 +25,10 @@ public class Icon : MonoBehaviour
     public void load()
     {
         this.s_data_cache=PlayerPrefs.GetString("s_data_icon_temp","");
-        if (this.s_data_cache != "") this.list_icon_name =(IList) Json.Deserialize(this.s_data_cache);
+        if (this.s_data_cache != "") 
+            this.list_icon_name = (IList)Json.Deserialize(this.s_data_cache);
+        else 
+            this.list_icon_name = (IList)Json.Deserialize("[]");
     }
 
     private void list_category_icon()
@@ -128,8 +131,6 @@ public class Icon : MonoBehaviour
         Carrot_Box_Btn_Item btn_icon_category = this.box_list_icon.create_btn_menu_header(this.app.carrot.icon_carrot_all_category);
         btn_icon_category.set_act(() => list_category_icon());
 
-        this.list_icon_name = new List<string>();
-
         foreach (DocumentSnapshot document in query_icon)
         {
             string id_icon = document.Id;
@@ -138,7 +139,7 @@ public class Icon : MonoBehaviour
             Carrot_Box_Item item_icon = this.box_list_icon.create_item();
             item_icon.set_title(document.Id);
             item_icon.set_tip(icon_data["icon"].ToString());
-            this.list_icon_name.Add(id_icon);
+            this.add_icon_to_list(id_icon);
             if (icon_data["color"] != null)
             {
                 s_color = icon_data["color"].ToString();
@@ -170,5 +171,13 @@ public class Icon : MonoBehaviour
             return 0;
         else
             return this.list_icon_name.Count;
+    }
+
+    public void add_icon_to_list(string s_id_icon)
+    {
+        if (!this.list_icon_name.Contains(s_id_icon))
+        {
+            this.list_icon_name.Add(s_id_icon);
+        }
     }
 }
