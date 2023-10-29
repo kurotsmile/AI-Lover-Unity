@@ -752,6 +752,14 @@ public class Command : MonoBehaviour
                                 if (sp_icon_chat != null) item_field.set_icon_white(sp_icon_chat);
                             }
                         }
+                        else if(s_key== "reports")
+                        {
+                            IList list_report = (IList)data_chat["reports"];
+                            s_field_title = PlayerPrefs.GetString("report_title", "Report");
+                            s_field_val = list_report.Count + " Report";
+                            item_field.set_icon(this.sp_icon_info_report_chat);
+                            //item_field.set_act(() => thís.show_);
+                        }
                         else
                         {
                             s_field_title = s_key;
@@ -783,6 +791,13 @@ public class Command : MonoBehaviour
                 btn_share.set_act_click(()=>this.share_chat(s_link_share));
             }
         }
+    }
+
+    private void show_list_report(IList list_report)
+    {
+        Carrot_Box box_list_report=this.app.carrot.Create_Box("report_list");
+        box_list_report.set_icon(this.sp_icon_info_report_chat);
+        box_list_report.set_title(PlayerPrefs.GetString("report_title","Report"));
     }
 
     public void btn_new_chat_with_fater()
