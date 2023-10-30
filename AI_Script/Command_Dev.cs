@@ -25,6 +25,7 @@ public class Command_Dev : MonoBehaviour
 
     private Command_Dev_Type type;
     private List<GameObject> list_obj_box = new List<GameObject>();
+    private IList<IDictionary> list_data_test=new List<IDictionary>();
 
     public void check()
     {
@@ -228,12 +229,14 @@ public class Command_Dev : MonoBehaviour
             return null;
         }
 
+        this.list_data_test = list_data;
         Carrot_Box box = this.app.carrot.Create_Box();
         this.list_obj_box.Add(box.gameObject);
 
         for (int i = 0; i < list_data.Count; i++)
         {
             IDictionary c = list_data[i];
+            c["index_list"] = i;
             string id_chat = c["id"].ToString();
             string key_chat = c["key"].ToString();
 
@@ -397,6 +400,15 @@ public class Command_Dev : MonoBehaviour
             item_play.set_title("Test");
             item_play.set_tip("Test preview of chat");
             item_play.set_act(() => this.app.command_storage.play_one_test_command(data));
+
+            if (data["index_list"] != null)
+            {
+                Carrot_Box_Item item_test_list = box_sub_menu.create_item();
+                item_test_list.set_icon(this.app.player_music.icon_play);
+                item_test_list.set_title("List Test");
+                item_test_list.set_tip("Test preview of all chat");
+                item_test_list.set_act(() => this.act_play_test_list(int.Parse(data["index_list"].ToString())));
+            }
         }
 
 
@@ -408,23 +420,17 @@ public class Command_Dev : MonoBehaviour
 
                 if (this.app.carrot.model_app == ModelApp.Develope)
                 {
-                    Carrot_Box_Item item_edit_cm_pending = box_sub_menu.create_item();
-                    item_edit_cm_pending.set_icon(this.app.carrot.user.icon_user_edit);
-                    item_edit_cm_pending.set_title("Edit Pending to Passed");
-                    item_edit_cm_pending.set_tip("Edit the draft and publish this chat (Dev)");
-                    if (obj_focus != null)
-                        item_edit_cm_pending.set_act(() => this.app.command_storage.show_edit_pending_to_pass(index_cm, obj_focus.GetComponent<Carrot_Box_Item>()));
-                    else
-                        item_edit_cm_pending.set_act(() => this.app.command_storage.show_edit_pending_to_pass(index_cm, null));
-                }
-
-                if (s_status != "test" || s_status != "list_test")
-                {
-                    Carrot_Box_Item item_play_list = box_sub_menu.create_item();
-                    item_play_list.set_icon(this.app.player_music.icon_play);
-                    item_play_list.set_title("List Test");
-                    item_play_list.set_tip("Test preview of all chat");
-                    item_play_list.set_act(() => this.app.command_storage.play_test_command(index_cm));
+                    if (s_status!="passed")
+                    {
+                        Carrot_Box_Item item_edit_cm_pending = box_sub_menu.create_item();
+                        item_edit_cm_pending.set_icon(this.app.carrot.user.icon_user_edit);
+                        item_edit_cm_pending.set_title("Edit Pending to Passed");
+                        item_edit_cm_pending.set_tip("Edit the draft and publish this chat (Dev)");
+                        if (obj_focus != null)
+                            item_edit_cm_pending.set_act(() => this.app.command_storage.show_edit_pending_to_pass(index_cm, obj_focus.GetComponent<Carrot_Box_Item>()));
+                        else
+                            item_edit_cm_pending.set_act(() => this.app.command_storage.show_edit_pending_to_pass(index_cm, null));
+                    }
                 }
 
                 Carrot_Box_Item item_del_offline = box_sub_menu.create_item();
@@ -433,6 +439,16 @@ public class Command_Dev : MonoBehaviour
                 item_del_offline.set_tip("Delete chat offline");
                 item_del_offline.set_act(() => this.app.command_storage.delete_cm(index_cm, obj_focus));
             }
+        }
+
+        if(data["reports"]!=null)
+        {
+            IList list_report = (IList)data["reports"];
+            Carrot_Box_Item item_report = box_sub_menu.create_item();
+            item_report.set_title(PlayerPrefs.GetString("report_title", "Report"));
+            item_report.set_tip(list_report.Count + " Report");
+            item_report.set_icon(this.app.command.sp_icon_info_report_chat);
+            item_report.set_act(() => this.app.report.show_list_report(list_report));
         }
 
         if (this.app.carrot.model_app == ModelApp.Develope)
@@ -451,4 +467,19 @@ public class Command_Dev : MonoBehaviour
         int index_last = this.list_obj_box.Count - 1;
         if (this.list_obj_box[index_last] != null) this.list_obj_box[index_last].GetComponent<Carrot_Box>().close();
     }
+
+    #region Command Test 
+    public void act_play_test_list(int index_play)
+    {
+        this.set_all_box_active(false);
+        IDictionary data_test = this.list_data_test[index_play];
+        data_test["status"] = "test_list";
+        this.app.command_storage.act_test_command(data_test);
+    }
+
+    public int length_list_test()
+    {
+        return this.list_data_test.Count;
+    }
+    #endregion
 }

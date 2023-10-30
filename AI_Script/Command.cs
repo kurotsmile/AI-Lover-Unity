@@ -763,6 +763,7 @@ public class Command : MonoBehaviour
                             Carrot_Box_Btn_Item btn_list_report = item_field.create_item();
                             btn_list_report.set_icon(this.app.carrot.icon_carrot_bug);
                             btn_list_report.set_color(this.app.carrot.color_highlight);
+                            Destroy(btn_list_report.GetComponent<Button>());
                         }
                         else
                         {
@@ -775,7 +776,6 @@ public class Command : MonoBehaviour
                         item_field.set_tip(s_field_val);
                     }
                 }
-
             }
         }
 

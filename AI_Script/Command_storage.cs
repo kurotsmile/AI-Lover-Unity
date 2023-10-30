@@ -92,8 +92,7 @@ public class Command_storage : MonoBehaviour
     [Header("Mode Test Command")]
     public GameObject obj_button_next_command_test;
     public GameObject obj_button_prev_command_test;
-    private int index_command_test_play = 0;
-    private bool is_list_command_test_play = false;
+    private int index_command_test_play = -1;
 
     [Header("Asset Icon")]
     public Sprite sp_icon_add_chat;
@@ -921,21 +920,13 @@ public class Command_storage : MonoBehaviour
         data_test["status"] = "test";
         this.app.command_dev.set_all_box_active(false);
         this.box_add_chat.gameObject.SetActive(false);
-        this.is_list_command_test_play = false;
-        this.obj_button_next_command_test.SetActive(false);
-        this.obj_button_prev_command_test.SetActive(false);
         this.act_test_command(data_test);
     }
 
     public void play_one_test_command(IDictionary data_chat)
     {
-        this.data_chat_test = data_chat;
-        this.data_chat_test["status"] = "test";
+        data_chat["status"]= "test";
         this.app.command_dev.set_all_box_active(false);
-
-        this.is_list_command_test_play = false;
-        this.obj_button_next_command_test.SetActive(false);
-        this.obj_button_prev_command_test.SetActive(false);
         this.act_test_command(data_chat);
     }
 
@@ -943,39 +934,32 @@ public class Command_storage : MonoBehaviour
     {
         if (this.box_add_chat != null) this.box_add_chat.gameObject.SetActive(true);
         this.app.command_dev.set_all_box_active(true);
-
         this.app.panel_inp_command_test.SetActive(false);
         this.app.panel_inp_func.SetActive(false);
         this.app.panel_inp_msg.SetActive(true);
+        this.index_command_test_play = -1;
     }
 
     public void btn_replay_test_command()
     {
-        if (this.is_list_command_test_play)
-        {
-            this.act_test_command(this.data_chat_test);
-        }
-        else
-        {
-            this.GetComponent<Command>().act_chat(data_chat_test, true);
-            this.app.panel_inp_func.SetActive(false);
-        }
-    }
-
-    public void play_test_command(int index_comand)
-    {
-        this.app.command_dev.set_all_box_active(false);
-        this.obj_button_next_command_test.SetActive(true);
-        this.obj_button_prev_command_test.SetActive(true);
-        this.is_list_command_test_play = true;
-        this.index_command_test_play = index_comand;
-        this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play));
-        this.data_chat_test["status"] = "list_test";
         this.act_test_command(this.data_chat_test);
     }
 
-    private void act_test_command(IDictionary data_chat)
+    public void act_test_command(IDictionary data_chat)
     {
+        this.data_chat_test = data_chat;
+        if (data_chat["status"].ToString()== "test_list")
+        {
+            if(data_chat["index_list"]!=null) this.index_command_test_play = int.Parse(data_chat["index_list"].ToString());
+            this.obj_button_next_command_test.SetActive(true);
+            this.obj_button_prev_command_test.SetActive(true);
+        }
+        else
+        {
+            this.obj_button_next_command_test.SetActive(false);
+            this.obj_button_prev_command_test.SetActive(false);
+        }
+
         this.app.panel_main.SetActive(true);
         this.app.panel_inp_command_test.SetActive(true);
         this.app.panel_inp_func.SetActive(false);
@@ -989,34 +973,15 @@ public class Command_storage : MonoBehaviour
     public void btn_play_next_command_test()
     {
         this.index_command_test_play++;
-        if (this.index_command_test_play >=this.length) this.index_command_test_play=0;
-        string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play);
-        if (s_data != "") {
-            this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(s_data);
-            this.data_chat_test["status"] = "list_test";
-            this.act_test_command(this.data_chat_test);
-        }
-        else
-        {
-            this.btn_play_next_command_test();
-        }
+        if (this.index_command_test_play >=this.app.command_dev.length_list_test()) this.index_command_test_play=0;
+        this.app.command_dev.act_play_test_list(this.index_command_test_play);
     }
 
     public void btn_play_prev_command_test()
     {
         this.index_command_test_play--;
-        if (this.index_command_test_play < 0) this.index_command_test_play=(this.length-1);
-        string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.index_command_test_play);
-        if (s_data != "")
-        {
-            this.data_chat_test = (IDictionary)Carrot.Json.Deserialize(s_data);
-            this.data_chat_test["status"] = "list_test";
-            this.act_test_command(this.data_chat_test);
-        }
-        else
-        {
-            this.btn_play_prev_command_test();
-        }
+        if (this.index_command_test_play < 0) this.index_command_test_play=(this.app.command_dev.length_list_test()-1);
+        this.app.command_dev.act_play_test_list(this.index_command_test_play);
     }
     #endregion
 
