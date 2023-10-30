@@ -39,6 +39,7 @@ public class Setting : MonoBehaviour
     public Sprite sp_icon_off;
     public Sprite sp_icon_ads;
     public Sprite sp_icon_buy;
+    public Sprite sp_icon_facebook;
 
     private string s_user_name;
     private string s_weather_pin;
@@ -497,6 +498,13 @@ public class Setting : MonoBehaviour
         group_sys.add_item(box_setting.area_all_item.GetChild(1).GetComponent<Carrot.Carrot_Box_Item>());
         group_sys.add_item(box_setting.area_all_item.GetChild(5).GetComponent<Carrot.Carrot_Box_Item>());
 
+        Carrot_Box_Item item_fb_fanpage = this.box_setting.create_item("item_fb_fanpage");
+        item_fb_fanpage.set_icon(this.sp_icon_facebook);
+        item_fb_fanpage.set_title("Virtual lover FanPage");    
+        item_fb_fanpage.set_tip("Facebook fanpage");
+        item_fb_fanpage.set_act(() => act_open_fb_fanpage());
+        other_group.add_item(item_fb_fanpage);
+
         this.box_setting.update_color_table_row();
     } 
 
@@ -787,6 +795,12 @@ public class Setting : MonoBehaviour
         }
         btn_buy.set_color(this.app.carrot.color_highlight);
         Destroy(btn_buy.GetComponent<Button>());
+    }
+
+    private void act_open_fb_fanpage()
+    {
+        this.app.carrot.play_sound_click();
+        Application.OpenURL("https://www.facebook.com/virtuallover");
     }
 
     public float get_voice_speed()
