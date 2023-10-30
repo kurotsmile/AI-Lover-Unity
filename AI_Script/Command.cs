@@ -92,11 +92,9 @@ public class Command : MonoBehaviour
             {
                 this.id_cur_chat = chat_offline["id"].ToString();
                 this.act_chat(chat_offline);
-                Debug.Log("Chat offline");
             }
             else
             {
-                Debug.Log("Chat online");
                 if (this.app.carrot.is_online())
                     this.play_chat(s_key);
                 else
@@ -251,14 +249,15 @@ public class Command : MonoBehaviour
         Item_command_chat comand_chat = item_command_chat.GetComponent<Item_command_chat>();
         comand_chat.txt_chat.text = s_txt_show;
         comand_chat.icon.sprite = icon;
-        comand_chat.btn_add_app.GetComponent<Image>().color=this.GetComponent<App>().carrot.color_highlight;
+        comand_chat.btn_add_app.GetComponent<Image>().color=this.app.carrot.color_highlight;
+
         if (i_data != null)
         {
-            item_command_chat.GetComponent<Item_command_chat>().idata_chat = i_data;
+            i_data["type_command"] = "log";
+            comand_chat.idata_chat = i_data;
             if (i_data["status"] != null)
             {
                 string s_status = i_data["status"].ToString();
-
                 if (s_status == "music")
                 {
                     item_command_chat.gameObject.name = "music_item";

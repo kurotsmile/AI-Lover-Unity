@@ -237,6 +237,7 @@ public class Command_Dev : MonoBehaviour
         {
             IDictionary c = list_data[i];
             c["index_list"] = i;
+            c["type_command"] = "list";
             string id_chat = c["id"].ToString();
             string key_chat = c["key"].ToString();
 

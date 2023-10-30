@@ -15,6 +15,7 @@ public enum Command_Type_Act {
     edit_pass,
     edit_live,
     edit_pending_to_pass,
+    edit_command_from_log
 }
 
 [FirestoreData]
@@ -68,6 +69,7 @@ public class Command_storage : MonoBehaviour
     private int length;
 
     private Carrot_Box_Item item_command_edit_temp;
+    private Item_command_chat item_command_log_temp;
     private int index_cm_update = -1;
     private bool is_cm_mode_nomal = true;
 
@@ -217,7 +219,15 @@ public class Command_storage : MonoBehaviour
         this.type_act = Command_Type_Act.edit_command;
         this.show_edit_by_index(index);
     }
-     
+
+    public void show_edit_command_from_log(IDictionary data, Item_command_chat item_edit_cm_log)
+    {
+        this.reset_all_s_data();
+        this.item_command_log_temp = item_edit_cm_log;
+        this.type_act = Command_Type_Act.edit_command_from_log;
+        this.show_edit_by_data(data);
+    }
+
     private void show_edit_by_index(int index)
     {
         this.reset_all_s_data();

@@ -292,10 +292,10 @@ public class Music_playlist : MonoBehaviour
                     item_more_music.set_act(() => this.act_get_more_song(item_more_music.gameObject));
 
                     Carrot_Box_Item item_order_music = this.box_list.create_item();
-                    item_order_music.set_icon(this.icon);
-                    item_order_music.set_title("Sort");
+                    item_order_music.set_icon(this.app.command_storage.sp_icon_random);
+                    item_order_music.set_title("Sort ("+this.type_order.ToString()+")");
                     item_order_music.set_tip("Randomize the order of songs in the list");
-                    item_order_music.set_act(() => this.show_list_song_by_random_order());
+                    item_order_music.set_act(() => this.show_list_song_by_random_order(item_order_music));
                 }
             }
             this.box_list.update_color_table_row();
@@ -527,12 +527,13 @@ public class Music_playlist : MonoBehaviour
         });
     }
 
-    private void show_list_song_by_random_order()
+    private void show_list_song_by_random_order(Carrot_Box_Item item_order_music)
     {
         if (this.type_order == OrderBy_Type.date_asc) this.type_order = OrderBy_Type.date_desc;
-        if (this.type_order == OrderBy_Type.date_desc) this.type_order = OrderBy_Type.name_desc;
-        if (this.type_order == OrderBy_Type.name_desc) this.type_order = OrderBy_Type.name_asc;
-        if (this.type_order == OrderBy_Type.name_asc) this.type_order = OrderBy_Type.date_asc;
+        else if(this.type_order == OrderBy_Type.date_desc) this.type_order = OrderBy_Type.name_desc;
+        else if (this.type_order == OrderBy_Type.name_desc) this.type_order = OrderBy_Type.name_asc;
+        else this.type_order = OrderBy_Type.date_asc;
+        item_order_music.set_title("Sort (" + this.type_order.ToString() + ")");
         this.get_data_list_by_order(this.s_lang_cur);
     }
 
