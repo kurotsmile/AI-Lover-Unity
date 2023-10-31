@@ -434,6 +434,12 @@ public class Command_Dev : MonoBehaviour
                     }
                 }
 
+                Carrot_Box_Item item_edit_offline = box_sub_menu.create_item();
+                item_edit_offline.set_icon(this.app.carrot.user.icon_user_edit);
+                item_edit_offline.set_title("Edit (Offline)");
+                item_edit_offline.set_tip("Edit chat offline");
+                item_edit_offline.set_act(() => this.app.command_storage.show_edit_command(index_cm, null));
+
                 Carrot_Box_Item item_del_offline = box_sub_menu.create_item();
                 item_del_offline.set_icon(this.app.command_storage.sp_icon_delete);
                 item_del_offline.set_title("Delete (Offline)");

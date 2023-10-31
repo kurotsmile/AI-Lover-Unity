@@ -90,11 +90,13 @@ public class Command : MonoBehaviour
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
             if (chat_offline != null)
             {
+                Debug.Log("chat offline (Id father:"+this.id_cur_chat+")");
                 this.id_cur_chat = chat_offline["id"].ToString();
                 this.act_chat(chat_offline);
             }
             else
             {
+                Debug.Log("chat online (Id father:"+this.id_cur_chat+")");
                 if (this.app.carrot.is_online())
                     this.play_chat(s_key);
                 else
@@ -532,9 +534,8 @@ public class Command : MonoBehaviour
 
     private void play_sound_chat(AudioClip audio_clip) {
         this.sound_command.clip = audio_clip;
-        this.sound_command.pitch = this.GetComponent<App>().setting.get_voice_speed();
+        this.sound_command.pitch = this.app.setting.get_voice_speed();
         this.sound_command.Play();
-        this.GetComponent<App>().waitting_command();
     }
 
     public void get_msg_hit()

@@ -42,7 +42,6 @@ public class App : MonoBehaviour
     public Sprite icon_pc_chat_girl;
 
     private Item_command_chat item_cur_log_chat;
-    private bool is_waiting_command = false;
     public GameObject button_randio;
     private string link_deep_app;
 
@@ -281,34 +280,6 @@ public class App : MonoBehaviour
             this.show_chat_function();
             this.carrot.set_no_check_exit_app();
         }
-    }
-
-    void Update()
-    {
-        if (is_waiting_command)
-        {
-            if (this.GetComponent<Command>().sound_command.isPlaying == false)
-            {
-                this.is_waiting_command = false;
-            }
-        }
-    }
-
-    public float GetAveragedVolume()
-    {
-        float[] data = new float[256];
-        float a = 0;
-        this.GetComponent<Command>().sound_command.clip.GetData(data, this.GetComponent<Command>().sound_command.timeSamples);
-        foreach (float s in data)
-        {
-            a += Mathf.Abs(s);
-        }
-        return (a / 256) * 1000;
-    }
-
-    public void waitting_command()
-    {
-        this.is_waiting_command = true;
     }
 
     public void btn_show_google_weather()

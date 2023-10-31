@@ -752,6 +752,7 @@ public class Command_storage : MonoBehaviour
             if (s_data!= "")
             {
                 IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
+                data_chat["index_cm"] = i;
                 if (id_pather == "")
                 {
                     if (cm_cmd.Equals(data_chat["key"].ToString().ToLower())) list_chat.Add(data_chat);
