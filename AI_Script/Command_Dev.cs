@@ -26,6 +26,7 @@ public class Command_Dev : MonoBehaviour
     private Command_Dev_Type type;
     private List<GameObject> list_obj_box = new List<GameObject>();
     private IList<IDictionary> list_data_test=new List<IDictionary>();
+    private Carrot_Window_Input box_inp_text;
 
     public void check()
     {
@@ -67,6 +68,9 @@ public class Command_Dev : MonoBehaviour
                     Carrot_Box box=this.box_list(list_chat);
                     box.set_icon(this.app.command.icon_info_chat);
                     box.set_title("Chat Pending (Dev)");
+
+                    Carrot_Box_Btn_Item btn_dev_user=box.create_btn_menu_header(this.app.carrot.user.icon_user_login_true);
+                    btn_dev_user.set_act(()=>this.show_chat_by_user());
                 }
             }
         });
@@ -473,6 +477,59 @@ public class Command_Dev : MonoBehaviour
     {
         int index_last = this.list_obj_box.Count - 1;
         if (this.list_obj_box[index_last] != null) this.list_obj_box[index_last].GetComponent<Carrot_Box>().close();
+    }
+
+    private void show_chat_by_user()
+    {
+        this.box_inp_text= this.app.carrot.show_input("Show List Chat By User", "Enter Id Username user to view");
+        this.box_inp_text.set_act_done(this.done_show_list_by_user);
+    }
+
+    private void done_show_list_by_user(string s_username)
+    {
+        if (this.box_inp_text != null) this.box_inp_text.close();
+        this.show_chat_by_user_id(s_username);
+    }
+
+    private void show_chat_by_user_id(string s_id_user)
+    {
+        this.type = Command_Dev_Type.by_user;
+        this.app.carrot.play_sound_click();
+        this.app.carrot.show_loading();
+        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
+        ChatQuery = ChatQuery.WhereEqualTo("user.name", s_id_user);
+        ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
+            QuerySnapshot capitalQuerySnapshot = task.Result;
+            if (task.IsFaulted)
+            {
+                this.app.carrot.hide_loading();
+            }
+
+            if (task.IsCompleted)
+            {
+                this.app.carrot.hide_loading();
+
+                if (capitalQuerySnapshot.Count > 0)
+                {
+
+                    List<IDictionary> list_chat = new List<IDictionary>();
+                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
+                    {
+                        IDictionary chat_data = documentSnapshot.ToDictionary();
+                        chat_data["id"] = documentSnapshot.Id;
+                        list_chat.Add(chat_data);
+                    }
+                    Carrot_Box box = this.box_list(list_chat);
+                    box.set_title(s_id_user);
+                    box.set_icon(this.sp_icon_chat_passed);
+                }
+                else
+                {
+                    this.app.carrot.hide_loading();
+                    this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+                }
+            }
+        });
     }
 
     #region Command Test 
