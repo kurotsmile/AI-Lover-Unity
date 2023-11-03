@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Command_Dev_Type {pending,by_user,by_father,same_key}
+public enum Command_Dev_Type {pending,by_user, by_user_field, by_father,same_key}
 
 public class Command_Dev : MonoBehaviour
 {
@@ -28,6 +28,7 @@ public class Command_Dev : MonoBehaviour
     private IList<IDictionary> list_data_test=new List<IDictionary>();
     private Carrot_Window_Input box_inp_text;
     private OrderBy_Type order;
+    private string s_id_fiel_view_cur = "";
 
     public void check()
     {
@@ -161,6 +162,16 @@ public class Command_Dev : MonoBehaviour
         this.app.carrot.show_loading();
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
         ChatQuery = ChatQuery.WhereEqualTo("user.id",this.app.carrot.user.get_id_user_login());
+
+        if (this.order == OrderBy_Type.date_desc)
+            ChatQuery = ChatQuery.OrderByDescending("date_create");
+        else if (this.order == OrderBy_Type.date_asc)
+            ChatQuery = ChatQuery.OrderBy("date_create");
+        else if (this.order == OrderBy_Type.name_desc)
+            ChatQuery = ChatQuery.OrderByDescending("key");
+        else
+            ChatQuery = ChatQuery.OrderBy("key");
+
         ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted)
@@ -202,6 +213,16 @@ public class Command_Dev : MonoBehaviour
         this.app.carrot.show_loading();
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
         ChatQuery = ChatQuery.WhereEqualTo("pater", s_id_fathe);
+
+        if (this.order == OrderBy_Type.date_desc)
+            ChatQuery = ChatQuery.OrderByDescending("date_create");
+        else if (this.order == OrderBy_Type.date_asc)
+            ChatQuery = ChatQuery.OrderBy("date_create");
+        else if (this.order == OrderBy_Type.name_desc)
+            ChatQuery = ChatQuery.OrderByDescending("key");
+        else
+            ChatQuery = ChatQuery.OrderBy("key");
+
         ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted)
@@ -337,7 +358,7 @@ public class Command_Dev : MonoBehaviour
             }
         }
 
-        if (this.type == Command_Dev_Type.pending)
+        if (this.type == Command_Dev_Type.pending||this.type==Command_Dev_Type.by_user||this.type==Command_Dev_Type.by_user_field)
         {
             Carrot_Box_Item item_order_by = box.create_item();
             item_order_by.set_icon(this.app.command_storage.sp_icon_random);
@@ -358,7 +379,13 @@ public class Command_Dev : MonoBehaviour
             this.order = OrderBy_Type.name_desc;
         else
             this.order = OrderBy_Type.date_asc;
-        this.show();
+
+        if (this.type == Command_Dev_Type.pending)
+            this.show();
+        else if (this.type == Command_Dev_Type.by_user)
+            this.show_chat_by_user();
+        else if (this.type == Command_Dev_Type.by_user_field)
+            this.show_chat_by_user_id(this.s_id_fiel_view_cur);
     }
 
     public void sub_menu(IDictionary data,GameObject obj_focus=null)
@@ -524,13 +551,24 @@ public class Command_Dev : MonoBehaviour
         this.show_chat_by_user_id(s_username);
     }
 
-    private void show_chat_by_user_id(string s_id_user)
+    private void show_chat_by_user_id(string s_user_name)
     {
-        this.type = Command_Dev_Type.by_user;
+        this.s_id_fiel_view_cur = s_user_name;
+        this.type = Command_Dev_Type.by_user_field;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-        ChatQuery = ChatQuery.WhereEqualTo("user.name", s_id_user);
+        ChatQuery = ChatQuery.WhereEqualTo("user.name", s_user_name);
+
+        if (this.order == OrderBy_Type.date_desc)
+            ChatQuery = ChatQuery.OrderByDescending("date_create");
+        else if (this.order == OrderBy_Type.date_asc)
+            ChatQuery = ChatQuery.OrderBy("date_create");
+        else if (this.order == OrderBy_Type.name_desc)
+            ChatQuery = ChatQuery.OrderByDescending("key");
+        else
+            ChatQuery = ChatQuery.OrderBy("key");
+
         ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted)
@@ -541,7 +579,6 @@ public class Command_Dev : MonoBehaviour
             if (task.IsCompleted)
             {
                 this.app.carrot.hide_loading();
-
                 if (capitalQuerySnapshot.Count > 0)
                 {
 
@@ -553,7 +590,7 @@ public class Command_Dev : MonoBehaviour
                         list_chat.Add(chat_data);
                     }
                     Carrot_Box box = this.box_list(list_chat);
-                    box.set_title(s_id_user);
+                    box.set_title(s_user_name);
                     box.set_icon(this.sp_icon_chat_passed);
                 }
                 else
