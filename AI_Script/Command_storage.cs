@@ -807,6 +807,7 @@ public class Command_storage : MonoBehaviour
 
     public void show_list_cm(string s_type)
     {
+        this.app.command_dev.set_type(Command_Dev_Type.storage);
         Carrot_Box box;
         if (s_type == "0")
         {

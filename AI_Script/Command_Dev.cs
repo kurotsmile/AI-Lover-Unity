@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Command_Dev_Type {pending,by_user, by_user_field, by_father,same_key}
+public enum Command_Dev_Type {storage,pending,by_user, by_user_field, by_father,same_key}
 
 public class Command_Dev : MonoBehaviour
 {
@@ -23,12 +23,17 @@ public class Command_Dev : MonoBehaviour
     public GameObject btn_chat_dev;
     public GameObject btn_chat_pass_user;
 
-    private Command_Dev_Type type;
+    private Command_Dev_Type type = Command_Dev_Type.storage;
     private List<GameObject> list_obj_box = new List<GameObject>();
     private IList<IDictionary> list_data_test=new List<IDictionary>();
     private Carrot_Window_Input box_inp_text;
     private OrderBy_Type order;
     private string s_id_fiel_view_cur = "";
+
+    public void set_type(Command_Dev_Type type_cmd)
+    {
+        this.type = type_cmd;
+    }
 
     public void check()
     {
@@ -383,7 +388,7 @@ public class Command_Dev : MonoBehaviour
         if (this.type == Command_Dev_Type.pending)
             this.show();
         else if (this.type == Command_Dev_Type.by_user)
-            this.show_chat_by_user();
+            this.show_chat_pass_by_user();
         else if (this.type == Command_Dev_Type.by_user_field)
             this.show_chat_by_user_id(this.s_id_fiel_view_cur);
     }
