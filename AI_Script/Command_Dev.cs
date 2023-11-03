@@ -27,6 +27,7 @@ public class Command_Dev : MonoBehaviour
     private List<GameObject> list_obj_box = new List<GameObject>();
     private IList<IDictionary> list_data_test=new List<IDictionary>();
     private Carrot_Window_Input box_inp_text;
+    private OrderBy_Type order;
 
     public void check()
     {
@@ -47,6 +48,16 @@ public class Command_Dev : MonoBehaviour
         this.app.carrot.show_loading();
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
         ChatQuery = ChatQuery.WhereEqualTo("status", "pending");
+
+        if (this.order == OrderBy_Type.date_desc)
+            ChatQuery = ChatQuery.OrderByDescending("date_create");
+        else if (this.order == OrderBy_Type.date_asc)
+            ChatQuery = ChatQuery.OrderBy("date_create");
+        else if (this.order == OrderBy_Type.name_desc)
+            ChatQuery = ChatQuery.OrderByDescending("key");
+        else
+            ChatQuery = ChatQuery.OrderBy("key");
+
         ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {  
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted) this.app.carrot.hide_loading();
@@ -325,7 +336,29 @@ public class Command_Dev : MonoBehaviour
                     item_chat.set_act(() => this.app.command.box_info_chat(c));
             }
         }
+
+        if (this.type == Command_Dev_Type.pending)
+        {
+            Carrot_Box_Item item_order_by = box.create_item();
+            item_order_by.set_icon(this.app.command_storage.sp_icon_random);
+            item_order_by.set_title("Sort ("+this.order.ToString()+")");
+            item_order_by.set_tip("Rearrange the data list in random patterns");
+            item_order_by.set_act(() => this.act_change_order_sort());
+        }
         return box;
+    }
+
+    private void act_change_order_sort()
+    {
+        if (this.order == OrderBy_Type.date_asc)
+            this.order = OrderBy_Type.date_desc;
+        else if (this.order == OrderBy_Type.date_desc)
+            this.order = OrderBy_Type.name_asc;
+        else if (this.order == OrderBy_Type.name_asc)
+            this.order = OrderBy_Type.name_desc;
+        else
+            this.order = OrderBy_Type.date_asc;
+        this.show();
     }
 
     public void sub_menu(IDictionary data,GameObject obj_focus=null)

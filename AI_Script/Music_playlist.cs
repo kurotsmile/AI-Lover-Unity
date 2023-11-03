@@ -7,8 +7,6 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public enum Playlist_Type {online,offline,radio,music_search_result}
-public enum OrderBy_Type {date_asc,date_desc,name_asc,name_desc}
-
 public class Music_playlist : MonoBehaviour
 {
     [Header("Obj Main")]

@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+public enum OrderBy_Type { date_asc, date_desc, name_asc, name_desc }
+
 public class App : MonoBehaviour
 {
     [Header("Main Obj")]
