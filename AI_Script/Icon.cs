@@ -58,7 +58,7 @@ public class Icon : MonoBehaviour
     {
         this.app.carrot.hide_loading();
         if (this.box_list_icon_category != null) this.box_list_icon_category.close();
-        this.box_list_icon_category = this.app.carrot.Create_Box();
+        this.box_list_icon_category = this.app.carrot.Creat e_Box();
         this.box_list_icon_category.set_icon(this.app.carrot.icon_carrot_all_category);
         this.box_list_icon_category.set_title("Bundle of object styles");
 
