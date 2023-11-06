@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using Firebase.Extensions;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Icon : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class Icon : MonoBehaviour
 
     private Carrot_Box_Item item_icon = null;
     private string s_data_cache = "";
+    private string s_id_category_buy_temp;
 
     public void load()
     {
@@ -62,19 +64,53 @@ public class Icon : MonoBehaviour
 
         foreach (DocumentSnapshot documentSnapshot in IconCategoryQuerySnapshot.Documents)
         {
+            string s_status_buy = "free";
             IDictionary icon_data = documentSnapshot.ToDictionary();
             Carrot_Box_Item item_cat = this.box_list_icon_category.create_item("item_icon");
             item_cat.set_icon(this.sp_icon_icons);
+
+            if (icon_data["buy"] != null) s_status_buy = icon_data["buy"].ToString();
+
             if (icon_data["key"] != null)
             {
                 string s_key_cat = icon_data["key"].ToString();
                 item_cat.set_title(s_key_cat);
                 item_cat.set_tip(s_key_cat);
-                item_cat.set_act(() => this.view_list_icon_by_category_key(s_key_cat));
+
+                if (s_status_buy != "free")
+                {
+                    Carrot_Box_Btn_Item btn_buy=item_cat.create_item();
+                    btn_buy.set_icon(this.app.setting.sp_icon_buy);
+                    btn_buy.set_color(this.app.carrot.color_highlight);
+                    Destroy(btn_buy.GetComponent<Button>());
+
+                    if(this.app.carrot.model_app==ModelApp.Publish)
+                        item_cat.set_act(() => this.act_buy_category(s_key_cat));
+                    else
+                        item_cat.set_act(() => this.view_list_icon_by_category_key(s_key_cat));
+                }
+                else
+                {
+                    item_cat.set_act(() => this.view_list_icon_by_category_key(s_key_cat));
+                }
             }
         };
-
         this.box_list_icon_category.update_color_table_row();
+    }
+
+    private void act_buy_category(string s_id_category)
+    {
+        this.s_id_category_buy_temp = s_id_category;
+        this.app.carrot.shop.buy_product(19);
+    }
+
+    public void act_buy_category_success()
+    {
+        if (this.s_id_category_buy_temp != "")
+        {
+            this.view_list_icon_by_category_key(this.s_id_category_buy_temp);
+            this.s_id_category_buy_temp="";
+        }
     }
 
     private void view_list_icon_by_category_key(string s_key)

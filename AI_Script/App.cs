@@ -809,6 +809,12 @@ public class App : MonoBehaviour
             PlayerPrefs.SetInt("is_buy_5", 1);
             this.get_character().check_buy_success_character();
         }
+
+        if (id_product == this.carrot.shop.get_id_by_index(19))
+        {
+            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.icon.act_buy_category_success();
+        }
     }
 
     private void onRestoreSuccessCarrotPay(string[] arr_id)
