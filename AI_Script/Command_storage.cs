@@ -658,7 +658,7 @@ public class Command_storage : MonoBehaviour
                 this.item_icon.img_icon.color = Color.black;
             }
             this.item_icon.txt_val.color = color_icon;
-            this.s_color = ColorUtility.ToHtmlStringRGBA(color_icon);
+            this.s_color = "#"+ColorUtility.ToHtmlStringRGBA(color_icon);
         }
     }
 

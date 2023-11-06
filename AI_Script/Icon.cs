@@ -1,11 +1,10 @@
 using Carrot;
 using Firebase.Firestore;
-using System.Collections.Generic;
-using System;
 using UnityEngine;
 using Firebase.Extensions;
 using System.Collections;
 using UnityEngine.UI;
+using System.Drawing;
 
 public class Icon : MonoBehaviour
 {
@@ -19,6 +18,7 @@ public class Icon : MonoBehaviour
     private IList list_icon_name;
     private Carrot.Carrot_Box box_list_icon;
     private Carrot.Carrot_Box box_list_icon_category;
+    private Carrot_Window_Input box_search_icon;
 
     private Carrot_Box_Item item_icon = null;
     private string s_data_cache = "";
@@ -61,6 +61,8 @@ public class Icon : MonoBehaviour
         this.box_list_icon_category = this.app.carrot.Create_Box();
         this.box_list_icon_category.set_icon(this.app.carrot.icon_carrot_all_category);
         this.box_list_icon_category.set_title("Bundle of object styles");
+
+        this.head_btn(this.box_list_icon_category);
 
         foreach (DocumentSnapshot documentSnapshot in IconCategoryQuerySnapshot.Documents)
         {
@@ -127,13 +129,17 @@ public class Icon : MonoBehaviour
         });
     }
 
-    public void set_icon_and_emoji(Color32 color_cm, Sprite sp_cm, string s_color, string s_id)
+    public void set_icon_and_emoji(Sprite sp_cm, string s_color, string s_id)
     {
         this.app.command_storage.set_s_color(s_color);
         this.app.command_storage.set_s_id_icon(s_id);
         this.item_icon.set_val(s_id);
         this.item_icon.set_icon_white(sp_cm);
-        this.item_icon.txt_val.color = color_cm;
+
+        UnityEngine.Color color_item;
+        ColorUtility.TryParseHtmlString(s_color, out color_item);
+
+        this.item_icon.txt_val.color = color_item;
         if (this.box_list_icon != null) this.box_list_icon.close();
         if (this.box_list_icon_category != null) this.box_list_icon_category.close();
     }
@@ -167,6 +173,8 @@ public class Icon : MonoBehaviour
         Carrot_Box_Btn_Item btn_icon_category = this.box_list_icon.create_btn_menu_header(this.app.carrot.icon_carrot_all_category);
         btn_icon_category.set_act(() => list_category_icon());
 
+        this.head_btn(this.box_list_icon);
+
         foreach (DocumentSnapshot document in query_icon)
         {
             string id_icon = document.Id;
@@ -179,7 +187,7 @@ public class Icon : MonoBehaviour
             if (icon_data["color"] != null)
             {
                 s_color = icon_data["color"].ToString();
-                Color color_item;
+                UnityEngine.Color color_item;
                 ColorUtility.TryParseHtmlString(icon_data["color"].ToString(), out color_item);
                 item_icon.set_tip(s_color);
                 item_icon.txt_tip.color = color_item;
@@ -191,7 +199,7 @@ public class Icon : MonoBehaviour
             else
                 if (icon_data["icon"] != null) this.app.carrot.get_img_and_save_playerPrefs(icon_data["icon"].ToString(), item_icon.img_icon, id_icon);
 
-            item_icon.set_act(() => this.set_icon_and_emoji(Color.red, item_icon.img_icon.sprite, s_color, id_icon));
+            item_icon.set_act(() => this.set_icon_and_emoji(item_icon.img_icon.sprite, s_color, id_icon));
         }
         PlayerPrefs.SetString("s_data_icon_temp",Json.Serialize(this.list_icon_name));
     }
@@ -214,6 +222,65 @@ public class Icon : MonoBehaviour
         if (!this.list_icon_name.Contains(s_id_icon))
         {
             this.list_icon_name.Add(s_id_icon);
+        }
+    }
+
+    private void head_btn(Carrot_Box box)
+    {
+        if (this.list_icon_name.Count > 0)
+        {
+            Carrot_Box_Btn_Item btn_search= box.create_btn_menu_header(this.app.carrot.icon_carrot_search);
+            btn_search.set_act(()=> show_search_icon());
+        }
+    }
+
+    private void show_search_icon()
+    {
+        this.box_search_icon=this.app.carrot.show_search(done_act_search, "Enter icon name to search");
+    }
+
+    private void done_act_search(string s_name)
+    {
+        IList list_name_result = (IList)Json.Deserialize("[]");
+
+        for (int i = 0; i < this.list_icon_name.Count; i++)
+        {
+            string id_icon = this.list_icon_name[i].ToString();
+            if (id_icon.Contains(s_name)) list_name_result.Add(id_icon);
+        }
+
+        if (list_name_result.Count > 0)
+        {
+            if (this.box_search_icon != null) this.box_search_icon.close();
+            if (this.box_list_icon != null) this.box_list_icon.close();
+
+            this.box_list_icon = this.app.carrot.Create_Box("result_search");
+            this.box_list_icon.set_icon(this.app.command_storage.sp_icon_icons);
+            this.box_list_icon.set_title("Icon search results");
+
+            for (int i = 0; i < list_name_result.Count; i++)
+            {
+                string id_icon = list_name_result[i].ToString();
+                if (id_icon.Contains(s_name))
+                {
+                    Sprite sp_icon = this.app.carrot.get_tool().get_sprite_to_playerPrefs(id_icon);
+                    if (sp_icon != null)
+                    {
+                        UnityEngine.Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                        string s_color ="#"+ColorUtility.ToHtmlStringRGBA(color_icon);
+                        Carrot_Box_Item item_result = this.box_list_icon.create_item("item_result_" + i);
+                        item_result.set_title(id_icon);
+                        item_result.set_tip(s_color);
+                        item_result.txt_tip.color = color_icon;
+                        item_result.set_icon_white(sp_icon);
+                        item_result.set_act(() => this.set_icon_and_emoji(item_result.img_icon.sprite, s_color, id_icon));
+                    }
+                }
+            }
+        }
+        else
+        {
+            this.app.carrot.show_msg("None");
         }
     }
 }
