@@ -58,7 +58,7 @@ public class Icon : MonoBehaviour
     {
         this.app.carrot.hide_loading();
         if (this.box_list_icon_category != null) this.box_list_icon_category.close();
-        this.box_list_icon_category = this.app.carrot.Creat e_Box();
+        this.box_list_icon_category = this.app.carrot.Create_Box();
         this.box_list_icon_category.set_icon(this.app.carrot.icon_carrot_all_category);
         this.box_list_icon_category.set_title("Bundle of object styles");
 
@@ -67,7 +67,7 @@ public class Icon : MonoBehaviour
         foreach (DocumentSnapshot documentSnapshot in IconCategoryQuerySnapshot.Documents)
         {
             string s_status_buy = "free";
-            IDictionary icon_data = documentSnapshot.ToDictionary();
+            IDictionary icon_data = documentSnapshot.ToDictionary();  
             Carrot_Box_Item item_cat = this.box_list_icon_category.create_item("item_icon");
             item_cat.set_icon(this.sp_icon_icons);
 
