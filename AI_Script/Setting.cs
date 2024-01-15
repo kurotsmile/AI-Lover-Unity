@@ -117,8 +117,7 @@ public class Setting : MonoBehaviour
         {
             this.img_sound_voice_home.sprite = this.sp_icon_voice_off;
             this.is_sound_voice = false;
-        }
-            
+        }  
     }
 
     public void show_setting()
@@ -529,14 +528,15 @@ public class Setting : MonoBehaviour
 
     private void act_weather_pin()
     {
-        this.app.carrot.location.get_location(get_location_success);
+        this.app.carrot.location.get_location(this.get_location_success);
     }
 
     private void get_location_success(LocationInfo l)
     {
+
         PlayerPrefs.SetFloat("weather_longitude", l.longitude);
         PlayerPrefs.SetFloat("weather_latitude", l.latitude);
-        StartCoroutine(this.GetComponent<App>().get_weather_buy_lot_and_lat());
+        StartCoroutine(this.app.get_weather_buy_lot_and_lat());
     }
 
     private void act_done_box_edit_weather_address(string s_address)
@@ -544,7 +544,7 @@ public class Setting : MonoBehaviour
         PlayerPrefs.SetString("weather_pin", s_address);
         if (this.box_inp != null) this.box_inp.close();
         this.item_weather_pin.set_val(s_address);
-        StartCoroutine(this.GetComponent<App>().get_weather_buy_address());
+        StartCoroutine(this.app.get_weather_buy_address());
     }
 
     private void act_show_box_edit_name_user()
@@ -843,5 +843,10 @@ public class Setting : MonoBehaviour
     public string get_tts_type()
     {
         return this.s_tts_type;
+    }
+
+    public void set_text_weather_pin(string s_address)
+    {
+        if(this.item_weather_pin!=null) this.item_weather_pin.set_val(s_address);
     }
 }

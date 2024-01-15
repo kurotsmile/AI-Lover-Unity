@@ -376,6 +376,8 @@ public class Command_Dev : MonoBehaviour
 
     private void act_change_order_sort()
     {
+        this.close_box_last();
+
         if (this.order == OrderBy_Type.date_asc)
             this.order = OrderBy_Type.date_desc;
         else if (this.order == OrderBy_Type.date_desc)

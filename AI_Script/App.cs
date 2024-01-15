@@ -386,6 +386,7 @@ public class App : MonoBehaviour
             {
                 PlayerPrefs.SetString("weather_" + System.DateTime.Now.ToString("dd_MM_yyyy") + "_" + PlayerPrefs.GetString("lang", "vi"), www.downloadHandler.text);
                 this.load_info_weather(www.downloadHandler.text);
+                this.setting.set_text_weather_pin(www.downloadHandler.text);
             }
         }
     }

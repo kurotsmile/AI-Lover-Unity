@@ -4,7 +4,6 @@ using UnityEngine;
 using Firebase.Extensions;
 using System.Collections;
 using UnityEngine.UI;
-using System.Drawing;
 
 public class Icon : MonoBehaviour
 {

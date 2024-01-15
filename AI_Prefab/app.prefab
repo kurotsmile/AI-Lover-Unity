@@ -33420,7 +33420,7 @@ MonoBehaviour:
   sp_icon_parameter_tag: {fileID: 21300000, guid: 66879d05effcc93469b99d23b36f8a88, type: 3}
   sp_icon_key_same: {fileID: 21300000, guid: c0ebbe56a8045914080a5f436c3eb87f, type: 3}
   sp_icon_father: {fileID: 21300000, guid: 6772418e55753bb4caa853eda64adeca, type: 3}
-  sp_icon_random: {fileID: 21300000, guid: 55ac0307352b6eb47b73130ca88711fb, type: 3}
+  sp_icon_random: {fileID: 21300000, guid: ec56ef8c3fed5ba42afe82abad55db9f, type: 3}
   icon_command_pass: {fileID: 21300000, guid: d5c0c8535297e774bbd02d44384bc444, type: 3}
   sp_icon_translation: {fileID: 21300000, guid: 6e9141f39a1f16745ae28da56bc77fc3, type: 3}
 --- !u!114 &2755477471257207458
@@ -33730,7 +33730,7 @@ MonoBehaviour:
   sp_icon_translate: {fileID: 21300000, guid: d8790ddbdd3bfaa48b6729f28415a4f8, type: 3}
   sp_icon_chat_passed: {fileID: 21300000, guid: d5c0c8535297e774bbd02d44384bc444, type: 3}
   sp_icon_chat_pending: {fileID: 21300000, guid: 321147dedcd1d514eb398189f231f321, type: 3}
-  sp_icon_chat_live: {fileID: 0}
+  sp_icon_chat_live: {fileID: 21300000, guid: bf082a3eef41f764782fa50faebf1dbe, type: 3}
   btn_chat_dev: {fileID: 3658171769424579257}
   btn_chat_pass_user: {fileID: 2016827399986293312}
 --- !u!114 &8147883725683145312
@@ -37390,7 +37390,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.00020599365}
+  m_AnchoredPosition: {x: -3, y: 0.00031280518}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004

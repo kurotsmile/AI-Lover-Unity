@@ -288,11 +288,13 @@ public class Music_playlist : MonoBehaviour
                     item_more_music.set_title("Get more songs");
                     item_more_music.set_tip("Get more songs into playlists");
                     item_more_music.set_act(() => this.act_get_more_song(item_more_music.gameObject));
+                    item_more_music.set_lang_data("get_more_songs", "get_more_songs_tip");
+                    item_more_music.load_lang_data();
 
                     Carrot_Box_Item item_order_music = this.box_list.create_item();
                     item_order_music.set_icon(this.app.command_storage.sp_icon_random);
-                    item_order_music.set_title("Sort ("+this.type_order.ToString()+")");
-                    item_order_music.set_tip("Randomize the order of songs in the list");
+                    item_order_music.set_title(PlayerPrefs.GetString("sort", "Sort")+" ("+this.type_order.ToString()+")");
+                    item_order_music.set_tip(PlayerPrefs.GetString("sort_tip", "Randomize the order of songs in the list"));
                     item_order_music.set_act(() => this.show_list_song_by_random_order(item_order_music));
                 }
             }
@@ -508,6 +510,7 @@ public class Music_playlist : MonoBehaviour
 
             if (task.IsCompleted)
             {
+                int index_next=this.list_music_cur.Count;
                 this.app.carrot.hide_loading();
                 if (songQuerySnapshot.Count > 0)
                 {
@@ -517,8 +520,11 @@ public class Music_playlist : MonoBehaviour
                         IDictionary data_music = SongSnapshot.ToDictionary();
                         data_music["id"] = SongSnapshot.Id;
                         data_music["type"] = "online";
+                        data_music["index"] = index_next;
+                        index_next++;
                         this.item_song(data_music);
                     }
+                    if(this.box_list!=null) this.box_list.update_color_table_row();
                 }
                 Destroy(obj_item_more.gameObject);
             }
