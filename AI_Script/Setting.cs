@@ -528,15 +528,18 @@ public class Setting : MonoBehaviour
 
     private void act_weather_pin()
     {
-        this.app.carrot.location.get_location(this.get_location_success);
+        if (this.app.carrot.model_app == ModelApp.Publish)
+            this.app.carrot.location.get_location(this.get_location_success);
+        else
+            StartCoroutine(this.app.get_weather_buy_lot_and_lat(16.518108f, 107.513729f));
     }
 
     private void get_location_success(LocationInfo l)
     {
-
         PlayerPrefs.SetFloat("weather_longitude", l.longitude);
         PlayerPrefs.SetFloat("weather_latitude", l.latitude);
-        StartCoroutine(this.app.get_weather_buy_lot_and_lat());
+        this.item_weather_pin.set_val(l.latitude + " : " + l.longitude);
+        StartCoroutine(this.app.get_weather_buy_lot_and_lat(l.longitude, l.latitude));
     }
 
     private void act_done_box_edit_weather_address(string s_address)

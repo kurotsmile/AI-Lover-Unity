@@ -372,6 +372,7 @@ public class Command : MonoBehaviour
             if (index_func == "10") this.app.carrot.show_rate();
             if (index_func == "11") this.app.carrot.show_share();
             if (index_func == "12") this.app.carrot.delay_function(3.6f, this.app.exit_app);
+            if (index_func == "13") this.app.carrot.delay_function(2f, this.app.view.show_list_background_image);
         }
         if (data_chat["icon"] != null)
         {

@@ -373,9 +373,9 @@ public class App : MonoBehaviour
         }
     }
 
-    public IEnumerator get_weather_buy_lot_and_lat()
+    public IEnumerator get_weather_buy_lot_and_lat(float weather_longitude,float weather_latitude)
     {
-        using (UnityWebRequest www = UnityWebRequest.Get("https://api.openweathermap.org/data/2.5/onecall?lat=" + PlayerPrefs.GetFloat("weather_longitude") + "&lon=" + PlayerPrefs.GetFloat("weather_latitude") + "&exclude=hourly,daily&appid=" + this.get_key_weather_api() + "&lang=" + PlayerPrefs.GetString("lang", "vi") + "&mode=json&units=metric&cnt=3"))
+        using (UnityWebRequest www = UnityWebRequest.Get("https://api.openweathermap.org/data/2.5/onecall?lat="+ weather_longitude + "&lon="+ weather_latitude + "&exclude=hourly,daily&appid=" + this.get_key_weather_api() + "&lang=" + PlayerPrefs.GetString("lang", "vi") + "&mode=json&units=metric&cnt=3"))
         {
             yield return www.SendWebRequest();
             if (www.result != UnityWebRequest.Result.Success)
@@ -386,7 +386,7 @@ public class App : MonoBehaviour
             {
                 PlayerPrefs.SetString("weather_" + System.DateTime.Now.ToString("dd_MM_yyyy") + "_" + PlayerPrefs.GetString("lang", "vi"), www.downloadHandler.text);
                 this.load_info_weather(www.downloadHandler.text);
-                this.setting.set_text_weather_pin(www.downloadHandler.text);
+                this.setting.set_text_weather_pin(weather_longitude+","+ weather_latitude);
             }
         }
     }
@@ -407,38 +407,101 @@ public class App : MonoBehaviour
     private void load_info_weather(string s)
     {
         IDictionary data = (IDictionary)Carrot.Json.Deserialize(s);
+        IDictionary current = (IDictionary)data["current"];
+        if (data["weather"] == null)
+        {
+            current["lat"] = data["lat"];
+            current["lon"] = data["lon"];
+            data = current;
+        }
         IList list_weather = (IList)data["weather"];
         IDictionary weather = (IDictionary)list_weather[0];
         IDictionary main = (IDictionary)data["main"];
         IDictionary sys = (IDictionary)data["sys"];
         IDictionary wind = (IDictionary)data["wind"];
-        IDictionary clouds = (IDictionary)data["clouds"];
-        string s_weather_temp = main["temp"].ToString();
-        this.s_weather_temp_feels_like = main["feels_like"].ToString();
-        this.txt_weather_temp.text = s_weather_temp + "°C";//-273.15
-        this.txt_weather_description.text = weather["description"].ToString();
-        this.txt_sunrise.text = UnixTimeStampToDateTime(long.Parse(sys["sunrise"].ToString())).ToString("dd/MM hh:ss tt");
-        this.txt_sunset.text = UnixTimeStampToDateTime(long.Parse(sys["sunset"].ToString())).ToString("dd/MM hh:ss tt");
-        this.txt_wind_speed.text = wind["speed"].ToString() + "m/s";
-        this.txt_wind_deg.text = wind["deg"].ToString() + "°";
-        this.txt_visibility.text = data["visibility"].ToString() + "m";
-        this.txt_pressur.text = main["pressure"].ToString() + "hPa";
-        this.txt_clouds.text = clouds["all"].ToString() + "%";
-        this.txt_humidity.text = main["humidity"].ToString() + "%";
-        this.s_weather_temp_min = main["temp_min"].ToString();
-        this.s_weather_temp_max = main["temp_max"].ToString();
-        this.setting.set_name_address_weather(data["name"].ToString());
-        string id_icon_weather = weather["icon"].ToString();
-        Sprite sp_icon_weather = this.carrot.get_tool().get_sprite_to_playerPrefs("w" + id_icon_weather);
-        if (sp_icon_weather != null)
+
+        string s_clouds = "";
+        if (data["clouds"]!= null)
         {
-            this.img_weather_icon.sprite = sp_icon_weather;
-            this.img_weather_icon.color = Color.white;
+            try
+            {
+                IDictionary clouds = (IDictionary)data["clouds"];
+                if(clouds["all"]!=null) s_clouds = clouds["all"].ToString();
+            }catch(Exception)
+            {
+                s_clouds = data["clouds"].ToString();
+            }
+        }
+
+        string s_weather_temp = "";
+        string s_sunrise = "";
+        string s_sunset = "";
+        string s_speed = "";
+        string s_deg = "";
+        string s_pressure = "";
+        string s_humidity = "";
+        string s_visibility = "";
+
+        if (data["temp"] != null)
+        {
+            s_weather_temp = data["temp"].ToString();
+            if(data["sunrise"]!=null) s_sunrise = data["sunrise"].ToString();
+            if(data["sunset"]!=null) s_sunset = data["sunset"].ToString();
+            if(data["wind_speed"]!=null) s_speed = data["wind_speed"].ToString();
+            if(data["wind_deg"]!=null) s_deg = data["wind_deg"].ToString();
+            if(data["pressure"]!=null) s_pressure= data["pressure"].ToString();
+            if(data["humidity"]!=null) s_humidity = data["humidity"].ToString();
+            this.s_weather_temp_min = "0.0";
+            this.s_weather_temp_max = "0.0";
+            if(data["feels_like"]!=null) this.s_weather_temp_feels_like = data["feels_like"].ToString();
         }
         else
         {
-            this.carrot.get_img_and_save_playerPrefs("https://openweathermap.org/img/wn/" + id_icon_weather + "@2x.png", this.img_weather_icon, "w" + id_icon_weather);
+            if(main["temp"]!=null) s_weather_temp = main["temp"].ToString();
+            if(sys["sunrise"]!=null) s_sunrise = sys["sunrise"].ToString();
+            if(sys["sunset"]!=null) s_sunset = sys["sunset"].ToString();
+            if(wind["speed"]!=null) s_speed = wind["speed"].ToString();
+            if(wind["deg"]!=null) s_deg = wind["deg"].ToString();
+            if(main["pressure"]!=null) s_pressure = main["pressure"].ToString();
+            if(main["humidity"] != null) s_humidity = main["humidity"].ToString();
+            if(main["temp_min"]!=null) this.s_weather_temp_min = main["temp_min"].ToString();
+            if(main["temp_max"]!=null) this.s_weather_temp_max = main["temp_max"].ToString();
+            if(main["feels_like"]!=null) this.s_weather_temp_feels_like = main["feels_like"].ToString();
         }
+
+        if(data["visibility"]!=null) s_visibility = data["visibility"].ToString();
+
+        this.txt_weather_temp.text = s_weather_temp + "°C";
+        if(weather["description"]!=null) this.txt_weather_description.text = weather["description"].ToString();
+        this.txt_sunrise.text = UnixTimeStampToDateTime(long.Parse(s_sunrise)).ToString("dd/MM hh:ss tt");
+        this.txt_sunset.text = UnixTimeStampToDateTime(long.Parse(s_sunset)).ToString("dd/MM hh:ss tt");
+        this.txt_wind_speed.text = s_speed + "m/s";
+        this.txt_wind_deg.text =s_deg + "°";
+        this.txt_visibility.text = s_visibility + "m";
+        this.txt_pressur.text = s_pressure+"hPa";
+        this.txt_clouds.text = s_clouds + "%";
+        this.txt_humidity.text = s_humidity + "%";
+
+        if (data["name"]!=null)
+            this.setting.set_name_address_weather(data["name"].ToString());
+        else
+            this.setting.set_name_address_weather(data["lat"].ToString()+","+ data["lon"].ToString());
+
+        if (weather["icon"] != null)
+        {
+            string id_icon_weather = weather["icon"].ToString();
+            Sprite sp_icon_weather = this.carrot.get_tool().get_sprite_to_playerPrefs("w" + id_icon_weather);
+            if (sp_icon_weather != null)
+            {
+                this.img_weather_icon.sprite = sp_icon_weather;
+                this.img_weather_icon.color = Color.white;
+            }
+            else
+            {
+                this.carrot.get_img_and_save_playerPrefs("https://openweathermap.org/img/wn/" + id_icon_weather + "@2x.png", this.img_weather_icon, "w" + id_icon_weather);
+            }
+        }
+
         this.show_tip_weather();
     }
 
