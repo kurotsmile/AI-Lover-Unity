@@ -80,6 +80,7 @@ public class Command : MonoBehaviour
 
     public void send_chat(string s_key,bool is_log_show=false)
     {
+        s_key = s_key.Trim().ToLower();
         this.is_live = false;
         this.s_command_chat_last = s_key;
         
