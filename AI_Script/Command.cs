@@ -373,6 +373,9 @@ public class Command : MonoBehaviour
             if (index_func == "11") this.app.carrot.show_share();
             if (index_func == "12") this.app.carrot.delay_function(3.6f, this.app.exit_app);
             if (index_func == "13") this.app.carrot.delay_function(2f, this.app.view.show_list_background_image);
+            if (index_func == "14") this.app.player_music.btn_next();
+            if (index_func == "15") this.app.player_music.btn_pause();
+            if (index_func == "16") this.app.carrot.delay_function(1.6f, ()=>this.app.open_sys(data_chat["link"].ToString().Trim()));
         }
         if (data_chat["icon"] != null)
         {

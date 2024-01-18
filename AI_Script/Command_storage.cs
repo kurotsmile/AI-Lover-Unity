@@ -1058,7 +1058,7 @@ public class Command_storage : MonoBehaviour
     {
         chat c = new chat
         {
-            msg = this.item_msg.get_val(),
+            msg = this.item_msg.get_val().Trim(),
             action = this.item_action.get_val(),
             face = this.item_face.get_val(),
             limit = "1",
@@ -1076,7 +1076,7 @@ public class Command_storage : MonoBehaviour
         if (this.s_id.Trim() == "") c.id = "chat" + this.app.carrot.generateID();
         else c.id = this.s_id;
 
-        if (this.item_keyword != null) c.key = this.item_keyword.get_val().ToLower();
+        if (this.item_keyword != null) c.key = this.item_keyword.get_val().Trim().ToLower();
         c.user = this.get_user_data_editor(this.s_user_id);
         return c;
     }

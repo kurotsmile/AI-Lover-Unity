@@ -643,6 +643,18 @@ public class App : MonoBehaviour
         this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
     }
 
+    public void open_sys(string s_action= "android.settings.SETTINGS")
+    {
+        using (var unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+        using (AndroidJavaObject currentActivityObject = unityClass.GetStatic<AndroidJavaObject>("currentActivity"))
+        {
+            using (var intentObject = new AndroidJavaObject("android.content.Intent", s_action))
+            {
+                currentActivityObject.Call("startActivity", intentObject);
+            }
+        }
+    }
+
     [ContextMenu("Delete all data app")]
     public void delete_all_data()
     {
