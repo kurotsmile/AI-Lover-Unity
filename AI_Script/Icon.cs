@@ -73,8 +73,6 @@ public class Icon : MonoBehaviour
 
             if (icon_data["buy"] != null) s_status_buy = icon_data["buy"].ToString();
 
-
-
             if (icon_data["key"] != null)
             {
                 string s_key_cat = icon_data["key"].ToString();
@@ -84,6 +82,10 @@ public class Icon : MonoBehaviour
                 if (s_status_buy != "free")
                 {
                     if (PlayerPrefs.GetInt("is_buy_category_icon_" + s_key_cat, 0) == 1) s_status_buy = "free";
+
+                    if (s_status_buy != "free") {
+                        if (PlayerPrefs.GetInt("is_buy_0", 0) == 1) s_status_buy = "free";
+                    }
                 }
 
                 if (s_status_buy != "free")
