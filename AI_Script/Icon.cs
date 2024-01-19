@@ -9,6 +9,7 @@ public class Icon : MonoBehaviour
 {
     [Header("Main Obj")]
     public App app;
+    public int index_buy_category_icon;
 
     [Header("Icon Obj")]
     public Sprite sp_icon_icons;
@@ -72,11 +73,18 @@ public class Icon : MonoBehaviour
 
             if (icon_data["buy"] != null) s_status_buy = icon_data["buy"].ToString();
 
+
+
             if (icon_data["key"] != null)
             {
                 string s_key_cat = icon_data["key"].ToString();
                 item_cat.set_title(s_key_cat);
                 item_cat.set_tip(s_key_cat);
+
+                if (s_status_buy != "free")
+                {
+                    if (PlayerPrefs.GetInt("is_buy_category_icon_" + s_key_cat, 0) == 1) s_status_buy = "free";
+                }
 
                 if (s_status_buy != "free")
                 {
@@ -102,7 +110,7 @@ public class Icon : MonoBehaviour
     private void act_buy_category(string s_id_category)
     {
         this.s_id_category_buy_temp = s_id_category;
-        this.app.carrot.shop.buy_product(19);
+        this.app.carrot.shop.buy_product(this.index_buy_category_icon);
     }
 
     public void act_buy_category_success()
@@ -110,6 +118,7 @@ public class Icon : MonoBehaviour
         if (this.s_id_category_buy_temp != "")
         {
             this.view_list_icon_by_category_key(this.s_id_category_buy_temp);
+            PlayerPrefs.SetInt("is_buy_category_icon_" + this.s_id_category_buy_temp, 1);
             this.s_id_category_buy_temp="";
         }
     }

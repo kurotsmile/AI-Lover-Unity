@@ -886,7 +886,7 @@ public class App : MonoBehaviour
             this.get_character().check_buy_success_character();
         }
 
-        if (id_product == this.carrot.shop.get_id_by_index(19))
+        if (id_product == this.carrot.shop.get_id_by_index(this.icon.index_buy_category_icon))
         {
             this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.icon.act_buy_category_success();
