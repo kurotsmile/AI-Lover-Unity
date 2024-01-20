@@ -13,9 +13,15 @@ public class OpenAIChatbot : MonoBehaviour
 
     private const string openaiEndpoint = "https://api.openai.com/v1/chat/completions";
 
+    private string key_api;
+
+    public void on_load()
+    {
+        this.key_api = PlayerPrefs.GetString("key_api_ai_gpt", this.get_key_api_random());
+    }
+
     IEnumerator PostRequest(string userMessage)
     {
-        string apiKey = this.get_key_api();
         string requestData = "{\"model\": \"gpt-3.5-turbo\",\"messages\":[{\"role\": \"user\",\"content\": \""+userMessage+"\"}]}";
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(requestData);
 
@@ -23,7 +29,7 @@ public class OpenAIChatbot : MonoBehaviour
         {
             www.uploadHandler = new UploadHandlerRaw(postData);
             www.SetRequestHeader("Content-Type", "application/json");
-            www.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+            www.SetRequestHeader("Authorization", $"Bearer {key_api}");
 
             yield return www.SendWebRequest();
 
@@ -87,10 +93,18 @@ public class OpenAIChatbot : MonoBehaviour
             StartCoroutine(PostRequest(s_key));
     }
 
-    private string get_key_api()
+    private string get_key_api_random()
     {
         int index_random = Random.Range(0, this.lis_api_key.Length);
         return this.lis_api_key[index_random];
+    }
+
+    public void set_key_api(string s_key)
+    {
+        if (s_key.Trim() != "")
+            this.key_api = s_key;
+        else
+            this.key_api = this.get_key_api_random();
     }
 
     public void stop_All_Action()

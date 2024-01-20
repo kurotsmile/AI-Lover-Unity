@@ -33785,9 +33785,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
-  lis_api_key:
-  - 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
-  - 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
+  lis_api_key: []
 --- !u!1 &2755477472104608252
 GameObject:
   m_ObjectHideFlags: 0
@@ -37415,7 +37413,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.00018310547}
+  m_AnchoredPosition: {x: -3, y: 0.00019836426}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004
@@ -41385,8 +41383,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1334967823943002200}
   m_HandleRect: {fileID: 2440126133283484171}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.5174486
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

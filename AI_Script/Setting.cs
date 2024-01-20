@@ -64,6 +64,7 @@ public class Setting : MonoBehaviour
     private Carrot.Carrot_Box_Item item_voice_speed;
     private Carrot.Carrot_Box_Item item_voice_type;
     private Carrot.Carrot_Box_Item item_voice_test;
+    private Carrot.Carrot_Box_Item item_gpt;
 
     private Carrot.Carrot_Box_Btn_Item btn_user_sex_boy;
     private Carrot.Carrot_Box_Btn_Item btn_user_sex_girl;
@@ -509,12 +510,32 @@ public class Setting : MonoBehaviour
         Carrot.Carrot_Box_Item_group gpt_group = box_setting.add_item_group("gpt_group");
         gpt_group.set_icon(this.sp_icon_gpt);
 
-        Carrot_Box_Item item_gpt = this.box_setting.create_item("item_gpt");
+        this.item_gpt = this.box_setting.create_item("item_gpt");
         item_gpt.set_icon(this.app.command_storage.sp_icon_key);
         item_gpt.set_title("API key");
         item_gpt.set_tip("Your OpenAI GPT API key");
-        item_gpt.set_act(() => act_open_fb_fanpage());
+        item_gpt.set_act(() => act_show_box_edit_key_api_gpt());
         other_group.add_item(item_fb_fanpage);
+
+        string key_api_ai_gpt = PlayerPrefs.GetString("key_api_ai_gpt", "");
+        if (key_api_ai_gpt != "")
+        {
+            this.item_gpt.set_type(Box_Item_Type.box_value_txt);
+            this.item_gpt.set_val(key_api_ai_gpt);
+            this.item_gpt.check_type();
+        }
+
+        Carrot.Carrot_Box_Btn_Item btn_edit_gpt = this.item_gpt.create_item();
+        btn_edit_gpt.set_icon(this.app.carrot.user.icon_user_edit);
+        btn_edit_gpt.set_color(this.app.carrot.color_highlight);
+        Destroy(btn_edit_gpt.GetComponent<Button>());
+
+        Carrot_Box_Btn_Item btn_help_gpt = this.item_gpt.create_item();
+        btn_help_gpt.set_icon(this.app.command.icon_info_chat);
+        btn_help_gpt.set_color(this.app.carrot.color_highlight);
+        btn_help_gpt.set_act(() => this.act_open_help_gpt_key());
+
+        group_chat.add_item(item_voice_speed);
 
         this.box_setting.update_color_table_row();
     } 
@@ -863,5 +884,29 @@ public class Setting : MonoBehaviour
     public void set_text_weather_pin(string s_address)
     {
         if(this.item_weather_pin!=null) this.item_weather_pin.set_val(s_address);
+    }
+
+    private void act_show_box_edit_key_api_gpt()
+    {
+        string s_title = PlayerPrefs.GetString("key_api_gpt", "API key");
+        string s_tip = PlayerPrefs.GetString("key_api_gpt_tip", "Your OpenAI GPT API key");
+        this.box_inp = this.app.carrot.show_input(s_title, s_tip,PlayerPrefs.GetString("key_api_ai_gpt",""));
+        this.box_inp.set_act_done(act_done_key_api_gpt);
+    }
+
+    private void act_done_key_api_gpt(string s_key_gpt)
+    {
+        PlayerPrefs.SetString("key_api_ai_gpt", s_key_gpt);
+        this.item_gpt.set_type(Box_Item_Type.box_value_txt);
+        this.item_gpt.set_val(s_key_gpt);
+        this.item_gpt.check_type();
+        this.app.open_AI.set_key_api(s_key_gpt);
+        if (this.box_inp != null) this.box_inp.close();
+    }
+
+    public void act_open_help_gpt_key()
+    {
+        this.app.carrot.play_sound_click();
+        Application.OpenURL("https://platform.openai.com/api-keys");
     }
 }
