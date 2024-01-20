@@ -40,6 +40,7 @@ public class Setting : MonoBehaviour
     public Sprite sp_icon_ads;
     public Sprite sp_icon_buy;
     public Sprite sp_icon_facebook;
+    public Sprite sp_icon_gpt;
 
     private string s_user_name;
     private string s_weather_pin;
@@ -504,6 +505,17 @@ public class Setting : MonoBehaviour
         item_fb_fanpage.set_act(() => act_open_fb_fanpage());
         other_group.add_item(item_fb_fanpage);
 
+
+        Carrot.Carrot_Box_Item_group gpt_group = box_setting.add_item_group("gpt_group");
+        gpt_group.set_icon(this.sp_icon_gpt);
+
+        Carrot_Box_Item item_gpt = this.box_setting.create_item("item_gpt");
+        item_gpt.set_icon(this.app.command_storage.sp_icon_key);
+        item_gpt.set_title("API key");
+        item_gpt.set_tip("Your OpenAI GPT API key");
+        item_gpt.set_act(() => act_open_fb_fanpage());
+        other_group.add_item(item_fb_fanpage);
+
         this.box_setting.update_color_table_row();
     } 
 
@@ -846,7 +858,7 @@ public class Setting : MonoBehaviour
     public string get_tts_type()
     {
         return this.s_tts_type;
-    }
+    } 
 
     public void set_text_weather_pin(string s_address)
     {

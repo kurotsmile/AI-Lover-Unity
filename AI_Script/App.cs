@@ -22,6 +22,7 @@ public class App : MonoBehaviour
     public Voice_Command command_voice;
     public TextToSpeech textToSpeech;
     public Icon icon;
+    public OpenAIChatbot open_AI;
 
     [Header("App obj")]
     public bool is_radio_func = true;

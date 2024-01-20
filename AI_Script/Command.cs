@@ -20,6 +20,7 @@ public class Command : MonoBehaviour
     public InputField inp_command;
     public GameObject prefab_item_command_chat;
     public GameObject prefab_item_command_pc;
+    public GameObject prefab_item_command_loading;
     public GameObject prefab_effect_icon_chat;
 
     public GameObject obj_btn_clear_all_log;
@@ -62,6 +63,7 @@ public class Command : MonoBehaviour
     private string s_command_chat_last;
     private string id_cur_chat = "";
     private IDictionary data_chat_cur;
+    private GameObject item_command_loading;
 
     public void load()
     {
@@ -86,7 +88,11 @@ public class Command : MonoBehaviour
         
         if (this.mode == Command_Type_Mode.chat)
         {
-            if (is_log_show) add_item_log_chat(s_key);
+            if (is_log_show)
+            {
+                this.add_item_log_chat(s_key);
+                this.add_item_log_loading();
+            }
 
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
             if (chat_offline != null)
@@ -165,7 +171,9 @@ public class Command : MonoBehaviour
                     }
                     else
                     {
-                        this.show_msg_no_chat();
+                        this.id_cur_chat = "";
+                        this.app.open_AI.send_chat(s_key);
+                        //this.show_msg_no_chat();
                     }
                 }
             }
@@ -184,7 +192,7 @@ public class Command : MonoBehaviour
         this.set_color(Color.red);
     }
 
-    private void show_msg_no_chat()
+    public void show_msg_no_chat()
     {
         this.data_chat_cur = null;
         this.hide_all_obj_msg();
@@ -241,8 +249,26 @@ public class Command : MonoBehaviour
         }
     }
 
+    private void add_item_log_loading()
+    {
+        if (this.item_command_loading != null)
+        {
+            Destroy(this.item_command_loading);
+            this.app.open_AI.stop_All_Action();
+        }
+        this.item_command_loading = Instantiate(this.prefab_item_command_loading);
+        this.item_command_loading.transform.SetParent(this.area_body_log_command);
+        this.item_command_loading.transform.localScale = new Vector3(1f, 1f, 1f);
+        this.item_command_loading.transform.localPosition = new Vector3(item_command_loading.transform.localPosition.x, item_command_loading.transform.localPosition.y, 0f);
+        this.item_command_loading.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        this.item_command_loading.name = "loading_chat";
+        this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
+    }
+
     public Item_command_chat add_item_pc_chat(string s_txt_show,Sprite icon, IDictionary i_data=null)
     {
+        if (this.item_command_loading != null) Destroy(this.item_command_loading);
+
         GameObject item_command_chat = Instantiate(this.prefab_item_command_pc);
         item_command_chat.transform.SetParent(this.area_body_log_command);
         item_command_chat.transform.localPosition = new Vector3(item_command_chat.transform.localPosition.x, item_command_chat.transform.localPosition.y, 0f);

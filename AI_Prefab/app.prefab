@@ -33166,6 +33166,7 @@ GameObject:
   - component: {fileID: 2395358536460521161}
   - component: {fileID: 8147883725683145312}
   - component: {fileID: 4001097227023413717}
+  - component: {fileID: 505306152552912675}
   m_Layer: 0
   m_Name: app
   m_TagString: Untagged
@@ -33217,6 +33218,7 @@ MonoBehaviour:
   command_voice: {fileID: 2755477471257207458}
   textToSpeech: {fileID: 427693655662882793}
   icon: {fileID: 8147883725683145312}
+  open_AI: {fileID: 505306152552912675}
   is_radio_func: 1
   img_bt_sel_lang: {fileID: 2755477472231957537}
   color_nomal:
@@ -33327,6 +33329,7 @@ MonoBehaviour:
   inp_command: {fileID: 2755477472397272199}
   prefab_item_command_chat: {fileID: 8507482465009177127, guid: 5d05e22407fb85d4dbb924821b2ec01a, type: 3}
   prefab_item_command_pc: {fileID: 8742407762213273243, guid: 2a5158c959d070b40ab19bb0f3c1a766, type: 3}
+  prefab_item_command_loading: {fileID: 6148873219918758934, guid: cbfd93978c61ea5458d153ef03a78d60, type: 3}
   prefab_effect_icon_chat: {fileID: 5086793952246010658, guid: d059e57523ad3ef4dab12a5ca507efbf, type: 3}
   obj_btn_clear_all_log: {fileID: 695487053551866572}
   obj_btn_play_all_log: {fileID: 168075459225608683}
@@ -33699,6 +33702,7 @@ MonoBehaviour:
   sp_icon_ads: {fileID: 21300000, guid: 9afe00141c4eca446807e1efdaa3c4ca, type: 3}
   sp_icon_buy: {fileID: 21300000, guid: 14d9cfee3bc91d74091d7370486c78f9, type: 3}
   sp_icon_facebook: {fileID: 21300000, guid: a81b655be664d824fae332ded21127b8, type: 3}
+  sp_icon_gpt: {fileID: 21300000, guid: d20b07d3b84303648a468768170e60c0, type: 3}
 --- !u!114 &8260292082639398144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33750,6 +33754,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
+  index_buy_category_icon: 0
   sp_icon_icons: {fileID: 21300000, guid: fd187c46b37322047a68d420491b1390, type: 3}
 --- !u!114 &4001097227023413717
 MonoBehaviour:
@@ -33767,6 +33772,22 @@ MonoBehaviour:
   img_icon_live_chat_box: {fileID: 2551485477759251707}
   obj_btn_play_chat_live: {fileID: 168075459225608683}
   icon: {fileID: 21300000, guid: bf082a3eef41f764782fa50faebf1dbe, type: 3}
+--- !u!114 &505306152552912675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755477472099462738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47fcdd4c7016e254dac1409c65e16772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  app: {fileID: 2755477471257207454}
+  lis_api_key:
+  - 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
+  - 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
 --- !u!1 &2755477472104608252
 GameObject:
   m_ObjectHideFlags: 0
@@ -37394,7 +37415,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.00035858154}
+  m_AnchoredPosition: {x: -3, y: 0.00018310547}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004
