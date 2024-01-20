@@ -610,6 +610,7 @@ public class Setting : MonoBehaviour
     private void act_done_name_npc_input(string s_name)
     {
         PlayerPrefs.SetString("ten_user", s_name);
+        this.item_name_npc.set_val(s_name);
         if (this.box_inp != null) this.box_inp.close();
         this.app.get_character().set_character_name(s_name);
     }

@@ -756,6 +756,11 @@ public class Command : MonoBehaviour
                             s_field_title = PlayerPrefs.GetString("cm_msg", "Feedback message");
                             s_field_val =s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_msg);
+
+                            Carrot_Box_Btn_Item btn_copy_msg = item_field.create_item();
+                            btn_copy_msg.set_icon(this.app.carrot.icon_carrot_write);
+                            btn_copy_msg.set_color(this.app.carrot.color_highlight);
+                            btn_copy_msg.set_act(() => this.act_open_copy_msg(s_data_val));
                         }
                         else if (s_key == "key")
                         {
@@ -827,6 +832,11 @@ public class Command : MonoBehaviour
                 btn_share.set_act_click(()=>this.share_chat(s_link_share));
             }
         }
+    }
+
+    private void act_open_copy_msg(string s_msg)
+    {
+        this.app.carrot.show_input("Copy", "You can copy the content here", s_msg);
     }
 
     public void btn_new_chat_with_fater()
