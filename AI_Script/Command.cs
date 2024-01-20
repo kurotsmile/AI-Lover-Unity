@@ -194,6 +194,7 @@ public class Command : MonoBehaviour
 
     public void show_msg_no_chat()
     {
+        if (this.item_command_loading != null) Destroy(this.item_command_loading);
         this.data_chat_cur = null;
         this.hide_all_obj_msg();
         this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));

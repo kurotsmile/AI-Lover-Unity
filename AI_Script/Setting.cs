@@ -594,6 +594,7 @@ public class Setting : MonoBehaviour
     private void act_done_name_user_input(string s_name)
     {
         PlayerPrefs.SetString("ten_user", s_name);
+        this.s_user_name = s_name;
         if (this.box_inp != null) this.box_inp.close();
         this.item_name_user.set_val(s_name);
     }

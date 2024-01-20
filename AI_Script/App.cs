@@ -148,6 +148,7 @@ public class App : MonoBehaviour
         this.command_dev.check();
 
         this.icon.load();
+        this.open_AI.on_load();
     }
 
     private void close_all_box()
