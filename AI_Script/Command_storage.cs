@@ -950,6 +950,7 @@ public class Command_storage : MonoBehaviour
         this.app.panel_inp_func.SetActive(false);
         this.app.panel_inp_msg.SetActive(true);
         this.index_command_test_play = -1;
+        this.app.show_character_on_test(this.app.setting.get_character_sex());
     }
 
     public void btn_replay_test_command()

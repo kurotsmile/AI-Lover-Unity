@@ -24,6 +24,7 @@ public class Voice_Command : MonoBehaviour
     public void btn_start()
     {
         this.inp_mic = null;
+        this.app.textToSpeech.StopSpeak();
         SpeechToText.Instance.StartRecording(PlayerPrefs.GetString("voice_command_ready", "Say something :-)"));
     }
 
@@ -56,7 +57,8 @@ public class Voice_Command : MonoBehaviour
 
     public void start_inp_mic(InputField inp)
     {
-        this.inp_mic = inp; 
+        this.inp_mic = inp;
+        this.app.textToSpeech.StopSpeak();
         SpeechToText.Instance.StartRecording(PlayerPrefs.GetString("voice_command_ready", "Say something :-)"));
     }
 

@@ -357,6 +357,12 @@ public class Command : MonoBehaviour
                 this.is_test_command = true;
                 this.obj_btn_log.SetActive(false);
                 this.obj_btn_more.SetActive(false);
+
+                if (data_chat["sex_character"] != null)
+                {
+                    string sex_character = data_chat["sex_character"].ToString();
+                    this.app.show_character_on_test(sex_character);
+                }
             }
         }
 
@@ -542,9 +548,14 @@ public class Command : MonoBehaviour
         {
             yield return www.SendWebRequest();
             if (www.result != UnityWebRequest.Result.Success)
+            {
                 Debug.Log(www.error);
+                this.app.textToSpeech.StartSpeak(txt_chat);
+            }
             else
+            {
                 this.play_sound_chat(DownloadHandlerAudioClip.GetContent(www));
+            }  
         }
     }
 

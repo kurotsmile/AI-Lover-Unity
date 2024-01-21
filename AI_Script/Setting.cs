@@ -1,4 +1,5 @@
 using Carrot;
+using TextSpeech;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -72,6 +73,7 @@ public class Setting : MonoBehaviour
     private Carrot.Carrot_Box_Btn_Item btn_character_sex_girl;
     private Carrot.Carrot_Box_Btn_Item btn_edit_sound;
     private Carrot.Carrot_Box_Btn_Item btn_edit_chat_bubble;
+    private Carrot.Carrot_Box_Btn_Item btn_edit_voice_dialog;
 
     private AudioClip[] audio_voice_sex_test = new AudioClip[2];
 
@@ -233,7 +235,6 @@ public class Setting : MonoBehaviour
         item_user_sex.set_tip("Choose your gender so that the system recommends choosing the right character for you");
         item_user_sex.set_lang_data("setting_your_sex", "setting_your_sex_tip");
         item_user_sex.load_lang_data();
-        item_user_sex.set_act(() => act_show_box_edit_weather_pin());
         this.btn_user_sex_boy = item_user_sex.create_item();
         this.btn_user_sex_boy.set_icon(this.sp_icon_sex_boy);
         this.btn_user_sex_boy.set_act(() => this.act_change_user_sex("0"));
@@ -346,7 +347,12 @@ public class Setting : MonoBehaviour
         Carrot_Box_Btn_Item btn_help_setting_voice_type = this.item_voice_type.create_item();
         btn_help_setting_voice_type.set_icon(this.app.command.icon_info_chat);
         btn_help_setting_voice_type.set_color(this.app.carrot.color_highlight);
-        btn_help_setting_voice_type.set_act(() => this.act_open_setting_voice_type());
+        btn_help_setting_voice_type.set_act(() => this.act_open_help_voice_type());
+
+        Carrot_Box_Btn_Item btn_open_setting_voice_type = this.item_voice_type.create_item();
+        btn_open_setting_voice_type.set_icon(this.app.carrot.sp_icon_setting);
+        btn_open_setting_voice_type.set_color(this.app.carrot.color_highlight);
+        btn_open_setting_voice_type.set_act(() => this.act_open_setting_voice_type());
         group_chat.add_item(item_voice_type);
 
         this.item_voice_test = box_setting.create_item("chat_voice_test");
@@ -358,6 +364,11 @@ public class Setting : MonoBehaviour
         item_voice_test.load_lang_data();
         item_voice_test.set_act(() => this.play_chat_voice_test());
         group_chat.add_item(item_voice_test);
+
+        Carrot_Box_Btn_Item btn_open_tts_setting = this.item_voice_test.create_item();
+        btn_open_tts_setting.set_icon(this.app.carrot.sp_icon_setting);
+        btn_open_tts_setting.set_color(this.app.carrot.color_highlight);
+        btn_open_tts_setting.set_act(() => this.act_open_tts_setting());
 
         Carrot.Carrot_Box_Btn_Item btn_voice_play = item_voice_test.create_item();
         btn_voice_play.set_icon(this.app.player_music.icon_play);
@@ -515,7 +526,6 @@ public class Setting : MonoBehaviour
         item_gpt.set_title("API key");
         item_gpt.set_tip("Your OpenAI GPT API key");
         item_gpt.set_act(() => act_show_box_edit_key_api_gpt());
-        other_group.add_item(item_fb_fanpage);
 
         string key_api_ai_gpt = PlayerPrefs.GetString("key_api_ai_gpt", "");
         if (key_api_ai_gpt != "")
@@ -535,7 +545,27 @@ public class Setting : MonoBehaviour
         btn_help_gpt.set_color(this.app.carrot.color_highlight);
         btn_help_gpt.set_act(() => this.act_open_help_gpt_key());
 
-        group_chat.add_item(item_voice_speed);
+        gpt_group.add_item(this.item_gpt);
+
+        Carrot_Box_Item item_popup_voice = this.box_setting.create_item("item_popup_voice");
+        item_popup_voice.set_icon(this.app.command_voice.icon_mic_chat);
+        item_popup_voice.set_title("Voice recognition dialog");
+        item_popup_voice.set_tip("Hide or show the voice recognition dialog box when active");
+        item_popup_voice.set_act(() => this.act_change_dialog_voice());
+
+        this.btn_edit_voice_dialog = item_popup_voice.create_item();
+        this.btn_edit_voice_dialog.set_color(this.app.carrot.color_highlight);
+        if (SpeechToText.Instance.isShowPopupAndroid)
+            this.btn_edit_voice_dialog.set_icon(this.sp_icon_on);
+        else
+            this.btn_edit_voice_dialog.set_icon(this.sp_icon_off);
+
+
+        Carrot_Box_Btn_Item btn_setting_input_voice = item_popup_voice.create_item();
+        btn_setting_input_voice.set_icon(this.app.carrot.sp_icon_setting);
+        btn_setting_input_voice.set_color(this.app.carrot.color_highlight);
+        btn_setting_input_voice.set_act(() => this.act_open_voice_inp_setting());
+        gpt_group.add_item(item_popup_voice);
 
         this.box_setting.update_color_table_row();
     } 
@@ -732,6 +762,22 @@ public class Setting : MonoBehaviour
         this.app.carrot.play_sound_click();
     }
 
+
+    private void act_change_dialog_voice()
+    {
+        if (SpeechToText.Instance.isShowPopupAndroid)
+        {
+            SpeechToText.Instance.isShowPopupAndroid = false;
+            this.btn_edit_voice_dialog.set_icon(this.sp_icon_off);
+        }
+        else
+        {
+            SpeechToText.Instance.isShowPopupAndroid = true;
+            this.btn_edit_voice_dialog.set_icon(this.sp_icon_on);
+        }
+        this.app.carrot.play_sound_click();
+    }
+
     private void act_whatch_ads_rewarded_data()
     {
         this.app.carrot.ads.show_ads_Rewarded();
@@ -869,6 +915,18 @@ public class Setting : MonoBehaviour
     public void act_open_setting_voice_type()
     {
         this.app.carrot.play_sound_click();
+        this.app.open_sys("android.speech.tts.engine.INSTALL_TTS_DATA");
+    }
+
+    public void act_open_tts_setting()
+    {
+        this.app.carrot.play_sound_click();
+        this.app.open_sys("android.speech.tts.engine.CHECK_TTS_DATA");
+    }
+
+    public void act_open_help_voice_type()
+    {
+        this.app.carrot.play_sound_click();
         Application.OpenURL("https://support.google.com/accessibility/answer/11221616?hl="+this.app.carrot.lang.get_key_lang());
     }
 
@@ -910,5 +968,11 @@ public class Setting : MonoBehaviour
     {
         this.app.carrot.play_sound_click();
         Application.OpenURL("https://platform.openai.com/api-keys");
+    }
+
+    private void act_open_voice_inp_setting()
+    {
+        this.app.carrot.play_sound_click();
+        this.app.open_sys("android.settings.VOICE_INPUT_SETTINGS");
     }
 }

@@ -267,6 +267,15 @@ public class App : MonoBehaviour
         this.character[this.sel_character_sex].load_character();
     }
 
+    public void show_character_on_test(string s_character_sex)
+    {
+        this.sel_character_sex = int.Parse(s_character_sex);
+        this.character[0].gameObject.SetActive(false);
+        this.character[1].gameObject.SetActive(false);
+        this.character[this.sel_character_sex].gameObject.SetActive(true);
+        this.character[this.sel_character_sex].load_character();
+    }
+
     public character_manager get_character()
     {
         return this.character[this.sel_character_sex];
