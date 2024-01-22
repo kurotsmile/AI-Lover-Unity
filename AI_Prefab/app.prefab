@@ -33168,6 +33168,7 @@ GameObject:
   - component: {fileID: 4001097227023413717}
   - component: {fileID: 505306152552912675}
   - component: {fileID: 2130662158616155322}
+  - component: {fileID: 2065144560488948737}
   m_Layer: 0
   m_Name: app
   m_TagString: Untagged
@@ -33220,6 +33221,7 @@ MonoBehaviour:
   textToSpeech: {fileID: 427693655662882793}
   icon: {fileID: 8147883725683145312}
   open_AI: {fileID: 505306152552912675}
+  tool: {fileID: 2065144560488948737}
   is_radio_func: 1
   img_bt_sel_lang: {fileID: 2755477472231957537}
   color_nomal:
@@ -33406,6 +33408,8 @@ MonoBehaviour:
   - fnc_next_music
   - fnc_pause_music
   - sys_action_by_link
+  - sys_turn_on_flashlight
+  - sys_turn_off_flashlight
   obj_button_next_command_test: {fileID: 249239798421708654}
   obj_button_prev_command_test: {fileID: 6492396854497497505}
   sp_icon_add_chat: {fileID: 21300000, guid: 9b6d1e5e13e6eec47a2253cf8923827a, type: 3}
@@ -33799,6 +33803,109 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86927131625bd7644a46407a174c7d4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2065144560488948737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755477472099462738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc562c5085535934f8ed9e555fdc07f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  list_name_action:
+  - android.app.action.SET_NEW_PASSWORD
+  - android.intent.action.DIAL
+  - android.intent.action.RINGTONE_PICKER
+  - android.intent.action.POWER_USAGE_SUMMARY
+  - android.intent.action.SET_WALLPAPER
+  - android.intent.action.VIEW_DOWNLOADS
+  - android.intent.action.VOICE_ASSIST
+  - android.intent.action.VOICE_COMMAND
+  - android.intent.action.WEB_SEARCH
+  - android.intent.action.SET_WALLPAPER
+  - android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL
+  - android.net.wifi.PICK_WIFI_NETWORK
+  - android.provider.MediaStore.RECORD_SOUND
+  - android.search.action.SEARCH_SETTINGS
+  - android.speech.tts.engine.INSTALL_TTS_DATA
+  - android.settings.ZEN_MODE_PRIORITY_SETTINGS
+  - android.intent.action.OPEN_DOCUMENT_TREE
+  - android.media.action.VIDEO_CAMERA
+  - android.media.action.VIDEO_CAPTURE
+  - android.settings.ACCESSIBILITY_SETTINGS
+  - android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
+  - android.settings.ACTION_PRINT_SETTINGS
+  - android.settings.ADD_ACCOUNT_SETTINGS
+  - android.settings.AIRPLANE_MODE_SETTINGS
+  - android.settings.APN_SETTINGS
+  - android.settings.APPLICATION_DETAILS_SETTINGS
+  - android.settings.APPLICATION_DEVELOPMENT_SETTINGS
+  - android.settings.APPLICATION_SETTINGS
+  - android.settings.APP_NOTIFICATION_SETTINGS
+  - android.settings.BATTERY_SAVER_SETTINGS
+  - android.settings.BLUETOOTH_SETTINGS
+  - android.settings.CAPTIONING_SETTINGS
+  - android.settings.CAST_SETTINGS
+  - android.settings.CHANNEL_NOTIFICATION_SETTINGS
+  - android.settings.DATA_ROAMING_SETTINGS
+  - android.settings.DATA_USAGE_SETTINGS
+  - android.settings.DATE_SETTINGS
+  - android.settings.DEVICE_INFO_SETTINGS
+  - android.settings.DISPLAY_SETTINGS
+  - android.settings.DREAM_SETTINGS
+  - android.settings.ENTERPRISE_PRIVACY_SETTINGS
+  - android.settings.FINGERPRINT_ENROLL
+  - android.settings.HARD_KEYBOARD_SETTINGS
+  - android.settings.HOME_SETTINGS
+  - android.settings.IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS
+  - android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+  - android.settings.INPUT_METHOD_SETTINGS
+  - android.settings.INPUT_METHOD_SUBTYPE_SETTINGS
+  - android.settings.INTERNAL_STORAGE_SETTINGS
+  - android.settings.LOCALE_SETTINGS
+  - android.settings.LOCATION_SOURCE_SETTINGS
+  - android.settings.MANAGE_ALL_APPLICATIONS_SETTINGS
+  - android.settings.MANAGE_APPLICATIONS_SETTINGS
+  - android.settings.MANAGE_DEFAULT_APPS_SETTINGS
+  - android.settings.MANAGE_UNKNOWN_APP_SOURCES
+  - android.settings.MEMORY_CARD_SETTINGS
+  - android.settings.NETWORK_OPERATOR_SETTINGS
+  - android.settings.NFCSHARING_SETTINGS
+  - android.settings.NFC_PAYMENT_SETTINGS
+  - android.settings.NFC_SETTINGS
+  - android.settings.NIGHT_DISPLAY_SETTINGS
+  - android.settings.NOTIFICATION_POLICY_ACCESS_SETTINGS
+  - android.settings.PRIVACY_SETTINGS
+  - android.settings.QUICK_LAUNCH_SETTINGS
+  - android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+  - android.settings.REQUEST_SET_AUTOFILL_SERVICE
+  - android.settings.SECURITY_SETTINGS
+  - android.settings.SETTINGS
+  - android.settings.SHOW_REGULATORY_INFO
+  - android.settings.SOUND_SETTINGS
+  - android.settings.STORAGE_VOLUME_ACCESS_SETTINGS
+  - android.settings.SYNC_SETTINGS
+  - android.settings.USAGE_ACCESS_SETTINGS
+  - android.settings.USER_DICTIONARY_SETTINGS
+  - android.settings.VOICE_CONTROL_AIRPLANE_MODE
+  - android.settings.VOICE_CONTROL_BATTERY_SAVER_MODE
+  - android.settings.VOICE_CONTROL_DO_NOT_DISTURB_MODE
+  - android.settings.VOICE_INPUT_SETTINGS
+  - android.settings.VPN_SETTINGS
+  - android.settings.VR_LISTENER_SETTINGS
+  - android.settings.WEBVIEW_SETTINGS
+  - android.settings.WIFI_IP_SETTINGS
+  - android.settings.WIFI_SETTINGS
+  - android.settings.WIRELESS_SETTINGS
+  - android.settings.ZEN_MODE_PRIORITY_SETTINGS
+  - android.settings.action.MANAGE_OVERLAY_PERMISSION
+  - android.settings.action.MANAGE_WRITE_SETTINGS
+  - android.settings.panel.action.NFC
+  - android.settings.panel.action.VOLUME
+  - android.settings.panel.action.WIFI
 --- !u!1 &2755477472104608252
 GameObject:
   m_ObjectHideFlags: 0
@@ -37426,7 +37533,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.0005493164}
+  m_AnchoredPosition: {x: -3, y: 0.00038909912}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004

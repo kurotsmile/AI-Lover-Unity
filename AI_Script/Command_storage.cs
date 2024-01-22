@@ -138,6 +138,8 @@ public class Command_storage : MonoBehaviour
     private Carrot.Carrot_Box_Btn_Item btn_model_advanced;
     private Carrot.Carrot_Button_Item obj_btn_test;
 
+    private Carrot.Carrot_Box_Btn_Item btn_run_control_tags;
+
     private Command_Type_Act type_act = Command_Type_Act.add_command;
 
     private IList list_key_block;
@@ -482,6 +484,7 @@ public class Command_storage : MonoBehaviour
                 this.item_run_control.set_val(index_control_app.ToString());
             }
         }
+        item_run_control.dropdown_val.onValueChanged.AddListener(this.act_check_run_control);
 
         this.item_icon = box_add_chat.create_item("item_icon");
         item_icon.set_type(Carrot.Box_Item_Type.box_value_txt);
@@ -1270,7 +1273,7 @@ public class Command_storage : MonoBehaviour
         if (this.box_parameter_tag != null) this.box_parameter_tag.close();
     }
 
-    public void show_list_parameter_tag()
+    private void show_list_parameter_tag()
     {
         this.box_parameter_tag=this.app.carrot.Create_Box("list_tag");   
         this.box_parameter_tag.set_title("Parameter Tag");
@@ -1327,5 +1330,46 @@ public class Command_storage : MonoBehaviour
     public void set_s_id_icon(string s_id_icon)
     {
         this.s_id_icon = s_id_icon;
+    }
+
+    private void act_check_run_control(int index_sel)
+    {
+        if (this.btn_run_control_tags != null) Destroy(this.btn_run_control_tags.gameObject);
+
+        if (index_sel == 16)
+        {
+            this.btn_run_control_tags=this.item_run_cmd.create_item();
+            btn_run_control_tags.set_icon(this.sp_icon_parameter_tag);
+            btn_run_control_tags.set_color(this.app.carrot.color_highlight);
+            btn_run_control_tags.set_act(() => this.show_list_sys_act_tag());
+        }
+    }
+
+    private void show_list_sys_act_tag()
+    {
+        this.box_parameter_tag = this.app.carrot.Create_Box("list_sys_act_tag");
+        this.box_parameter_tag.set_title("sys_action_by_link");
+        this.box_parameter_tag.set_icon(this.sp_icon_parameter_tag);
+
+        for (int i = 0; i < this.app.tool.list_name_action.Length; i++)
+        {
+            var s_tag = this.app.tool.list_name_action[i];
+            Carrot.Carrot_Box_Item item_tag = this.box_parameter_tag.create_item("item_tag_" + i);
+            item_tag.set_icon(this.sp_icon_parameter_tag);
+            item_tag.set_title(this.app.tool.list_name_action[i]);
+            item_tag.set_tip(this.app.tool.list_name_action[i]);
+            item_tag.set_act(() => btn_add_sys_act_tag(s_tag));
+
+            Carrot.Carrot_Box_Btn_Item btn_add_tag = item_tag.create_item();
+            btn_add_tag.set_icon(this.sp_icon_add_chat);
+            btn_add_tag.set_color(this.GetComponent<App>().carrot.color_highlight);
+            Destroy(btn_add_tag.GetComponent<UnityEngine.UI.Button>());
+        }
+    }
+
+    public void btn_add_sys_act_tag(string s_tag)
+    {
+        this.item_run_cmd.set_val(s_tag);
+        if (this.box_parameter_tag != null) this.box_parameter_tag.close();
     }
 }

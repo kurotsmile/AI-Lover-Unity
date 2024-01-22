@@ -73,7 +73,6 @@ public class Setting : MonoBehaviour
     private Carrot.Carrot_Box_Btn_Item btn_character_sex_girl;
     private Carrot.Carrot_Box_Btn_Item btn_edit_sound;
     private Carrot.Carrot_Box_Btn_Item btn_edit_chat_bubble;
-    private Carrot.Carrot_Box_Btn_Item btn_edit_voice_dialog;
 
     private AudioClip[] audio_voice_sex_test = new AudioClip[2];
 
@@ -551,15 +550,7 @@ public class Setting : MonoBehaviour
         item_popup_voice.set_icon(this.app.command_voice.icon_mic_chat);
         item_popup_voice.set_title("Voice recognition dialog");
         item_popup_voice.set_tip("Hide or show the voice recognition dialog box when active");
-        item_popup_voice.set_act(() => this.act_change_dialog_voice());
-
-        this.btn_edit_voice_dialog = item_popup_voice.create_item();
-        this.btn_edit_voice_dialog.set_color(this.app.carrot.color_highlight);
-        if (SpeechToText.Instance.isShowPopupAndroid)
-            this.btn_edit_voice_dialog.set_icon(this.sp_icon_on);
-        else
-            this.btn_edit_voice_dialog.set_icon(this.sp_icon_off);
-
+        item_popup_voice.set_act(() => this.act_open_voice_inp_setting());
 
         Carrot_Box_Btn_Item btn_setting_input_voice = item_popup_voice.create_item();
         btn_setting_input_voice.set_icon(this.app.carrot.sp_icon_setting);
@@ -762,22 +753,6 @@ public class Setting : MonoBehaviour
         this.app.carrot.play_sound_click();
     }
 
-
-    private void act_change_dialog_voice()
-    {
-        if (SpeechToText.Instance.isShowPopupAndroid)
-        {
-            SpeechToText.Instance.isShowPopupAndroid = false;
-            this.btn_edit_voice_dialog.set_icon(this.sp_icon_off);
-        }
-        else
-        {
-            SpeechToText.Instance.isShowPopupAndroid = true;
-            this.btn_edit_voice_dialog.set_icon(this.sp_icon_on);
-        }
-        this.app.carrot.play_sound_click();
-    }
-
     private void act_whatch_ads_rewarded_data()
     {
         this.app.carrot.ads.show_ads_Rewarded();
@@ -915,13 +890,13 @@ public class Setting : MonoBehaviour
     public void act_open_setting_voice_type()
     {
         this.app.carrot.play_sound_click();
-        this.app.open_sys("android.speech.tts.engine.INSTALL_TTS_DATA");
+        this.app.tool.open_content_Intent("android.speech.tts.engine.INSTALL_TTS_DATA");
     }
 
     public void act_open_tts_setting()
     {
         this.app.carrot.play_sound_click();
-        this.app.open_sys("android.speech.tts.engine.CHECK_TTS_DATA");
+        this.app.tool.open_content_Intent("android.speech.tts.engine.CHECK_TTS_DATA");
     }
 
     public void act_open_help_voice_type()
@@ -973,6 +948,6 @@ public class Setting : MonoBehaviour
     private void act_open_voice_inp_setting()
     {
         this.app.carrot.play_sound_click();
-        this.app.open_sys("android.settings.VOICE_INPUT_SETTINGS");
+        this.app.tool.open_content_Intent("android.settings.VOICE_INPUT_SETTINGS");
     }
 }

@@ -409,7 +409,9 @@ public class Command : MonoBehaviour
             if (index_func == "13") this.app.carrot.delay_function(2f, this.app.view.show_list_background_image);
             if (index_func == "14") this.app.player_music.btn_next();
             if (index_func == "15") this.app.player_music.btn_pause();
-            if (index_func == "16") this.app.carrot.delay_function(1.6f, ()=>this.app.open_sys(data_chat["link"].ToString().Trim()));
+            if (index_func == "16") this.app.carrot.delay_function(1.6f, ()=>this.app.tool.open_content_Intent(data_chat["link"].ToString().Trim()));
+            if (index_func == "17") this.app.tool.on_Flashlight();
+            if (index_func == "18") this.app.tool.off_Flashlight();
         }
         if (data_chat["icon"] != null)
         {
