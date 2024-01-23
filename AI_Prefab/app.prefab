@@ -33221,6 +33221,7 @@ MonoBehaviour:
   textToSpeech: {fileID: 427693655662882793}
   icon: {fileID: 8147883725683145312}
   open_AI: {fileID: 505306152552912675}
+  gemini_AI: {fileID: 2130662158616155322}
   tool: {fileID: 2065144560488948737}
   is_radio_func: 1
   img_bt_sel_lang: {fileID: 2755477472231957537}
@@ -33708,6 +33709,9 @@ MonoBehaviour:
   sp_icon_buy: {fileID: 21300000, guid: 14d9cfee3bc91d74091d7370486c78f9, type: 3}
   sp_icon_facebook: {fileID: 21300000, guid: a81b655be664d824fae332ded21127b8, type: 3}
   sp_icon_gpt: {fileID: 21300000, guid: d20b07d3b84303648a468768170e60c0, type: 3}
+  sp_icon_gemini: {fileID: 21300000, guid: 7312b40f71d5dde4baa46074d69edc28, type: 3}
+  sp_icon_ai_robot: {fileID: 21300000, guid: 4d0413cfbbccd8248922ace558600b1d, type: 3}
+  sp_icon_prioritize: {fileID: 21300000, guid: 1a521fc79c671d84c9afc478683f5763, type: 3}
 --- !u!114 &8260292082639398144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33803,6 +33807,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86927131625bd7644a46407a174c7d4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  app: {fileID: 2755477471257207454}
+  key_api_default: 
 --- !u!114 &2065144560488948737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37533,7 +37539,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.00038909912}
+  m_AnchoredPosition: {x: -3, y: 0.00021362305}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004

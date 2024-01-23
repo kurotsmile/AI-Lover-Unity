@@ -23,6 +23,7 @@ public class App : MonoBehaviour
     public TextToSpeech textToSpeech;
     public Icon icon;
     public OpenAIChatbot open_AI;
+    public GeminiAPI gemini_AI;
     public Utility_Tool tool;
 
     [Header("App obj")]
@@ -150,6 +151,7 @@ public class App : MonoBehaviour
 
         this.icon.load();
         this.open_AI.on_load();
+        this.gemini_AI.on_load();
         this.tool.on_load();
     }
 

@@ -172,8 +172,18 @@ public class Command : MonoBehaviour
                     else
                     {
                         this.id_cur_chat = "";
-                        this.app.open_AI.send_chat(s_key);
-                        //this.show_msg_no_chat();
+
+                        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active==false)
+                        {
+                            this.show_msg_no_chat();
+                        }
+                        else
+                        {
+                            if(this.app.open_AI.is_active)
+                                this.app.open_AI.send_chat(s_key);
+                            else
+                                this.app.gemini_AI.send_chat(s_key);
+                        }
                     }
                 }
             }

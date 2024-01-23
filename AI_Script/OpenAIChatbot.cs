@@ -2,6 +2,7 @@
 using UnityEngine.Networking;
 using System.Collections;
 using Carrot;
+using System;
 
 public class OpenAIChatbot : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class OpenAIChatbot : MonoBehaviour
 
     [Header("AI Chat Obj")]
     public string[] lis_api_key;
+    public bool is_active = true;
 
     private const string openaiEndpoint = "https://api.openai.com/v1/chat/completions";
 
@@ -18,6 +20,10 @@ public class OpenAIChatbot : MonoBehaviour
     public void on_load()
     {
         this.key_api = PlayerPrefs.GetString("key_api_ai_gpt", this.get_key_api_random());
+        if (PlayerPrefs.GetInt("is_active_gpt", 0) == 0)
+            this.is_active = true;
+        else
+            this.is_active = false;
     }
 
     IEnumerator PostRequest(string userMessage)
@@ -49,15 +55,15 @@ public class OpenAIChatbot : MonoBehaviour
                     chat_ai["status"] = "pending";
                     chat_ai["key"] = userMessage;
                     chat_ai["msg"] = message["content"].ToString();
-                    chat_ai["face"] = Random.Range(0, 18).ToString();
-                    chat_ai["action"] = Random.Range(0, 41).ToString();
+                    chat_ai["face"] = UnityEngine.Random.Range(0, 18).ToString();
+                    chat_ai["action"] = UnityEngine.Random.Range(0, 41).ToString();
 
                     Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                     chat_ai["color"]= "#" + ColorUtility.ToHtmlStringRGBA(color_icon);
 
                     chat_ai["sex_user"] = this.app.setting.get_user_sex();
                     chat_ai["sex_character"] = this.app.setting.get_character_sex();
-                    chat_ai["date_create"] = chat_ai["created"];
+                    chat_ai["date_create"] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
                     chat_ai["link"] = "";
                     chat_ai["lang"] = this.app.carrot.lang.get_key_lang();
                     chat_ai["icon"] = "";
@@ -80,8 +86,11 @@ public class OpenAIChatbot : MonoBehaviour
             }
             else
             {
-                this.app.command.show_msg_no_chat();
                 Debug.LogError($"Error: {www.error}");
+                if(this.app.gemini_AI.is_active)
+                    this.app.gemini_AI.send_chat(userMessage);
+                else
+                    this.app.command.show_msg_no_chat();
             }
         }
     }
@@ -97,7 +106,7 @@ public class OpenAIChatbot : MonoBehaviour
 
     private string get_key_api_random()
     {
-        int index_random = Random.Range(0, this.lis_api_key.Length);
+        int index_random = UnityEngine.Random.Range(0, this.lis_api_key.Length);
         return this.lis_api_key[index_random];
     }
 

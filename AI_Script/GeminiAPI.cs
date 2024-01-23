@@ -1,108 +1,97 @@
+using Carrot;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class GeminiAPI : MonoBehaviour
 {
-    // The Gemini API endpoint
-    private string apiEndpoint = "https://api.gemini.com/v1";
+    [Header("Main Obj")]
+    public App app;
 
-    // The Gemini API key
-    private string apiKey = "YOUR_API_KEY";
+    [Header("AI Chat Obj")]
+    public string key_api_default;
+    public bool is_active = true;
+    private string apiEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
 
-    // The Gemini API secret
-    private string apiSecret = "YOUR_API_SECRET";
+    private string key_api;
 
-    // The Gemini API passphrase
-    private string apiPassphrase = "YOUR_API_PASSPHRASE";
-
-    // The Gemini API endpoint for getting the price of a cryptocurrency
-    private string priceEndpoint = "/price";
-
-    // The cryptocurrency pair to get the price for
-    private string cryptoPair = "BTCUSD";
-
-    // Start is called before the first frame update
-    void Start()
+    public void on_load()
     {
-        // Get the price of the cryptocurrency pair
-        StartCoroutine(GetPrice());
-    }
-
-    // Get the price of the cryptocurrency pair
-    IEnumerator GetPrice()
-    {
-        // Create the request URL
-        string requestUrl = apiEndpoint + priceEndpoint + "?symbol=" + cryptoPair;
-
-        // Create the request headers
-        Dictionary<string, string> headers = new Dictionary<string, string>();
-        headers.Add("X-Auth", "Basic " + this.apiKey + ":" + this.apiSecret);
-        headers.Add("X-Sign", GenerateSign(requestUrl, "GET"));
-
-        // Create the request
-        UnityWebRequest request = UnityWebRequest.Get(requestUrl);
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        // Set the request headers
-        foreach (KeyValuePair<string, string> header in headers)
-        {
-            request.SetRequestHeader(header.Key, header.Value);
-        }
-
-        // Send the request
-        yield return request.SendWebRequest();
-
-        // Check for errors
-        if (request.isNetworkError || request.isHttpError)
-        {
-            Debug.LogError(request.error);
-        }
+        this.key_api = PlayerPrefs.GetString("key_api_ai_gemini", this.key_api_default);
+        if (PlayerPrefs.GetInt("is_active_gemini",0)==0)
+            this.is_active= true;
         else
-        {
-            // Parse the response
-            string responseText = request.downloadHandler.text;
-            PriceResponse response = JsonUtility.FromJson<PriceResponse>(responseText);
+            this.is_active= false;
+    }
 
-            // Log the price
-            Debug.Log("The price of " + cryptoPair + " is " + response.price);
+    IEnumerator PostRequest(string userMessage)
+    {
+        if (this.key_api.Trim() == "") this.key_api = this.key_api_default;
+
+        string requestData = "{\"contents\":[{\"parts\":[{\"text\":\""+ userMessage + "\"}]}]}";
+        byte[] postData = System.Text.Encoding.UTF8.GetBytes(requestData);
+
+        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(apiEndpoint+ "?key=" + this.key_api, "POST"))
+        {
+            www.uploadHandler = new UploadHandlerRaw(postData);
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                IDictionary gemini_ai = (IDictionary)Json.Deserialize(www.downloadHandler.text);
+                IList candidates = (IList)gemini_ai["candidates"];
+                IDictionary candidate = (IDictionary) candidates[0];
+                IDictionary content = (IDictionary) candidate["content"];
+                IList parts = (IList) content["parts"];
+                IDictionary chat_ai = (IDictionary)parts[0];
+
+                chat_ai["id"] = "chat" + this.app.carrot.generateID();
+                chat_ai["func"] = "0";
+                chat_ai["status"] = "pending";
+                chat_ai["key"] = userMessage;
+                chat_ai["msg"] = chat_ai["text"].ToString();
+                chat_ai["face"] = UnityEngine.Random.Range(0, 18).ToString();
+                chat_ai["action"] = UnityEngine.Random.Range(0, 41).ToString();
+
+                Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                chat_ai["color"] = "#" + ColorUtility.ToHtmlStringRGBA(color_icon);
+
+                chat_ai["sex_user"] = this.app.setting.get_user_sex();
+                chat_ai["sex_character"] = this.app.setting.get_character_sex();
+                chat_ai["date_create"] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                chat_ai["link"] = "";
+                chat_ai["lang"] = this.app.carrot.lang.get_key_lang();
+                chat_ai["icon"] = "";
+                chat_ai["pater"] = "";
+                chat_ai["mp3"] = "";
+                chat_ai["user"] = null;
+
+                chat_ai["text"] = null;
+
+                this.app.command.act_chat(chat_ai);
+                this.app.command_storage.add_command_offline(chat_ai);
+            }
+            else
+            {
+                this.app.command.show_msg_no_chat();
+                Debug.LogError($"Error: {www.error}");
+            }
         }
     }
 
-    // Generate the signature for the request
-    private string GenerateSign(string requestUrl, string method)
+    public void send_chat(string s_key)
     {
-        // Create the message to sign
-        string message = method + "\n" + requestUrl + "\n" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + "\n";
-
-        // Create the HMACSHA512 signature
-        byte[] keyBytes = Encoding.UTF8.GetBytes(apiSecret);
-        byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-        HMACSHA512 hmac = new HMACSHA512(keyBytes);
-        byte[] signatureBytes = hmac.ComputeHash(messageBytes);
-
-        // Encode the signature in Base64
-        string signature = Base64Encode(signatureBytes);
-
-        // Return the signature
-        return signature;
+        StartCoroutine(PostRequest(s_key));
     }
 
-    // Encode the data in Base64
-    private string Base64Encode(byte[] data)
+    public void set_key_api(string s_key)
     {
-        return Convert.ToBase64String(data);
-    }
-
-    // The response object for the price API endpoint
-    [Serializable]
-    public class PriceResponse
-    {
-        public string symbol;
-        public string price;
+        if (s_key.Trim() != "")
+            this.key_api = s_key;
+        else
+            this.key_api = this.key_api_default;
     }
 }
