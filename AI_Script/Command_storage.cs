@@ -56,6 +56,22 @@ public struct chat
     public string date_create { get; set; }
 }
 
+[FirestoreData]
+public struct Chat_Log
+{
+    public string id { get; set; }
+    [FirestoreProperty]
+    public string key { get; set; }
+    [FirestoreProperty]
+    public string pater { get; set; }
+    [FirestoreProperty]
+    public string lang { get; set; }
+    [FirestoreProperty]
+    public Carrot_Rate_user_data user { get; set; }
+    [FirestoreProperty]
+    public string date_create { get; set; }
+}
+
 public class Command_storage : MonoBehaviour
 {
     [Header("Obj Main")]
@@ -1371,5 +1387,36 @@ public class Command_storage : MonoBehaviour
     {
         this.item_run_cmd.set_val(s_tag);
         if (this.box_parameter_tag != null) this.box_parameter_tag.close();
+    }
+
+    public void add_log(string s_key)
+    {
+        Chat_Log log = new Chat_Log
+        {
+            key = s_key,
+            pater = this.app.command.get_id_chat_cur(),
+            date_create = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            lang=this.app.carrot.lang.get_key_lang()
+        };
+
+        log.key = s_key;
+
+
+        if (this.app.carrot.user.get_id_user_login() != "")
+        {
+            Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
+            user_login.name = this.app.carrot.user.get_data_user_login("name");
+            user_login.id = this.app.carrot.user.get_id_user_login();
+            user_login.lang = this.app.carrot.user.get_lang_user_login();
+            user_login.avatar = this.app.carrot.user.get_data_user_login("avatar");
+            log.user = user_login;
+        }
+
+
+        string s_id_log = "log" + this.app.carrot.generateID();
+        CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-log");
+        DocumentReference chatRef = chatDbRef.Document(s_id_log);
+        log.id = s_id_log;
+        chatRef.SetAsync(log);
     }
 }

@@ -70,21 +70,46 @@ public class GeminiAPI : MonoBehaviour
                 chat_ai["user"] = null;
 
                 chat_ai["text"] = null;
+                chat_ai["ai"] = "Gemini";
 
                 this.app.command.act_chat(chat_ai);
                 this.app.command_storage.add_command_offline(chat_ai);
             }
             else
             {
-                this.app.command.show_msg_no_chat();
                 Debug.LogError($"Error: {www.error}");
+                if (this.app.setting.get_index_prioritize() == 0)
+                {
+                    this.app.command.show_msg_no_chat();
+                }else if (this.app.setting.get_index_prioritize() == 1)
+                {
+                    if(this.app.open_AI.is_active)
+                        this.app.open_AI.send_chat(userMessage);
+                    else
+                        this.app.command.show_msg_no_chat();
+                }
+                else if (this.app.setting.get_index_prioritize() == 2)
+                {
+                    this.app.command.show_msg_no_chat();
+                }else if (this.app.setting.get_index_prioritize() == 3)
+                {
+                    if (this.app.open_AI.is_active)
+                        this.app.open_AI.send_chat(userMessage);
+                    else
+                        this.app.command.show_msg_no_chat();
+                }
+                
             }
         }
     }
 
     public void send_chat(string s_key)
     {
-        StartCoroutine(PostRequest(s_key));
+        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, "");
+        if (chat_offline != null)
+            this.app.command.act_chat(chat_offline);
+        else
+            StartCoroutine(PostRequest(s_key));
     }
 
     public void set_key_api(string s_key)

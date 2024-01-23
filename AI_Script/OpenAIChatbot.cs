@@ -74,6 +74,7 @@ public class OpenAIChatbot : MonoBehaviour
                     chat_ai["usage"] = null;
                     chat_ai["choices"] = null;
                     chat_ai["created"] = null;
+                    chat_ai["ai"] = "Gpt";
 
                     this.app.command.act_chat(chat_ai);
                     this.app.command_storage.add_command_offline(chat_ai);
@@ -87,10 +88,28 @@ public class OpenAIChatbot : MonoBehaviour
             else
             {
                 Debug.LogError($"Error: {www.error}");
-                if(this.app.gemini_AI.is_active)
-                    this.app.gemini_AI.send_chat(userMessage);
-                else
+                if (this.app.setting.get_index_prioritize() == 0)
+                {
+                    if (this.app.gemini_AI.is_active)
+                        this.app.gemini_AI.send_chat(userMessage);
+                    else
+                        this.app.command.show_msg_no_chat();
+                }else if (this.app.setting.get_index_prioritize() == 1)
+                {
                     this.app.command.show_msg_no_chat();
+                }
+                else if (this.app.setting.get_index_prioritize() == 2)
+                {
+                    if (this.app.gemini_AI.is_active)
+                        this.app.gemini_AI.send_chat(userMessage);
+                    else
+                        this.app.command.show_msg_no_chat();
+                }
+                else if(this.app.setting.get_index_prioritize()==3)
+                {
+                    this.app.command.show_msg_no_chat();
+                }
+
             }
         }
     }

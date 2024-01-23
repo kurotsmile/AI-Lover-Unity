@@ -105,9 +105,49 @@ public class Command : MonoBehaviour
             {
                 Debug.Log("chat online (Id father:"+this.id_cur_chat+")");
                 if (this.app.carrot.is_online())
-                    this.play_chat(s_key);
+                {
+                    if (this.app.setting.get_index_prioritize() == 0)
+                    {
+                        this.play_chat(s_key);
+                    }
+                    else if (this.app.setting.get_index_prioritize() == 1)
+                    {
+                        this.play_chat(s_key);
+                    }
+                    else if (this.app.setting.get_index_prioritize() == 2)
+                    {
+                        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
+                        {
+                            this.show_msg_no_chat();
+                        }
+                        else
+                        {
+                            if (this.app.open_AI.is_active)
+                                this.app.open_AI.send_chat(s_key);
+                            else
+                                this.app.gemini_AI.send_chat(s_key);
+                        }
+                    }
+                    else if (this.app.setting.get_index_prioritize() == 3)
+                    {
+                        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
+                        {
+                            this.show_msg_no_chat();
+                        }
+                        else
+                        {
+                            if (this.app.gemini_AI.is_active)
+                                this.app.gemini_AI.send_chat(s_key);
+                            else
+                                this.app.open_AI.send_chat(s_key);
+                        }
+
+                    }
+                }
                 else
+                {
                     this.show_msg_no_chat();
+                }  
             }
         }
         else
@@ -147,7 +187,7 @@ public class Command : MonoBehaviour
 
                     if (list_chat.Count == 0)
                     {
-                        this.show_msg_no_chat();
+                        this.send_to_all_ai(s_key);
                     }
                     else
                     {
@@ -166,28 +206,47 @@ public class Command : MonoBehaviour
                 {
                     if (this.id_cur_chat != "")
                     {
+                        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
+                        {
+                            if (this.app.carrot.lang.get_key_lang() == "vi") this.app.command_storage.add_log(s_key);
+                        }
+
                         this.id_cur_chat = "";
                         this.play_chat(s_key);
                     }
                     else
                     {
-                        this.id_cur_chat = "";
-
-                        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active==false)
-                        {
-                            this.show_msg_no_chat();
-                        }
-                        else
-                        {
-                            if(this.app.open_AI.is_active)
-                                this.app.open_AI.send_chat(s_key);
-                            else
-                                this.app.gemini_AI.send_chat(s_key);
-                        }
+                        this.send_to_all_ai(s_key);
                     }
                 }
             }
         });
+    }
+
+    private void send_to_all_ai(string s_key)
+    {
+        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
+        {
+            this.show_msg_no_chat();
+        }
+        else
+        {
+            if (this.app.setting.get_index_prioritize() == 0)
+            {
+                if (this.app.open_AI.is_active)
+                    this.app.open_AI.send_chat(s_key);
+                else
+                    this.app.gemini_AI.send_chat(s_key);
+            }
+            else
+            {
+                if (this.app.gemini_AI.is_active)
+                    this.app.gemini_AI.send_chat(s_key);
+                else
+                    this.app.open_AI.send_chat(s_key);
+            }
+
+        }
     }
 
     private void hide_all_obj_msg()
@@ -585,6 +644,11 @@ public class Command : MonoBehaviour
                 this.play_sound_chat(DownloadHandlerAudioClip.GetContent(www));
             }
         }
+    }
+
+    public string get_id_chat_cur()
+    {
+        return this.id_cur_chat;
     }
 
     private void play_sound_chat(AudioClip audio_clip) {

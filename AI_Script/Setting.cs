@@ -57,6 +57,7 @@ public class Setting : MonoBehaviour
     private string character_sex;
     private string user_sex;
     private string s_color_select;
+    private int index_prioritize;
 
     private Carrot.Carrot_Box box_list;
     private Carrot.Carrot_Box box_setting;
@@ -90,6 +91,7 @@ public class Setting : MonoBehaviour
         this.user_sex = PlayerPrefs.GetString("sex", "0");
         this.s_color_select = PlayerPrefs.GetString("color_select");
         this.s_tts_type= PlayerPrefs.GetString("tts_type","0");
+        this.index_prioritize = PlayerPrefs.GetInt("index_prioritize_ai", 0);
         if (s_color_select != "")
         {
             Color newCol;
@@ -530,6 +532,8 @@ public class Setting : MonoBehaviour
         item_gpt_active.set_icon(this.sp_icon_gpt);
         item_gpt_active.set_title("ChatGPT");
         item_gpt_active.set_tip("Pioneering research on the path to AGI. Learn about our research ");
+        item_gpt_active.set_lang_data("ai_gpt", "ai_gpt_tip");
+        item_gpt_active.load_lang_data();
         item_gpt_active.set_act(() => act_gpt_active());
 
         this.btn_edit_gpt_active = item_gpt_active.create_item();
@@ -544,6 +548,8 @@ public class Setting : MonoBehaviour
         item_gpt.set_icon(this.app.command_storage.sp_icon_key);
         item_gpt.set_title("API key");
         item_gpt.set_tip("Your OpenAI GPT API key");
+        item_gpt.set_lang_data("ai_gpt_key", "ai_gpt_key_tip");
+        item_gpt.load_lang_data();
         item_gpt.set_act(() => act_show_box_edit_key_api_gpt());
 
         string key_api_ai_gpt = PlayerPrefs.GetString("key_api_ai_gpt", "");
@@ -573,6 +579,8 @@ public class Setting : MonoBehaviour
         item_gemini_active.set_icon(this.sp_icon_gemini);
         item_gemini_active.set_title("Gemini AI chatbot");
         item_gemini_active.set_tip("Gemini AI is a chatbot that uses artificial intelligence to combine text and image processing");
+        item_gemini_active.set_lang_data("ai_gemini", "ai_gemini_tip");
+        item_gemini_active.load_lang_data();
         item_gemini_active.set_act(() => act_gemini_active());
 
         this.btn_edit_gemini_active=item_gemini_active.create_item();
@@ -587,6 +595,8 @@ public class Setting : MonoBehaviour
         item_gemini_api_key.set_icon(this.app.command_storage.sp_icon_key);
         item_gemini_api_key.set_title("API key");
         item_gemini_api_key.set_tip("Your Gemini AI (Google) GPT API key");
+        item_gemini_api_key.set_lang_data("ai_gemini_key", "ai_gemini_key_tip");
+        item_gemini_api_key.load_lang_data();
         item_gemini_api_key.set_act(() => act_show_box_edit_key_api_gemini());
 
         string key_api_ai_gemini = PlayerPrefs.GetString("key_api_ai_gemini", "");
@@ -615,13 +625,17 @@ public class Setting : MonoBehaviour
         item_ai_prioritize.set_icon(this.sp_icon_prioritize);
         item_ai_prioritize.set_title("Prioritize");
         item_ai_prioritize.set_tip("Change the priority order of artificial minds");
-        item_ai_prioritize.set_act(() => this.act_open_voice_inp_setting());
+        item_ai_prioritize.set_lang_data("ai_prioritize", "ai_prioritize_tip");
+        item_ai_prioritize.load_lang_data();
+        item_ai_prioritize.set_act(() => this.show_list_ai_prioritize());
         ai_robot_group.add_item(item_ai_prioritize);
 
         Carrot_Box_Item item_popup_voice = this.box_setting.create_item("item_popup_voice");
         item_popup_voice.set_icon(this.app.command_voice.icon_mic_chat);
-        item_popup_voice.set_title("Voice recognition dialog");
-        item_popup_voice.set_tip("Hide or show the voice recognition dialog box when active");
+        item_popup_voice.set_title("Voice recognition");
+        item_popup_voice.set_tip("Set up voice recognition and speech-to-text input");
+        item_popup_voice.set_lang_data("voice_command_setting", "voice_command_setting_tip");
+        item_popup_voice.load_lang_data();
         item_popup_voice.set_act(() => this.act_open_voice_inp_setting());
 
         Carrot_Box_Btn_Item btn_setting_input_voice = item_popup_voice.create_item();
@@ -823,6 +837,7 @@ public class Setting : MonoBehaviour
             this.btn_edit_chat_bubble.set_icon(this.sp_icon_on);
         }
         this.app.carrot.play_sound_click();
+        this.show_msg_status(PlayerPrefs.GetString("setting_bubble_icon", "Bubble chat icon"),this.is_bubble_icon);
     }
 
     private void act_whatch_ads_rewarded_data()
@@ -1031,6 +1046,8 @@ public class Setting : MonoBehaviour
             this.btn_edit_gpt_active.set_icon(this.sp_icon_on);
         else
             this.btn_edit_gpt_active.set_icon(this.sp_icon_off);
+
+        this.show_msg_status(PlayerPrefs.GetString("ai_gpt", "Chat GPT"), this.app.open_AI.is_active);
     }
 
     private void act_gemini_active()
@@ -1052,6 +1069,8 @@ public class Setting : MonoBehaviour
             this.btn_edit_gemini_active.set_icon(this.sp_icon_on);
         else
             this.btn_edit_gemini_active.set_icon(this.sp_icon_off);
+
+        this.show_msg_status(PlayerPrefs.GetString("ai_gemini", "Gemini AI chatbot"), this.app.gemini_AI.is_active);
     }
 
     private void act_show_box_edit_key_api_gemini()
@@ -1088,5 +1107,63 @@ public class Setting : MonoBehaviour
     {
         this.app.carrot.play_sound_click();
         this.app.tool.open_content_Intent("android.settings.VOICE_INPUT_SETTINGS");
+    }
+
+    private void show_msg_status(string s_title,bool is_active)
+    {
+        if (is_active)
+            this.app.carrot.show_msg(s_title, PlayerPrefs.GetString("setting_on", "Turn on"));
+        else
+            this.app.carrot.show_msg(s_title, PlayerPrefs.GetString("setting_off", "Turn off"));
+    }
+
+    public void show_list_ai_prioritize()
+    {
+        this.app.carrot.play_sound_click();
+        this.box_list= this.app.carrot.Create_Box("ai_prioritize");
+        this.box_list.set_title(PlayerPrefs.GetString("ai_prioritize", "AI Prioritize"));
+        this.box_list.set_icon(this.sp_icon_prioritize);
+
+        string[] s_name_p=new string[4];
+        string[] s_name_p_tip = new string[4];
+
+        s_name_p[0] = "AI Lover - GPT - Gemini";
+        s_name_p[1] = "AI Lover - Gemini - GPT";
+        s_name_p[2] = "GPT - Gemini";
+        s_name_p[3] = "Gemini - GPT";
+
+        s_name_p_tip[0] = "Ai lover -> GPT (Open AI) -> Genimi (Google)";
+        s_name_p_tip[1] = "Ai lover -> Genimi (Google) -> GPT (Open AI)";
+        s_name_p_tip[2] = "GPT (Open AI) -> Genimi (Google)";
+        s_name_p_tip[3] = "Genimi (Google) -> GPT (Open AI)";
+
+        for(int i = 0; i < s_name_p.Length; i++)
+        {
+            var index_p = i;
+            Carrot_Box_Item item_p = this.box_list.create_item();
+            item_p.set_title(s_name_p[i]);
+            item_p.set_tip(s_name_p_tip[i]);
+            item_p.set_icon(this.sp_icon_ai_robot);
+            item_p.set_act(() => this.select_ai_prioritize(index_p));
+
+            if (this.index_prioritize == i)
+            {
+                Carrot_Box_Btn_Item btn_p_sel = item_p.create_item();
+                btn_p_sel.set_icon(this.app.carrot.icon_carrot_done);
+                btn_p_sel.set_color(this.app.carrot.color_highlight);
+            }
+        }
+    }
+
+    private void select_ai_prioritize(int index_p)
+    {
+        if (this.box_list != null) this.box_list.close();
+        PlayerPrefs.SetInt("index_prioritize_ai", index_p);
+        this.index_prioritize = index_p;
+    }
+
+    public int get_index_prioritize()
+    {
+        return this.index_prioritize;
     }
 }
