@@ -543,6 +543,7 @@ public class Setting : MonoBehaviour
             this.btn_edit_gpt_active.set_icon(this.sp_icon_off);
         this.btn_edit_gpt_active.set_color(this.app.carrot.color_highlight);
         Destroy(this.btn_edit_gpt_active.GetComponent<Button>());
+        gpt_group.add_item(item_gpt_active);
 
         this.item_gpt = this.box_setting.create_item("item_gpt");
         item_gpt.set_icon(this.app.command_storage.sp_icon_key);
@@ -590,6 +591,7 @@ public class Setting : MonoBehaviour
             this.btn_edit_gemini_active.set_icon(this.sp_icon_off);
         this.btn_edit_gemini_active.set_color(this.app.carrot.color_highlight);
         Destroy(this.btn_edit_gemini_active.GetComponent<Button>());
+        gemini_group.add_item(item_gemini_active);
 
         this.item_gemini_api_key = this.box_setting.create_item("item_gemini_api_key");
         item_gemini_api_key.set_icon(this.app.command_storage.sp_icon_key);
