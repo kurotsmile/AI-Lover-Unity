@@ -77,7 +77,7 @@ public class GeminiAPI : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"Error: {www.error}");
+                Debug.Log($"Error: {www.error}");
                 if (this.app.setting.get_index_prioritize() == 0)
                 {
                     this.app.command.show_msg_no_chat();

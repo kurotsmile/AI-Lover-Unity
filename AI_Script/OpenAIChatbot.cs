@@ -87,7 +87,7 @@ public class OpenAIChatbot : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"Error: {www.error}");
+                Debug.Log($"Error: {www.error}");
                 if (this.app.setting.get_index_prioritize() == 0)
                 {
                     if (this.app.gemini_AI.is_active)
