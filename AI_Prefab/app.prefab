@@ -33411,6 +33411,7 @@ MonoBehaviour:
   - sys_action_by_link
   - sys_turn_on_flashlight
   - sys_turn_off_flashlight
+  - sys_open_app_link_bundleId
   obj_button_next_command_test: {fileID: 249239798421708654}
   obj_button_prev_command_test: {fileID: 6492396854497497505}
   sp_icon_add_chat: {fileID: 21300000, guid: 9b6d1e5e13e6eec47a2253cf8923827a, type: 3}
@@ -33795,6 +33796,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
   lis_api_key: []
+  is_active: 1
 --- !u!114 &2130662158616155322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33809,6 +33811,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
   key_api_default: 
+  is_active: 1
 --- !u!114 &2065144560488948737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37539,7 +37542,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.00021362305}
+  m_AnchoredPosition: {x: -3, y: 0.0005645752}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004

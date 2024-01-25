@@ -168,15 +168,6 @@ public class Command_Dev : MonoBehaviour
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
         ChatQuery = ChatQuery.WhereEqualTo("user.id",this.app.carrot.user.get_id_user_login());
 
-        if (this.order == OrderBy_Type.date_desc)
-            ChatQuery = ChatQuery.OrderByDescending("date_create");
-        else if (this.order == OrderBy_Type.date_asc)
-            ChatQuery = ChatQuery.OrderBy("date_create");
-        else if (this.order == OrderBy_Type.name_desc)
-            ChatQuery = ChatQuery.OrderByDescending("key");
-        else
-            ChatQuery = ChatQuery.OrderBy("key");
-
         ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted)

@@ -117,6 +117,8 @@ public class App : MonoBehaviour
 
     void Start()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         this.link_deep_app = Application.absoluteURL;
         Application.deepLinkActivated += onDeepLinkActivated;
 
