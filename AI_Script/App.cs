@@ -25,6 +25,7 @@ public class App : MonoBehaviour
     public OpenAIChatbot open_AI;
     public GeminiAPI gemini_AI;
     public Utility_Tool tool;
+    public character_actions action;
 
     [Header("App obj")]
     public bool is_radio_func = true;
@@ -896,6 +897,18 @@ public class App : MonoBehaviour
             this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.icon.act_buy_category_success();
         }
+
+        if (id_product == this.carrot.shop.get_id_by_index(this.action.index_product_buy_act))
+        {
+            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.action.check_buy_success_action();
+        }
+
+        if (id_product == this.carrot.shop.get_id_by_index(this.action.index_product_buy_all_act))
+        {
+            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.act_inapp_unlock_all_animation();
+        }
     }
 
     private void onRestoreSuccessCarrotPay(string[] arr_id)
@@ -907,6 +920,7 @@ public class App : MonoBehaviour
             if (id_p == this.carrot.shop.get_id_by_index(2)) this.act_inapp_removeAds();
             if (id_p == this.carrot.shop.get_id_by_index(6)) this.act_inapp_unlock_all_character();
             if (id_p == this.carrot.shop.get_id_by_index(7)) this.act_inapp_unlock_downloadmp3();
+            if (id_p == this.carrot.shop.get_id_by_index(this.action.index_product_buy_all_act)) this.act_inapp_unlock_all_animation();
         }
     }
 
@@ -931,6 +945,7 @@ public class App : MonoBehaviour
         PlayerPrefs.SetInt("is_buy_5", 1);
         PlayerPrefs.SetInt("is_buy_6", 1);
         PlayerPrefs.SetInt("is_buy_7", 1);
+        PlayerPrefs.SetInt("is_buy_"+this.action.index_product_buy_all_act, 1);
         this.hide_banner_ads();
     }
 
@@ -943,6 +958,11 @@ public class App : MonoBehaviour
     private void act_inapp_unlock_downloadmp3()
     {
         PlayerPrefs.SetInt("is_buy_7", 1);
+    }
+
+    private void act_inapp_unlock_all_animation()
+    {
+        PlayerPrefs.SetInt("is_buy_"+this.action.index_product_buy_all_act, 1);
     }
 
     public void act_inapp_unlock_all_character()

@@ -402,13 +402,13 @@ public class Player_music : MonoBehaviour
             {
                 this.img_play.sprite = this.icon_pause;
                 this.img_play_mini.sprite = this.icon_pause;
-                if (this.sound_music.clip != null) GameObject.Find("app").GetComponent<App>().get_character().unpause_ani();
+                if (this.sound_music.clip != null) this.app.get_character().unpause_ani();
             }
             else
             {
                 this.img_play.sprite = this.icon_play;
                 this.img_play_mini.sprite = this.icon_play;
-                if (this.sound_music.clip != null) GameObject.Find("app").GetComponent<App>().get_character().pause_ani();
+                if (this.sound_music.clip != null) this.app.get_character().pause_ani();
             }
         }
     }

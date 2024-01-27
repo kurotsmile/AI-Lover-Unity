@@ -9185,48 +9185,6 @@ MonoBehaviour:
   icon_sex: {fileID: 21300000, guid: 193281141b87eb74d80f6a22097d53e7, type: 3}
   obj_character_phone: []
   character_name: 
-  arr_name_ani_action:
-  - IdleE_wing
-  - DieB
-  - Jump
-  - DieA
-  - Run
-  - CuteA
-  - CastspellC
-  - Walk
-  - Damaged
-  - SLIDE00
-  - PoseA_wing
-  - IdleG_wing
-  - Walk_back
-  - Cry
-  - IdleF
-  - Atk1
-  - Fly_idle
-  - Atk3
-  - Shocked
-  - Atk6
-  - Bye
-  - LOSE00 0
-  - Rei
-  - Idle_B
-  - Walk_L
-  - CastspellB
-  - Thinking
-  - WALK00_B
-  - Angpose
-  - HANDUP00_R
-  - REFLESH00
-  - Cast spellA
-  - WIN00
-  - JUMP01B
-  - Atk7
-  - Atk_A1_wing
-  - Atk2
-  - Atk_A2_wing
-  - Atk_A3_wing
-  - IdleG_wing
-  - UMATOBI00
   arr_name_ani_waitting:
   - w_0_IdleE_wing
   - waitting_1
@@ -33169,6 +33127,7 @@ GameObject:
   - component: {fileID: 505306152552912675}
   - component: {fileID: 2130662158616155322}
   - component: {fileID: 2065144560488948737}
+  - component: {fileID: 1793282830951987721}
   m_Layer: 0
   m_Name: app
   m_TagString: Untagged
@@ -33223,6 +33182,7 @@ MonoBehaviour:
   open_AI: {fileID: 505306152552912675}
   gemini_AI: {fileID: 2130662158616155322}
   tool: {fileID: 2065144560488948737}
+  action: {fileID: 1793282830951987721}
   is_radio_func: 1
   img_bt_sel_lang: {fileID: 2755477472231957537}
   color_nomal:
@@ -33414,6 +33374,7 @@ MonoBehaviour:
   - sys_open_app_link_bundleId
   obj_button_next_command_test: {fileID: 249239798421708654}
   obj_button_prev_command_test: {fileID: 6492396854497497505}
+  obj_button_prev_command_replay: {fileID: 6680625288135196851}
   sp_icon_add_chat: {fileID: 21300000, guid: 9b6d1e5e13e6eec47a2253cf8923827a, type: 3}
   sp_icon_patert: {fileID: 21300000, guid: a949f43a3f01e5340a643e817d1d827a, type: 3}
   sp_icon_func: {fileID: 21300000, guid: 2397baf74e708a14e94deeaf5696c3a5, type: 3}
@@ -33915,6 +33876,63 @@ MonoBehaviour:
   - android.settings.panel.action.NFC
   - android.settings.panel.action.VOLUME
   - android.settings.panel.action.WIFI
+--- !u!114 &1793282830951987721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755477472099462738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ffacf1179157524c829f51fb9ceea9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  app: {fileID: 2755477471257207454}
+  url: 
+  index_product_buy_act: 8
+  list_anim_act_defalt:
+  - IdleE_wing
+  - DieB
+  - Jump
+  - DieA
+  - Run
+  - CuteA
+  - CastspellC
+  - Walk
+  - Damaged
+  - SLIDE00
+  - PoseA_wing
+  - IdleG_wing
+  - Walk_back
+  - Cry
+  - IdleF
+  - Atk1
+  - Fly_idle
+  - Atk3
+  - Shocked
+  - Atk6
+  - Bye
+  - LOSE00 0
+  - Rei
+  - Idle_B
+  - Walk_L
+  - CastspellB
+  - Thinking
+  - WALK00_B
+  - Angpose
+  - HANDUP00_R
+  - REFLESH00
+  - Cast spellA
+  - WIN00
+  - JUMP01B
+  - Atk7
+  - Atk_A1_wing
+  - Atk2
+  - Atk_A2_wing
+  - Atk_A3_wing
+  - IdleG_wing
+  - UMATOBI00
 --- !u!1 &2755477472104608252
 GameObject:
   m_ObjectHideFlags: 0
@@ -35844,48 +35862,6 @@ MonoBehaviour:
   icon_sex: {fileID: 21300000, guid: f69c71104e56d2c4cbb492034b54c81e, type: 3}
   obj_character_phone: []
   character_name: 
-  arr_name_ani_action:
-  - IdleE_wing
-  - DieB
-  - Jump
-  - DieA
-  - Run
-  - CuteA
-  - CastspellC
-  - Walk
-  - Damaged
-  - SLIDE00
-  - PoseA_wing
-  - IdleG_wing
-  - Walk_back
-  - Cry
-  - IdleF
-  - Atk1
-  - Fly_idle
-  - Atk3
-  - Shocked
-  - Atk6
-  - Bye
-  - LOSE00 0
-  - Rei
-  - Idle_B
-  - Walk_L
-  - CastspellB
-  - Thinking
-  - WALK00_B
-  - Angpose
-  - HANDUP00_R
-  - REFLESH00
-  - Cast spellA
-  - WIN00
-  - JUMP01B
-  - Atk7
-  - Atk_A1_wing
-  - Atk2
-  - Atk_A2_wing
-  - Atk_A3_wing
-  - IdleG_wing
-  - UMATOBI00
   arr_name_ani_waitting:
   - w_0_IdleE_wing
   - waitting_1
@@ -37542,7 +37518,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3, y: 0.0005645752}
+  m_AnchoredPosition: {x: -3, y: 0.00065612793}
   m_SizeDelta: {x: -5.999999, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2755477472425579004
@@ -41512,8 +41488,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1334967823943002200}
   m_HandleRect: {fileID: 2440126133283484171}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.5174486
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

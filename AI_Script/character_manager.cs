@@ -19,7 +19,6 @@ public class character_manager : MonoBehaviour
 
     public string character_name;
     private int sel_character;
-    public string[] arr_name_ani_action;
     public string[] arr_name_ani_waitting;
     public string[] arr_name_ani_dance_music;
     public string[] arr_name_ani_stop_dance;
@@ -178,7 +177,7 @@ public class character_manager : MonoBehaviour
         }
     }
 
-    private Animator get_anim_character()
+    public Animator get_anim_character()
     {
         return this.obj_npc.GetComponent<Animator>();
     }
@@ -221,10 +220,10 @@ public class character_manager : MonoBehaviour
         this.get_anim_character().Play(this.arr_name_ani_speak[index_ani_speak], 1);
     }
 
-    public void play_ani(int index)
+    public void play_ani(string s_name_anim)
     {
         this.unpause_ani();
-        this.get_anim_character().Play(this.arr_name_ani_action[index], 0);
+        this.get_anim_character().Play(s_name_anim, 0);
     }
 
     public void play_ani_face(int index)

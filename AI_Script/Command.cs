@@ -444,7 +444,8 @@ public class Command : MonoBehaviour
             if (this.app.setting.get_status_sound_voice()) this.play_text_audio(s_msg_chat);
         }
 
-        if (data_chat["action"] != null) this.play_act(data_chat["action"].ToString());
+        if (data_chat["action"] != null) this.app.action.play_act_anim_by_index_default(int.Parse(data_chat["action"].ToString()));
+        if (data_chat["act"] != null) this.app.action.play_act_anim(data_chat["act"].ToString());
         if (data_chat["face"] != null) this.act_cm_face(data_chat["face"].ToString());
         if (data_chat["color"] != null) this.set_color_by_string(data_chat["color"].ToString());
 
@@ -510,11 +511,6 @@ public class Command : MonoBehaviour
     public void act_cm_face(string s_face)
     {
         if(s_face!="") this.play_face(int.Parse(s_face));
-    }
-
-    public void play_act(string number_animation)
-    {
-        this.app.get_character().play_ani(int.Parse(number_animation));
     }
 
     public void play_face(int index)

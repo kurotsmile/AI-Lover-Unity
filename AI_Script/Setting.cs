@@ -917,6 +917,15 @@ public class Setting : MonoBehaviour
         item_shop_fahsion.set_act(() => this.app.carrot.buy_product(6));
         this.add_btn_buy(item_shop_fahsion,6);
 
+        Carrot.Carrot_Box_Item item_shop_act = box_shop.create_item("shop_animations");
+        item_shop_act.set_icon(this.app.command_storage.sp_icon_action);
+        item_shop_act.set_title("Use all actions");
+        item_shop_act.set_tip("Unlock and use all actions");
+        item_shop_act.set_lang_data("shop_animaton", "shop_animaton_tip");
+        item_shop_act.load_lang_data();
+        item_shop_act.set_act(() => this.app.carrot.buy_product(9));
+        this.add_btn_buy(item_shop_act, 9);
+
         Carrot.Carrot_Box_Item item_shop_all_func = box_shop.create_item("shop_all_fun");
         item_shop_all_func.set_icon(this.sp_icon_shop_all_func);
         item_shop_all_func.set_title("Full use of functions");
