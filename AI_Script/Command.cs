@@ -83,6 +83,7 @@ public class Command : MonoBehaviour
     public void send_chat(string s_key,bool is_log_show=false)
     {
         s_key = s_key.Trim().ToLower();
+       
         this.is_live = false;
         this.s_command_chat_last = s_key;
         
@@ -92,6 +93,7 @@ public class Command : MonoBehaviour
             {
                 this.add_item_log_chat(s_key);
                 this.add_item_log_loading();
+                if (this.app.player_music.playlist.check_query_key(s_key)) return;
             }
 
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);

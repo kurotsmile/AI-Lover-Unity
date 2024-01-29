@@ -165,6 +165,8 @@ public class Command_storage : MonoBehaviour
     private Carrot_Box box_parameter_tag;
     private Carrot_Box box_sex_sel_chat;
 
+    private List<Carrot_Box_Item> list_item_key_query = null;
+
     private int c_length_face = 18;
 
     private void reset_all_s_data()
@@ -438,12 +440,12 @@ public class Command_storage : MonoBehaviour
                 item_action.check_type();
             }
         }
-        item_action.set_act(()=>this.app.action.btn_show_category());
+        item_action.set_act(()=>this.app.action.btn_show_category(item_action));
 
         Carrot.Carrot_Box_Btn_Item btn_act_list = this.item_action.create_item();
         btn_act_list.set_icon(this.app.carrot.icon_carrot_all_category);
         btn_act_list.set_color(this.app.carrot.color_highlight);
-        btn_act_list.set_act(() => this.app.action.btn_show_category());
+        btn_act_list.set_act(() => this.app.action.btn_show_category(item_action));
 
         Carrot.Carrot_Box_Btn_Item btn_act_random = this.item_action.create_item();
         btn_act_random.set_icon(this.sp_icon_random);
@@ -655,7 +657,9 @@ public class Command_storage : MonoBehaviour
         this.app.carrot.play_sound_click();
         IList list_all_name_animations = this.app.action.get_list_all_name_animations();
         int index_act =UnityEngine.Random.Range(0, list_all_name_animations.Count);
-        this.set_action_animation(list_all_name_animations[index_act].ToString());
+        this.item_action.set_type(Box_Item_Type.box_value_txt);
+        this.item_action.check_type();
+        this.item_action.set_val(list_all_name_animations[index_act].ToString());
     }
 
     private void change_face_random()
@@ -949,7 +953,7 @@ public class Command_storage : MonoBehaviour
 
     public void hide_box_add()
     {
-        this.box_add_chat.gameObject.SetActive(false);
+        if(this.box_add_chat!=null) this.box_add_chat.gameObject.SetActive(false);
     }
 
     #region Mode Test Command
@@ -1359,13 +1363,6 @@ public class Command_storage : MonoBehaviour
         this.s_color = s_color;
     }
 
-    public void set_action_animation(string s_name_aimation)
-    {
-        this.item_action.set_type(Box_Item_Type.box_value_txt);
-        this.item_action.check_type();
-        this.item_action.set_val(s_name_aimation);
-    }
-
     public void set_s_id_icon(string s_id_icon)
     {
         this.s_id_icon = s_id_icon;
@@ -1439,4 +1436,106 @@ public class Command_storage : MonoBehaviour
         log.id = s_id_log;
         chatRef.SetAsync(log);
     }
+
+    #region Query Key Setting
+    public void show_setting_query_key()
+    {
+        this.box_add_chat = this.app.carrot.Create_Box("Query Key Setting");
+        this.box_add_chat.set_icon(this.app.carrot.sp_icon_dev);
+        this.list_item_key_query = new List<Carrot_Box_Item>();
+        string s_data_querys_song = this.app.player_music.playlist.get_data_key_query_music();
+        if (s_data_querys_song=="")
+        {
+            Carrot_Box_Item item_key_query=this.box_add_chat.create_item("item_key_0");
+            item_key_query.set_title("Key Query");
+            item_key_query.set_icon(this.app.command_storage.sp_icon_key);
+            item_key_query.set_tip("Keyword used to open the song by name");
+            item_key_query.set_type(Box_Item_Type.box_value_input);
+            item_key_query.check_type();
+            this.list_item_key_query.Add(item_key_query);
+        }
+        else
+        {
+            IList list_key = (IList)Json.Deserialize(s_data_querys_song);
+            for(int i = 0; i < list_key.Count; i++)
+            {
+                var index_item = i;
+                Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_"+i);
+                item_key_query.set_icon(this.app.command_storage.sp_icon_key);
+                item_key_query.set_title("Key Query ("+(i+1)+")");
+                item_key_query.set_tip(list_key[i].ToString()+"- Keyword used to open the song by name");
+                item_key_query.set_type(Box_Item_Type.box_value_input);
+                item_key_query.check_type();
+                item_key_query.set_val(list_key[i].ToString());
+                this.list_item_key_query.Add(item_key_query);
+
+                Carrot_Box_Btn_Item btn_del = item_key_query.create_item();
+                btn_del.set_icon(this.app.carrot.sp_icon_del_data);
+                btn_del.set_color(this.app.carrot.color_highlight);
+                btn_del.set_act(() =>this.delete_query(index_item));
+            }
+        }
+
+        Carrot_Box_Btn_Item btn_add_key = this.box_add_chat.create_btn_menu_header(this.sp_icon_add_chat);
+        btn_add_key.set_act(() => this.add_key_query());
+
+        Carrot_Box_Btn_Panel panel_btn=this.box_add_chat.create_panel_btn();
+        Carrot_Button_Item btn_done=panel_btn.create_btn("btn_done");
+        btn_done.set_icon_white(this.app.carrot.icon_carrot_done);
+        btn_done.set_bk_color(this.app.carrot.color_highlight);
+        btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
+        btn_done.set_label_color(Color.white);
+        btn_done.set_act_click(() => this.done_box_setting_query());
+
+        Carrot_Button_Item btn_close = panel_btn.create_btn("btn_close");
+        btn_close.set_icon_white(this.app.carrot.icon_carrot_done);
+        btn_close.set_bk_color(this.app.carrot.color_highlight);
+        btn_close.set_label(PlayerPrefs.GetString("cancel", "Cancel"));
+        btn_close.set_label_color(Color.white);
+        btn_close.set_act_click(() => this.close_box_setting_query());
+    }
+
+    private void delete_query(int index)
+    {
+        Destroy(this.list_item_key_query[index]);
+        Destroy(this.list_item_key_query[index].gameObject);
+        this.list_item_key_query[index] = null;
+    }
+
+    private void add_key_query()
+    {
+        this.app.carrot.play_sound_click();
+        Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_" + this.list_item_key_query.Count);
+        item_key_query.set_icon(this.app.command_storage.sp_icon_key);
+        item_key_query.set_title("Key Query (" + (this.list_item_key_query.Count+1) + ")");
+        item_key_query.set_tip("Keyword used to open the song by name");
+        item_key_query.set_type(Box_Item_Type.box_value_input);
+        item_key_query.check_type();
+        item_key_query.set_val("");
+        item_key_query.transform.SetSiblingIndex(0);
+        this.list_item_key_query.Add(item_key_query);
+    }
+
+    private void done_box_setting_query()
+    {
+        IList list_key_update = (IList)Json.Deserialize("[]");
+        for(int i = 0; i < this.list_item_key_query.Count; i++)
+        {
+            if (this.list_item_key_query[i] != null)
+            {
+                list_key_update.Add(this.list_item_key_query[i].get_val());
+                Destroy(this.list_item_key_query[i]);
+            }
+        }
+        this.app.player_music.playlist.set_data_key_query_music(Json.Serialize(list_key_update));
+        this.app.carrot.play_sound_click();
+        if (this.box_add_chat != null) this.box_add_chat.close();
+    }
+
+    private void close_box_setting_query()
+    {
+        this.app.carrot.play_sound_click();
+        if (this.box_add_chat != null) this.box_add_chat.close();
+    }
+    #endregion
 }

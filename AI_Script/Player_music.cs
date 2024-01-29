@@ -26,6 +26,7 @@ public class Player_music : MonoBehaviour
     private string link_store = "";
     private string data_lyrics = "";
     private string data_song = "";
+    private string s_name_song_last;
 
     public Sprite icon_play;
     public Sprite icon_pause;
@@ -109,6 +110,7 @@ public class Player_music : MonoBehaviour
         {
             this.txt_name_song_full.text = data_music["name"].ToString();
             this.txt_name_song_mini.text = data_music["name"].ToString();
+            this.s_name_song_last = data_music["name"].ToString();
         }
 
         if (data_music["type"].ToString() == "radio")
@@ -573,5 +575,10 @@ public class Player_music : MonoBehaviour
     public string StripHTML(string input)
     {
         return Regex.Replace(input, "<.*?>", String.Empty);
+    }
+
+    public string get_name_song_last()
+    {
+        return this.s_name_song_last;
     }
 }

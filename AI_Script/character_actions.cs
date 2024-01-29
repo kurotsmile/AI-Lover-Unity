@@ -1,6 +1,9 @@
 using Carrot;
+using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
@@ -17,28 +20,26 @@ public class character_actions : MonoBehaviour
     private AssetBundle bundle;
     private IList list_animations;
     private IList list_category_animations;
-    private IDictionary data_catgeory_cur;
     private Carrot_Box box_list;
     private IList list_name_animation;
     private string s_name_animation_by_temp = "";
+    private Carrot_Box_Item item_box_temp=null;
 
-    public void btn_show_list()
-    {  
-        if (this.data_catgeory_cur == null)
-            StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation());
-        else
-            this.box_list_animation(this.data_catgeory_cur);
-    }
-
-    public void btn_show_category()
+    public void btn_show_category(Carrot_Box_Item item_set_data)
     {
+        this.item_box_temp = item_set_data;
         if (this.list_category_animations == null)
-            StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation());
+            StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(()=>this.box_list_category()));
         else
-            this.box_list_category(list_category_animations);
+            this.box_list_category();
     }
 
-    IEnumerator DownloadAndLoadCaetgoryAndAnimation()
+    public void show_list_category()
+    {
+        this.btn_show_category(null);
+    }
+
+    IEnumerator DownloadAndLoadCaetgoryAndAnimation(UnityAction act_call_back)
     {
         using (UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url))
         {
@@ -64,9 +65,8 @@ public class character_actions : MonoBehaviour
                         this.list_name_animation.Add(data_anim["name"].ToString());
                     }
                 }
-
-                this.box_list_category(this.list_category_animations);
                 Debug.Log("Download Data Category and list Animation");
+                if (act_call_back != null) act_call_back();
             }
             else
             {
@@ -76,7 +76,7 @@ public class character_actions : MonoBehaviour
         }
     }
 
-    private void box_list_category(IList list_category)
+    private void box_list_category()
     {
         if (this.box_list != null) this.box_list.close();
         this.box_list = this.app.carrot.Create_Box();
@@ -85,9 +85,9 @@ public class character_actions : MonoBehaviour
 
         string s_action = PlayerPrefs.GetString("act", "Action");
 
-        for (int i = 0; i < list_category.Count; i++)
+        for (int i = 0; i < this.list_category_animations.Count; i++)
         {
-            IDictionary data_item_anim = (IDictionary)list_category[i];
+            IDictionary data_item_anim = (IDictionary)this.list_category_animations[i];
             IList data_animations = (IList)data_item_anim["data"];
             var s_name = data_item_anim["name"].ToString();
             Carrot_Box_Item item_anim = this.box_list.create_item("item_cat_" + i);
@@ -100,7 +100,6 @@ public class character_actions : MonoBehaviour
 
     private void sel_category(IDictionary data_anim)
     {
-        this.data_catgeory_cur = data_anim;
         this.box_list_animation(data_anim);
     }
 
@@ -112,7 +111,7 @@ public class character_actions : MonoBehaviour
         this.box_list.set_icon(this.app.command_storage.sp_icon_action);
 
         Carrot_Box_Btn_Item btn_category = this.box_list.create_btn_menu_header(this.app.carrot.icon_carrot_all_category);
-        btn_category.set_act(this.btn_show_category);
+        btn_category.set_act(()=>this.btn_show_category(this.item_box_temp));
 
         bool is_unlock_animation = this.app.setting.check_buy_product(this.index_product_buy_all_act);
         this.list_animations = (IList)data_category["data"];
@@ -159,7 +158,10 @@ public class character_actions : MonoBehaviour
 
             if (is_used)
             {
-                item_anim.set_act(() => this.act_sel_action(s_name));
+                if(this.item_box_temp!=null)
+                    item_anim.set_act(() => this.act_sel_action(s_name));
+                else
+                    item_anim.set_act(() => this.act_test_anim(s_name));
             }
             else
             {
@@ -181,7 +183,13 @@ public class character_actions : MonoBehaviour
     private void act_sel_action(string s_name_anim)
     {
         this.app.carrot.play_sound_click();
-        this.app.command_storage.set_action_animation(s_name_anim);
+        if (this.item_box_temp != null)
+        {
+            this.item_box_temp.set_type(Box_Item_Type.box_value_txt);
+            this.item_box_temp.check_type();
+            this.item_box_temp.set_val(s_name_anim);
+        }
+ 
         if (this.box_list != null) this.box_list.close();
     }
 
@@ -200,6 +208,7 @@ public class character_actions : MonoBehaviour
 
     public void play_act_anim(string s_name_animation)
     {
+        if (s_name_animation=="") return;
         Animator animator = this.app.get_character().get_anim_character();
         if (this.check_anim_default(s_name_animation))
         {
@@ -207,14 +216,29 @@ public class character_actions : MonoBehaviour
         }
         else
         {
-            AnimationClip animClip = bundle.LoadAsset<AnimationClip>(s_name_animation);
-            if (animClip != null)
+            if (bundle == null)
             {
-                AnimatorOverrideController overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
-                overrideController["Run"] = animClip;
-                animator.runtimeAnimatorController = overrideController;
-                animator.Play("Run");
+                Debug.Log("play_act_anim download:" + s_name_animation);
+                StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(() => this.play_act_anim(s_name_animation)));
             }
+            else
+            {
+                AnimationClip animClip = bundle.LoadAsset<AnimationClip>(s_name_animation);
+                if (animClip != null)
+                {
+                    AnimatorOverrideController overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+                    overrideController["Run"] = animClip;
+                    animator.runtimeAnimatorController = overrideController;
+                    animator.Play("Run");
+                    Debug.Log("play_act_anim load:" + s_name_animation);
+                }
+                else
+                {
+                    Debug.Log("play_act_anim download:" + s_name_animation);
+                    StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(() => this.play_act_anim(s_name_animation)));
+                }
+            }
+
         }
     }
 

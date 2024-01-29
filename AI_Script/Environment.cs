@@ -280,7 +280,7 @@ public class Environment : MonoBehaviour
         {
             if (this.box_list != null) this.box_list.close();
             this.box_list = this.app.carrot.show_grid();
-            this.box_list.set_title("List Floor");
+            this.box_list.set_title(PlayerPrefs.GetString("bk_floor","List Floor"));
             this.box_list.set_icon(this.icon_floor);
 
             foreach (DocumentSnapshot document_floor in FQuery.Documents)

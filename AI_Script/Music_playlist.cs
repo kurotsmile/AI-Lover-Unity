@@ -39,9 +39,11 @@ public class Music_playlist : MonoBehaviour
     private string s_buy_id_song = "";
     private string s_buy_link_mp3_song="";
     private string s_lang_cur = "";
+    private string s_data_key_query_music = "";
 
     void Start()
     {
+        this.s_data_key_query_music = PlayerPrefs.GetString("key_query_music","");
         this.length = PlayerPrefs.GetInt("music_length");
         this.check_show_btn_playlist();
     }
@@ -590,5 +592,82 @@ public class Music_playlist : MonoBehaviour
                 }
             }
         });
+    }
+
+    public bool check_query_key(string s_key)
+    {
+        if (this.s_data_key_query_music == "") return false;
+
+        IList list_key_query_search =(IList) Json.Deserialize(this.s_data_key_query_music);
+        if(list_key_query_search.Count==0) return false;
+
+        for(int i = 0; i < list_key_query_search.Count; i++)
+        {
+            string s_query_search = list_key_query_search[i].ToString();
+            if (s_key.Contains(s_query_search))
+            {
+                if (s_key.IndexOf(s_query_search) == 0)
+                {
+                    if (s_key.Length > s_query_search.Length)
+                    {
+                        string s_name_song = s_key.Replace(s_query_search, "");
+                        s_name_song = s_name_song.Trim();
+                        Debug.Log("check_query_key true :" + s_name_song);
+                        this.get_song_by_name(s_name_song);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void get_song_by_name(string s_name)
+    {
+        this.app.carrot.show_loading();
+        Query ChatQuery = this.app.carrot.db.Collection("song").WhereEqualTo("name", s_name);
+        ChatQuery = ChatQuery.Limit(1);
+        ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
+            QuerySnapshot songQuerySnapshot = task.Result;
+
+            if (task.IsFaulted)
+            {
+                this.app.carrot.hide_loading();
+                this.app.command.send_chat("no_found_song");
+            }
+
+            if (task.IsCompleted)
+            {
+                this.app.carrot.hide_loading();
+                if (songQuerySnapshot.Count > 0)
+                {
+                    foreach (DocumentSnapshot SongSnapshot in songQuerySnapshot.Documents)
+                    {
+                        IDictionary data_music = SongSnapshot.ToDictionary();
+                        data_music["id"] = SongSnapshot.Id;
+                        data_music["type"] = "online";
+                        data_music["index"] = 0;
+                        this.app.player_music.act_play_data(data_music);
+                        this.app.command.send_chat("found_song");
+                        return;
+                    };
+                }
+                else
+                {
+                    this.app.command.send_chat("no_found_song");
+                }
+            }
+        });
+    }
+
+    public string get_data_key_query_music()
+    {
+        return this.s_data_key_query_music;
+    }
+
+    public void set_data_key_query_music(string s_keys)
+    {
+        this.s_data_key_query_music = s_keys;
+        PlayerPrefs.SetString("key_query_music", s_keys);
     }
 }

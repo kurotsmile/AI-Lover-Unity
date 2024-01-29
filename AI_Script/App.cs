@@ -745,6 +745,7 @@ public class App : MonoBehaviour
         s_chat = s_chat.Replace("{thang}", DateTime.Now.Month.ToString());
         s_chat = s_chat.Replace("{nam}", DateTime.Now.Year.ToString());
         s_chat = s_chat.Replace("{key_chat}", this.command.get_s_command_chat_last());
+        s_chat = s_chat.Replace("{song_name}", this.player_music.get_name_song_last());
         return s_chat;
     }
 
