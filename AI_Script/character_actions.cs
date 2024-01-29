@@ -41,7 +41,7 @@ public class character_actions : MonoBehaviour
 
     IEnumerator DownloadAndLoadCaetgoryAndAnimation(UnityAction act_call_back)
     {
-        using (UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url))
+        using (UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url,1,0))
         {
             this.app.carrot.show_loading();
             yield return request.SendWebRequest();

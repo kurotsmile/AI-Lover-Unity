@@ -144,6 +144,7 @@ public class App : MonoBehaviour
         this.setting.load_setting();
         this.panel_main.SetActive(true);
         this.player_music.panel_player_mini.SetActive(false);
+        this.player_music.playlist.on_load();
         this.show_chat_function();
         this.check_manager_character();
 

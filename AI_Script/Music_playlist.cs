@@ -41,7 +41,7 @@ public class Music_playlist : MonoBehaviour
     private string s_lang_cur = "";
     private string s_data_key_query_music = "";
 
-    void Start()
+    public void on_load()
     {
         this.s_data_key_query_music = PlayerPrefs.GetString("key_query_music","");
         this.length = PlayerPrefs.GetInt("music_length");
@@ -598,10 +598,10 @@ public class Music_playlist : MonoBehaviour
     {
         if (this.s_data_key_query_music == "") return false;
 
-        IList list_key_query_search =(IList) Json.Deserialize(this.s_data_key_query_music);
-        if(list_key_query_search.Count==0) return false;
+        string[] list_key_query_search = this.s_data_key_query_music.Split(";");
+        if (list_key_query_search.Length==0) return false;
 
-        for(int i = 0; i < list_key_query_search.Count; i++)
+        for(int i = 0; i < list_key_query_search.Length; i++)
         {
             string s_query_search = list_key_query_search[i].ToString();
             if (s_key.Contains(s_query_search))
@@ -613,7 +613,10 @@ public class Music_playlist : MonoBehaviour
                         string s_name_song = s_key.Replace(s_query_search, "");
                         s_name_song = s_name_song.Trim();
                         Debug.Log("check_query_key true :" + s_name_song);
-                        this.get_song_by_name(s_name_song);
+                        if(this.app.carrot.is_online())
+                            this.get_song_by_name(s_name_song);
+                        else
+                            this.search_and_play_offline(s_name_song);
                         return true;
                     }
                 }
@@ -669,5 +672,23 @@ public class Music_playlist : MonoBehaviour
     {
         this.s_data_key_query_music = s_keys;
         PlayerPrefs.SetString("key_query_music", s_keys);
+    }
+
+    private void search_and_play_offline(string s_key)
+    {
+        for (int i = this.length - 1; i >= 0; i--)
+        {
+            string s_data = PlayerPrefs.GetString("music_" + i);
+            if (s_data != "")
+            {
+                IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
+                if (data_music["name"].ToString() == s_key)
+                {
+                    data_music["type"] = "offline";
+                    data_music["index_del"] = i;
+                    this.app.player_music.act_play_data(data_music);
+                }
+            }
+        }
     }
 }

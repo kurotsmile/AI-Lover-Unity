@@ -1456,8 +1456,8 @@ public class Command_storage : MonoBehaviour
         }
         else
         {
-            IList list_key = (IList)Json.Deserialize(s_data_querys_song);
-            for(int i = 0; i < list_key.Count; i++)
+            string[] list_key = s_data_querys_song.Split(";");
+            for(int i = 0; i < list_key.Length; i++)
             {
                 var index_item = i;
                 Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_"+i);
@@ -1518,16 +1518,19 @@ public class Command_storage : MonoBehaviour
 
     private void done_box_setting_query()
     {
-        IList list_key_update = (IList)Json.Deserialize("[]");
+        string s_query_data = "";
         for(int i = 0; i < this.list_item_key_query.Count; i++)
         {
             if (this.list_item_key_query[i] != null)
             {
-                list_key_update.Add(this.list_item_key_query[i].get_val());
+                s_query_data= s_query_data+this.list_item_key_query[i].get_val()+";";
                 Destroy(this.list_item_key_query[i]);
             }
         }
-        this.app.player_music.playlist.set_data_key_query_music(Json.Serialize(list_key_update));
+        s_query_data = s_query_data+"end";
+        s_query_data = s_query_data.Replace(";end", "");
+        if (s_query_data == "end") s_query_data = "";
+        this.app.player_music.playlist.set_data_key_query_music(s_query_data);
         this.app.carrot.play_sound_click();
         if (this.box_add_chat != null) this.box_add_chat.close();
     }
