@@ -490,7 +490,7 @@ public class Setting : MonoBehaviour
         box_setting.area_all_item.GetChild(6).SetSiblingIndex(34);
 
         Carrot.Carrot_Box_Item item_removeads = box_setting.area_all_item.GetChild(19).GetComponent<Carrot.Carrot_Box_Item>();
-        item_removeads.set_lang_data("shop_ads", "shop_ads_tip");
+        item_removeads.set_lang_data("remove_ads", "remove_ads_tip");
         item_removeads.load_lang_data();
         Carrot.Carrot_Box_Btn_Item btn_by_ads = item_removeads.create_item();
         if (this.app.carrot.ads.get_status_ads())
