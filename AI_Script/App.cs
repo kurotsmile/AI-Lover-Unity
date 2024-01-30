@@ -156,6 +156,7 @@ public class App : MonoBehaviour
         this.icon.load();
         this.open_AI.on_load();
         this.gemini_AI.on_load();
+        this.action.on_load();
         this.tool.on_load();
     }
 
@@ -195,6 +196,7 @@ public class App : MonoBehaviour
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
         this.command.send_chat("hi_" + hour);
+        this.player_music.playlist.on_load();
         if (!this.is_radio_func) this.button_randio.SetActive(false);
     }
 

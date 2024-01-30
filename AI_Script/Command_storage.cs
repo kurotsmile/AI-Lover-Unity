@@ -27,7 +27,7 @@ public struct chat
     [FirestoreProperty]
     public string msg {get; set;}
     [FirestoreProperty]
-    public string action {get; set;}
+    public string act {get; set;}
     [FirestoreProperty]
     public string face {get; set;}
     [FirestoreProperty]
@@ -1099,7 +1099,7 @@ public class Command_storage : MonoBehaviour
         chat c = new chat
         {
             msg = this.item_msg.get_val().Trim(),
-            action = this.item_action.get_val(),
+            act = this.item_action.get_val(),
             face = this.item_face.get_val(),
             limit = "1",
             sex_character = this.s_sex_character,
@@ -1463,7 +1463,7 @@ public class Command_storage : MonoBehaviour
                 Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_"+i);
                 item_key_query.set_icon(this.app.command_storage.sp_icon_key);
                 item_key_query.set_title("Key Query ("+(i+1)+")");
-                item_key_query.set_tip(list_key[i].ToString()+"- Keyword used to open the song by name");
+                item_key_query.set_tip(list_key[i].ToString()+" {song_name} -> Keyword used to open the song by name");
                 item_key_query.set_type(Box_Item_Type.box_value_input);
                 item_key_query.check_type();
                 item_key_query.set_val(list_key[i].ToString());

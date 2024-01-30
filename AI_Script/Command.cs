@@ -557,7 +557,7 @@ public class Command : MonoBehaviour
                     this.obj_btn_clear_all_log.SetActive(true);
                     if(this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
                 }
-                this.action_waitting();
+                if(this.app.player_music.sound_music.isPlaying==false) this.action_waitting();
             }
         }
 

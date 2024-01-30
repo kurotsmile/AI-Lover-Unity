@@ -1,12 +1,11 @@
 using Carrot;
-using System;
 using System.Collections;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+public enum Act_List_Func {Add_Box_Item,View_Category,Select_Dance_Animation}
 public class character_actions : MonoBehaviour
 {
     [Header("Main Obj")]
@@ -18,15 +17,25 @@ public class character_actions : MonoBehaviour
     public int index_product_buy_all_act = 9;
     public string[] list_anim_act_defalt;
     private AssetBundle bundle;
-    private IList list_animations;
+
     private IList list_category_animations;
     private Carrot_Box box_list;
     private IList list_name_animation;
+    private IDictionary obj_list_dance_animation;
     private string s_name_animation_by_temp = "";
     private Carrot_Box_Item item_box_temp=null;
 
+    private string s_act_animation_dance = "002_SIM01_Final";
+    private Act_List_Func func;
+
+    public void on_load()
+    {
+        this.s_act_animation_dance = PlayerPrefs.GetString("act_animation_dance", "002_SIM01_Final");
+    }
+
     public void btn_show_category(Carrot_Box_Item item_set_data)
     {
+        this.func = Act_List_Func.Add_Box_Item;
         this.item_box_temp = item_set_data;
         if (this.list_category_animations == null)
             StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(()=>this.box_list_category()));
@@ -36,6 +45,7 @@ public class character_actions : MonoBehaviour
 
     public void show_list_category()
     {
+        this.func = Act_List_Func.View_Category;
         this.btn_show_category(null);
     }
 
@@ -64,6 +74,8 @@ public class character_actions : MonoBehaviour
                         IDictionary data_anim = (IDictionary) data_animations[y];
                         this.list_name_animation.Add(data_anim["name"].ToString());
                     }
+
+                    if (data_item_anim["name"].ToString() == "Dance") this.obj_list_dance_animation = data_item_anim;
                 }
                 Debug.Log("Download Data Category and list Animation");
                 if (act_call_back != null) act_call_back();
@@ -80,8 +92,11 @@ public class character_actions : MonoBehaviour
     {
         if (this.box_list != null) this.box_list.close();
         this.box_list = this.app.carrot.Create_Box();
-        this.box_list.set_title("List Action Category");
+        this.box_list.set_title(PlayerPrefs.GetString("act","List Action Category"));
         this.box_list.set_icon(this.app.command_storage.sp_icon_action);
+
+        Carrot_Box_Btn_Item btn_buy=this.box_list.create_btn_menu_header(this.app.setting.sp_icon_buy);
+        btn_buy.set_act(() => this.app.buy_product(this.index_product_buy_all_act));
 
         string s_action = PlayerPrefs.GetString("act", "Action");
 
@@ -114,10 +129,10 @@ public class character_actions : MonoBehaviour
         btn_category.set_act(()=>this.btn_show_category(this.item_box_temp));
 
         bool is_unlock_animation = this.app.setting.check_buy_product(this.index_product_buy_all_act);
-        this.list_animations = (IList)data_category["data"];
-        for (int i = 0; i < this.list_animations.Count; i++)
+        IList list_animations = (IList)data_category["data"];
+        for (int i = 0; i <list_animations.Count; i++)
         {
-            IDictionary data_item_anim = (IDictionary)this.list_animations[i];
+            IDictionary data_item_anim = (IDictionary)list_animations[i];
             var s_name = data_item_anim["name"].ToString();
             Carrot_Box_Item item_anim = this.box_list.create_item("item_anim_" + i);
             item_anim.set_title(data_item_anim["name"].ToString());
@@ -158,10 +173,7 @@ public class character_actions : MonoBehaviour
 
             if (is_used)
             {
-                if(this.item_box_temp!=null)
-                    item_anim.set_act(() => this.act_sel_action(s_name));
-                else
-                    item_anim.set_act(() => this.act_test_anim(s_name));
+                item_anim.set_act(() => this.act_sel_action(s_name));
             }
             else
             {
@@ -172,25 +184,51 @@ public class character_actions : MonoBehaviour
                 item_anim.set_act(() => this.act_buy_action(s_name));
             }
 
+            if (this.func == Act_List_Func.Select_Dance_Animation)
+            {
+                if(this.s_act_animation_dance== s_name)
+                {
+                    Carrot_Box_Btn_Item btn_sel = item_anim.create_item();
+                    btn_sel.set_icon(this.app.carrot.icon_carrot_done);
+                    btn_sel.set_color(this.app.carrot.color_highlight);
+                    btn_sel.set_act(() => this.act_test_anim(s_name));
+                    Destroy(btn_sel.GetComponent<Button>());
+                }
+            }
 
             Carrot_Box_Btn_Item btn_test = item_anim.create_item();
             btn_test.set_icon(this.app.player_music.icon_play);
             btn_test.set_color(this.app.carrot.color_highlight);
             btn_test.set_act(() => this.act_test_anim(s_name));
         }
+        this.box_list.update_color_table_row();
     }
 
     private void act_sel_action(string s_name_anim)
     {
         this.app.carrot.play_sound_click();
-        if (this.item_box_temp != null)
+        if (this.func == Act_List_Func.Add_Box_Item)
         {
-            this.item_box_temp.set_type(Box_Item_Type.box_value_txt);
-            this.item_box_temp.check_type();
-            this.item_box_temp.set_val(s_name_anim);
+            if (this.item_box_temp != null)
+            {
+                this.item_box_temp.set_type(Box_Item_Type.box_value_txt);
+                this.item_box_temp.check_type();
+                this.item_box_temp.set_val(s_name_anim);
+                if (this.box_list != null) this.box_list.close();
+            }
         }
- 
-        if (this.box_list != null) this.box_list.close();
+        if (this.func == Act_List_Func.View_Category)
+        {
+            this.act_test_anim(s_name_anim);
+        }
+
+        if (this.func == Act_List_Func.Select_Dance_Animation)
+        {
+            this.s_act_animation_dance = s_name_anim;
+            PlayerPrefs.SetString("act_animation_dance", s_name_anim);
+            if (this.box_list != null) this.box_list.close();
+        }
+        
     }
 
     private void act_buy_action(string s_name_anim)
@@ -296,5 +334,24 @@ public class character_actions : MonoBehaviour
             this.act_sel_action(this.s_name_animation_by_temp);
             this.s_name_animation_by_temp = "";
         }
+    }
+
+    public void show_list_animtion_dance()
+    {
+        this.func = Act_List_Func.Select_Dance_Animation;
+        this.app.carrot.play_sound_click();
+        if(this.obj_list_dance_animation != null)
+        {
+            this.box_list_animation(this.obj_list_dance_animation);
+        }
+        else
+        {
+            StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(this.show_list_animtion_dance));
+        }
+    }
+
+    public void play_animation_dance()
+    {
+        this.play_act_anim(this.s_act_animation_dance);
     }
 }

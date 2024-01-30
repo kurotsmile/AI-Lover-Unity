@@ -20,7 +20,6 @@ public class character_manager : MonoBehaviour
     public string character_name;
     private int sel_character;
     public string[] arr_name_ani_waitting;
-    public string[] arr_name_ani_dance_music;
     public string[] arr_name_ani_stop_dance;
     public string[] arr_name_ani_hit;
     public string[] arr_name_ani_speak;
@@ -235,14 +234,13 @@ public class character_manager : MonoBehaviour
     {
         this.unpause_ani();
         int rand_act = UnityEngine.Random.Range(0, this.arr_name_ani_waitting.Length);
-        if (this.get_npc().gameObject.activeInHierarchy)
-            this.get_anim_character().Play(this.arr_name_ani_waitting[rand_act], 0);
+        if (this.get_npc().gameObject.activeInHierarchy) this.get_anim_character().Play(this.arr_name_ani_waitting[rand_act], 0);
     }
 
     public void play_ani_dance()
     {
         this.unpause_ani();
-        this.get_anim_character().Play(this.arr_name_ani_dance_music[0], 0);
+        this.app.action.play_animation_dance();
     }
 
     public void play_ani_stop_dance()

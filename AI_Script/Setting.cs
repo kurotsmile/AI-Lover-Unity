@@ -885,7 +885,7 @@ public class Setting : MonoBehaviour
         item_shop_ads.set_icon(this.sp_icon_ads);
         item_shop_ads.set_title("Remove Ads");
         item_shop_ads.set_tip("Buy and remove advertising function, No ads in the app");
-        item_shop_ads.set_lang_data("shop_ads", "shop_ads_tip");
+        item_shop_ads.set_lang_data("remove_ads", "remove_ads_tip");
         item_shop_ads.load_lang_data();
         item_shop_ads.set_act(() => this.app.carrot.buy_product(this.app.carrot.index_inapp_remove_ads));
         this.add_btn_buy(item_shop_ads, this.app.carrot.index_inapp_remove_ads);
