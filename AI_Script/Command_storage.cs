@@ -656,10 +656,21 @@ public class Command_storage : MonoBehaviour
     {
         this.app.carrot.play_sound_click();
         IList list_all_name_animations = this.app.action.get_list_all_name_animations();
-        int index_act =UnityEngine.Random.Range(0, list_all_name_animations.Count);
-        this.item_action.set_type(Box_Item_Type.box_value_txt);
-        this.item_action.check_type();
-        this.item_action.set_val(list_all_name_animations[index_act].ToString());
+        if (list_all_name_animations==null)
+        {
+            int index_act = UnityEngine.Random.Range(0,this.app.action.list_anim_act_defalt.Length);
+            this.item_action.set_type(Box_Item_Type.box_value_txt);
+            this.item_action.check_type();
+            this.item_action.set_val(this.app.action.list_anim_act_defalt[index_act]);
+        }
+        else
+        {
+            int index_act = UnityEngine.Random.Range(0, list_all_name_animations.Count);
+            this.item_action.set_type(Box_Item_Type.box_value_txt);
+            this.item_action.check_type();
+            this.item_action.set_val(list_all_name_animations[index_act].ToString());
+        }
+
     }
 
     private void change_face_random()

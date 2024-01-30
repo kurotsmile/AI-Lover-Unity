@@ -226,6 +226,7 @@ public class character_actions : MonoBehaviour
         {
             this.s_act_animation_dance = s_name_anim;
             PlayerPrefs.SetString("act_animation_dance", s_name_anim);
+            if (this.app.player_music.sound_music.isPlaying) this.play_act_anim(s_name_anim);
             if (this.box_list != null) this.box_list.close();
         }
         

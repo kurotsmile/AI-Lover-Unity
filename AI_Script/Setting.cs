@@ -493,7 +493,7 @@ public class Setting : MonoBehaviour
         item_removeads.set_lang_data("shop_ads", "shop_ads_tip");
         item_removeads.load_lang_data();
         Carrot.Carrot_Box_Btn_Item btn_by_ads = item_removeads.create_item();
-        if(this.app.carrot.ads.get_status_ads())
+        if (this.app.carrot.ads.get_status_ads())
             btn_by_ads.set_icon(this.sp_icon_buy);
         else
             btn_by_ads.set_icon(this.app.carrot.icon_carrot_done);
@@ -519,7 +519,7 @@ public class Setting : MonoBehaviour
 
         Carrot_Box_Item item_fb_fanpage = this.box_setting.create_item("item_fb_fanpage");
         item_fb_fanpage.set_icon(this.sp_icon_facebook);
-        item_fb_fanpage.set_title("Virtual lover FanPage");    
+        item_fb_fanpage.set_title("Virtual lover FanPage");
         item_fb_fanpage.set_tip("Facebook fanpage");
         item_fb_fanpage.set_act(() => act_open_fb_fanpage());
         other_group.add_item(item_fb_fanpage);
@@ -584,8 +584,8 @@ public class Setting : MonoBehaviour
         item_gemini_active.load_lang_data();
         item_gemini_active.set_act(() => act_gemini_active());
 
-        this.btn_edit_gemini_active=item_gemini_active.create_item();
-        if(this.app.gemini_AI.is_active)
+        this.btn_edit_gemini_active = item_gemini_active.create_item();
+        if (this.app.gemini_AI.is_active)
             this.btn_edit_gemini_active.set_icon(this.sp_icon_on);
         else
             this.btn_edit_gemini_active.set_icon(this.sp_icon_off);
@@ -647,7 +647,8 @@ public class Setting : MonoBehaviour
         ai_robot_group.add_item(item_popup_voice);
 
         this.box_setting.update_color_table_row();
-    } 
+    }
+
 
     private void play_chat_voice_test()
     {

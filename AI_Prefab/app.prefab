@@ -33967,7 +33967,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
-  url: https://firebasestorage.googleapis.com/v0/b/carrotstore.appspot.com/o/AssetBundle%2Fanimations.ai_lover?alt=media&token=04027061-454e-4261-99b8-0d2ce12e289e
+  url: 
   index_product_buy_act: 8
   index_product_buy_all_act: 9
   list_anim_act_defalt:
