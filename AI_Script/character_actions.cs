@@ -1,5 +1,6 @@
 using Carrot;
 using System.Collections;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -60,6 +61,7 @@ public class character_actions : MonoBehaviour
             {
                 this.app.carrot.hide_loading();
                 this.bundle = DownloadHandlerAssetBundle.GetContent(request);
+                bool is_unlock_animation = this.app.setting.check_buy_product(this.index_product_buy_all_act);
 
                 TextAsset jsonFile = bundle.LoadAsset<TextAsset>("data_animations");
                 string jsonString = jsonFile.text;
@@ -72,7 +74,32 @@ public class character_actions : MonoBehaviour
                     for(int y = 0; y < data_animations.Count; y++)
                     {
                         IDictionary data_anim = (IDictionary) data_animations[y];
-                        this.list_name_animation.Add(data_anim["name"].ToString());
+                        string s_name_item_anim = data_anim["name"].ToString();
+                        bool is_used = false;
+                        if (is_unlock_animation)
+                        {
+                            is_used = true;
+                        }
+                        else
+                        {
+                            if (data_anim["buy"].ToString() != "0")
+                            {
+                                if (PlayerPrefs.GetInt("is_user_act_" + s_name_item_anim) == 1)
+                                {
+                                    is_used = true;
+                                }
+                                else
+                                {
+                                    is_used = false;
+                                }
+                            }
+                            else
+                            {
+                                is_used = true;
+                            }
+                        }
+
+                        if(is_used) this.list_name_animation.Add(s_name_item_anim);
                     }
 
                     if (data_item_anim["name"].ToString() == "Dance") this.obj_list_dance_animation = data_item_anim;
@@ -125,8 +152,19 @@ public class character_actions : MonoBehaviour
         this.box_list.set_title(data_category["name"].ToString());
         this.box_list.set_icon(this.app.command_storage.sp_icon_action);
 
-        Carrot_Box_Btn_Item btn_category = this.box_list.create_btn_menu_header(this.app.carrot.icon_carrot_all_category);
-        btn_category.set_act(()=>this.btn_show_category(this.item_box_temp));
+        if (this.func == Act_List_Func.Select_Dance_Animation)
+        {
+            if (!this.app.setting.check_buy_product(this.index_product_buy_all_act))
+            {
+                Carrot_Box_Btn_Item btn_buy = this.box_list.create_btn_menu_header(this.app.setting.sp_icon_buy);
+                btn_buy.set_act(() => this.app.buy_product(this.index_product_buy_all_act));
+            }
+        }
+        else
+        {
+            Carrot_Box_Btn_Item btn_category = this.box_list.create_btn_menu_header(this.app.carrot.icon_carrot_all_category);
+            btn_category.set_act(() => this.btn_show_category(this.item_box_temp));
+        }
 
         bool is_unlock_animation = this.app.setting.check_buy_product(this.index_product_buy_all_act);
         IList list_animations = (IList)data_category["data"];

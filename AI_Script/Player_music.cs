@@ -52,6 +52,8 @@ public class Player_music : MonoBehaviour
     public GameObject button_add_playlist;
     public GameObject prefab_item_lyrics;
 
+    public GameObject obj_btn_nex_mini_player;
+
     private byte[] data_mp3;
     private byte[] data_avatar;
     private string s_link_download_mp3;
@@ -105,6 +107,12 @@ public class Player_music : MonoBehaviour
 
         this.id_music = data_music["id"].ToString();
         this.sel_index_music = int.Parse(data_music["index"].ToString());
+
+        this.obj_btn_nex_mini_player.SetActive(false);
+        if (this.playlist.list_music_cur != null)
+        {
+            if (this.playlist.list_music_cur.Count > 0) this.obj_btn_nex_mini_player.SetActive(true);
+        }
 
         if (data_music["name"] != null)
         {

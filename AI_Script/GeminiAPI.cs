@@ -54,7 +54,7 @@ public class GeminiAPI : MonoBehaviour
                 chat_ai["key"] = userMessage;
                 chat_ai["msg"] = chat_ai["text"].ToString();
                 chat_ai["face"] = UnityEngine.Random.Range(0, 18).ToString();
-                chat_ai["action"] = UnityEngine.Random.Range(0, 41).ToString();
+                chat_ai["action"] = UnityEngine.Random.Range(0, this.app.action.list_anim_act_defalt.Length).ToString();
 
                 Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                 chat_ai["color"] = "#" + ColorUtility.ToHtmlStringRGBA(color_icon);

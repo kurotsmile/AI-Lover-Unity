@@ -1451,14 +1451,15 @@ public class Command_storage : MonoBehaviour
     #region Query Key Setting
     public void show_setting_query_key()
     {
-        this.box_add_chat = this.app.carrot.Create_Box("Query Key Setting");
+        this.box_add_chat = this.app.carrot.Create_Box("query_key_setting");
+        this.box_add_chat.set_title(PlayerPrefs.GetString("cm_query_setting", "Customize command query keywords"));
         this.box_add_chat.set_icon(this.app.carrot.sp_icon_dev);
         this.list_item_key_query = new List<Carrot_Box_Item>();
         string s_data_querys_song = this.app.player_music.playlist.get_data_key_query_music();
         if (s_data_querys_song=="")
         {
             Carrot_Box_Item item_key_query=this.box_add_chat.create_item("item_key_0");
-            item_key_query.set_title("Key Query");
+            item_key_query.set_title(PlayerPrefs.GetString("music", "Music"));
             item_key_query.set_icon(this.app.command_storage.sp_icon_key);
             item_key_query.set_tip("Keyword used to open the song by name");
             item_key_query.set_type(Box_Item_Type.box_value_input);
@@ -1471,13 +1472,14 @@ public class Command_storage : MonoBehaviour
             for(int i = 0; i < list_key.Length; i++)
             {
                 var index_item = i;
+                string s_name_query = list_key[i].ToString();
                 Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_"+i);
                 item_key_query.set_icon(this.app.command_storage.sp_icon_key);
-                item_key_query.set_title("Key Query ("+(i+1)+")");
-                item_key_query.set_tip(list_key[i].ToString()+" {song_name} -> Keyword used to open the song by name");
+                item_key_query.set_title(PlayerPrefs.GetString("music", "Music")+"("+(i+1)+")");
+                item_key_query.set_tip(s_name_query + " {song_name} -> Keyword used to open the song by name");
                 item_key_query.set_type(Box_Item_Type.box_value_input);
                 item_key_query.check_type();
-                item_key_query.set_val(list_key[i].ToString());
+                item_key_query.set_val(s_name_query);
                 this.list_item_key_query.Add(item_key_query);
 
                 Carrot_Box_Btn_Item btn_del = item_key_query.create_item();
@@ -1518,7 +1520,7 @@ public class Command_storage : MonoBehaviour
         this.app.carrot.play_sound_click();
         Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_" + this.list_item_key_query.Count);
         item_key_query.set_icon(this.app.command_storage.sp_icon_key);
-        item_key_query.set_title("Key Query (" + (this.list_item_key_query.Count+1) + ")");
+        item_key_query.set_title(PlayerPrefs.GetString("music", "Music") + "(" + (this.list_item_key_query.Count + 1) + ")");
         item_key_query.set_tip("Keyword used to open the song by name");
         item_key_query.set_type(Box_Item_Type.box_value_input);
         item_key_query.check_type();
