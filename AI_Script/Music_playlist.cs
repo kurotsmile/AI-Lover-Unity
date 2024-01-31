@@ -129,15 +129,23 @@ public class Music_playlist : MonoBehaviour
 
     public void show_list_music_online()
     {
-        if (this.list_music_online!=null)
+        if (this.app.carrot.is_online())
         {
-            this.type = Playlist_Type.online;
-            this.box_list_song(this.list_music_online);
+            if (this.list_music_online != null)
+            {
+                this.type = Playlist_Type.online;
+                this.box_list_song(this.list_music_online);
+            }
+            else
+            {
+                this.get_data_list_playlist(this.app.carrot.lang.get_key_lang(), this.show_list_music_online);
+            }
         }
         else
         {
-            this.get_data_list_playlist(this.app.carrot.lang.get_key_lang(), this.show_list_music_online);
+            this.show_playlist();
         }
+
     }
 
     public void btn_show_seach_music()

@@ -119,4 +119,9 @@ public class GeminiAPI : MonoBehaviour
         else
             this.key_api = this.key_api_default;
     }
+
+    public void stop_All_Action()
+    {
+        this.StopAllCoroutines();
+    }
 }

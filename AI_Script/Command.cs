@@ -327,6 +327,7 @@ public class Command : MonoBehaviour
         {
             Destroy(this.item_command_loading);
             this.app.open_AI.stop_All_Action();
+            this.app.gemini_AI.stop_All_Action();
         }
         this.item_command_loading = Instantiate(this.prefab_item_command_loading);
         this.item_command_loading.transform.SetParent(this.area_body_log_command);

@@ -670,7 +670,6 @@ public class Command_storage : MonoBehaviour
             this.item_action.check_type();
             this.item_action.set_val(list_all_name_animations[index_act].ToString());
         }
-
     }
 
     private void change_face_random()
