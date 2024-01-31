@@ -33447,6 +33447,7 @@ MonoBehaviour:
   - sys_turn_on_flashlight
   - sys_turn_off_flashlight
   - sys_open_app_link_bundleId
+  - fnc_open_shop
   obj_button_next_command_test: {fileID: 249239798421708654}
   obj_button_prev_command_test: {fileID: 6492396854497497505}
   obj_button_prev_command_replay: {fileID: 6680625288135196851}
@@ -33553,8 +33554,8 @@ MonoBehaviour:
   - act_tip
   - cm_del
   - cm_del_tip
-  - cm_del_tip
-  - cm_del_tip
+  - cm_query_setting
+  - cm_query_setting_tip
   emp:
   - {fileID: 2755477471232854845}
   - {fileID: 2755477471318803740}
@@ -33606,8 +33607,8 @@ MonoBehaviour:
   - {fileID: 7295960979910211128}
   - {fileID: 7624045730587415140}
   - {fileID: 7307796838524570101}
-  - {fileID: 7307796838524570101}
-  - {fileID: 7307796838524570101}
+  - {fileID: 7689608996661031315}
+  - {fileID: 6012707852248946808}
   List_img_change_icon_lang:
   - {fileID: 2755477472231957537}
 --- !u!114 &5998282485210906143

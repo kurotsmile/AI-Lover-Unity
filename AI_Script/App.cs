@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Carrot;
+using System;
 using System.Collections;
 using TextSpeech;
 using UnityEngine;
@@ -188,6 +189,7 @@ public class App : MonoBehaviour
 
     public void load(string s_data_lang)
     {
+        this.GetComponent<Carrot_lang_show>().load_lang_emp();
         this.panel_main.SetActive(true);
         this.load_weather();
         this.get_character().gameObject.SetActive(true);
