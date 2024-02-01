@@ -1,51 +1,44 @@
 using System;
 using UnityEngine;
+using UnityEngine.Android;
+
 public class Utility_Tool : MonoBehaviour
 {
     public String[] list_name_action;
-
-    private AndroidJavaObject camera1;
+#if UNITY_ANDROID
+    public AndroidJavaClass javaObject;
+#endif
 
     public void on_Flashlight()
     {
-        AndroidJavaClass cameraClass = new AndroidJavaClass("android.hardware.Camera");
-        WebCamDevice[] devices = WebCamTexture.devices;
-
-        int camID = 0;
-        camera1 = cameraClass.CallStatic<AndroidJavaObject>("open", camID);
-
-        if (camera1 != null)
-        {
-            AndroidJavaObject cameraParameters = camera1.Call<AndroidJavaObject>("getParameters");
-            cameraParameters.Call("setFlashMode", "torch");
-            camera1.Call("setParameters", cameraParameters);
-            camera1.Call("startPreview");
-        }
-        else
-        {
-            Debug.LogError("[CameraParametersAndroid] Camera not available");
-        }
+#if UNITY_ANDROID
+        javaObject.CallStatic("on", GetUnityActivity());
+#endif
     }
 
     public void off_Flashlight()
-    { 
-        if (camera1 != null)
-        {
-            camera1.Call("stopPreview");
-            camera1.Call("release");
-        }
-        else
-        {
-            Debug.LogError("[CameraParametersAndroid] Camera not available");
-        }
+    {
+#if UNITY_ANDROID
+        javaObject.CallStatic("off", GetUnityActivity());
+#endif
     }
-
-
 
     public void on_load()
     {
-
+#if UNITY_ANDROID
+        javaObject = new AndroidJavaClass("com.myflashlight.flashlightlib.Flashlight");
+#endif
     }
+
+#if UNITY_ANDROID
+    AndroidJavaObject GetUnityActivity()
+    {
+        using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+        {
+            return unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        }
+    }
+#endif
 
     public void open_content_Intent(string s_action = "android.settings.SETTINGS")
     {
@@ -65,7 +58,7 @@ public class Utility_Tool : MonoBehaviour
         AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
         AndroidJavaObject packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
 
-        AndroidJavaObject launchIntent= packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", bundleId);
+        AndroidJavaObject launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", bundleId);
         ca.Call("startActivity", launchIntent);
         up.Dispose();
         ca.Dispose();

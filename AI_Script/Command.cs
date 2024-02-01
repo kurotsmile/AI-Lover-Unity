@@ -413,6 +413,7 @@ public class Command : MonoBehaviour
 
         this.data_chat_cur = data_chat;
         this.app.panel_main.SetActive(true);
+        this.app.textToSpeech.StopSpeak();
 
         if (data_chat["id"] != null)
         {
