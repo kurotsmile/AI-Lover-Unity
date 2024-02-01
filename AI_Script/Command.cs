@@ -877,6 +877,20 @@ public class Command : MonoBehaviour
                                 if (sp_icon_chat != null) item_field.set_icon_white(sp_icon_chat);
                             }
                         }
+                        else if (s_key == "func")
+                        {
+                            s_field_title = PlayerPrefs.GetString("cm_func_app", "Program control");
+                            item_field.set_icon(this.app.command_storage.sp_icon_func);
+                            try
+                            {
+                                int index_name_func = int.Parse(s_data_val);
+                                s_field_val = this.app.command_storage.func_app_name[index_name_func];
+                            }
+                            catch (System.Exception e)
+                            {
+                                s_field_val = "None";
+                            }
+                        }
                         else if(s_key== "reports")
                         {
                             IList list_report = (IList)data_chat["reports"];
