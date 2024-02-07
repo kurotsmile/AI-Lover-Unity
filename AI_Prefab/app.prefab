@@ -33448,6 +33448,7 @@ MonoBehaviour:
   - sys_turn_off_flashlight
   - sys_open_app_link_bundleId
   - fnc_open_shop
+  - test_audio
   obj_button_next_command_test: {fileID: 249239798421708654}
   obj_button_prev_command_test: {fileID: 6492396854497497505}
   obj_button_prev_command_replay: {fileID: 6680625288135196851}
@@ -33873,6 +33874,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc562c5085535934f8ed9e555fdc07f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bs: {fileID: 0}
+  app: {fileID: 2755477471257207454}
   list_name_action:
   - android.app.action.SET_NEW_PASSWORD
   - android.intent.action.DIAL
@@ -33964,6 +33967,71 @@ MonoBehaviour:
   - android.settings.panel.action.NFC
   - android.settings.panel.action.VOLUME
   - android.settings.panel.action.WIFI
+  list_package_action:
+  - com.zing.zalo
+  - com.ss.android.ugc.trill
+  - com.zhiliaoapp.musically.go
+  - com.facebook.orca
+  - com.zing.mp3
+  - com.lemon.lvoverseas
+  - vn.tiki.app.tikiandroid
+  - free.tube.premium.advanced.tuber
+  - org.telegram.messenger
+  - com.mm.android.smartlifeiot
+  - com.grabtaxi.passenger
+  - com.instagram.android
+  - com.cloudflare.onedotonedotonedotone
+  - sg.bigo.live
+  - com.duolingo
+  - com.tinder
+  - com.twitter.android
+  - com.discord
+  - com.valvesoftware.android.steam.community
+  - vn.fimplus.app.and
+  - com.yy.hiyo
+  - com.bstar.intl
+  - us.nobarriers.elsa
+  - jp.naver.line.android
+  - com.tencent.mm
+  - com.gsm.customer
+  - com.spotify.music
+  - com.spotify.lite
+  - us.zoom.videomeetings
+  - com.netflix.mediaclient
+  - com.snapchat.android
+  - com.whatsapp
+  - com.truecaller
+  - com.lazada.android
+  - com.shopee.vn
+  - com.shopeepay.merchant.vn
+  - com.chotot.vn
+  - com.mservice.momotransfer
+  - com.bplus.vtpay
+  - com.vnid
+  - com.mbmobile
+  - com.vnpay.Agribank3g
+  - com.VCB
+  - com.vietinbank.ipay
+  - vn.com.techcombank.bb.app
+  - vn.homecredit.capp
+  - vn.shb.mbanking
+  - mobile.acb.com.vn
+  - com.supercell.clashofclans
+  - com.dts.freefireth
+  - com.riotgames.league.wildrift
+  - com.roblox.client
+  - com.garena.game.kgvn
+  - com.outfit7.mytalkingtomfree
+  - com.netease.partygloba
+  - gsn.game.zingplaynew
+  - com.football.soccer.league
+  - com.igg.android.lordsmobilevn
+  - com.moonactive.coinmaster
+  - com.vng.pubgmobile
+  - com.miHoYo.GenshinImpact.vn
+  - com.king.candycrushsaga
+  - com.innersloth.spacemafia
+  - com.vng.codmvn
 --- !u!114 &1793282830951987721
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -9,7 +9,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public enum Command_Type_Act {
+public enum Command_Type_Act
+{
     add_command,
     edit_command,
     edit_pass,
@@ -23,17 +24,17 @@ public struct chat
 {
     public string id { get; set; }
     [FirestoreProperty]
-    public string key {get; set;}
+    public string key { get; set; }
     [FirestoreProperty]
-    public string msg {get; set;}
+    public string msg { get; set; }
     [FirestoreProperty]
-    public string act {get; set;}
+    public string act { get; set; }
     [FirestoreProperty]
-    public string face {get; set;}
+    public string face { get; set; }
     [FirestoreProperty]
     public string limit { get; set; }
     [FirestoreProperty]
-    public string mp3 {get; set;}
+    public string mp3 { get; set; }
     [FirestoreProperty]
     public string sex_user { get; set; }
     [FirestoreProperty]
@@ -203,7 +204,7 @@ public class Command_storage : MonoBehaviour
         this.show_edit_by_data(data_new_chat);
     }
 
-    public void show_add_command_with_pater_and_keyword(string s_key,string s_chat, string pater)
+    public void show_add_command_with_pater_and_keyword(string s_key, string s_chat, string pater)
     {
         this.reset_all_s_data();
         this.type_act = Command_Type_Act.add_command;
@@ -218,7 +219,7 @@ public class Command_storage : MonoBehaviour
     {
         this.reset_all_s_data();
         this.type_act = Command_Type_Act.add_command;
-        IDictionary data_new_chat = (IDictionary) Carrot.Json.Deserialize("{}");
+        IDictionary data_new_chat = (IDictionary)Carrot.Json.Deserialize("{}");
         data_new_chat["key"] = "";
         this.show_edit_by_data(data_new_chat);
     }
@@ -232,7 +233,7 @@ public class Command_storage : MonoBehaviour
         this.show_edit_by_data(data_new_chat);
     }
 
-    public void show_edit_command(int index,Carrot_Box_Item item_edit)
+    public void show_edit_command(int index, Carrot_Box_Item item_edit)
     {
         this.reset_all_s_data();
         this.item_command_edit_temp = item_edit;
@@ -257,7 +258,7 @@ public class Command_storage : MonoBehaviour
         this.show_edit_by_data(data_chat);
     }
 
-    public void show_edit_dev(IDictionary data_chat,Carrot_Box_Item item_edit)
+    public void show_edit_dev(IDictionary data_chat, Carrot_Box_Item item_edit)
     {
         this.reset_all_s_data();
         this.type_act = Command_Type_Act.add_command;
@@ -433,14 +434,14 @@ public class Command_storage : MonoBehaviour
         if (data_chat["act"] != null)
         {
             string s_act = data_chat["act"].ToString();
-            if (s_act!= "")
+            if (s_act != "")
             {
                 this.item_action.set_val(s_act);
                 item_action.set_type(Carrot.Box_Item_Type.box_value_txt);
                 item_action.check_type();
             }
         }
-        item_action.set_act(()=>this.app.action.btn_show_category(item_action));
+        item_action.set_act(() => this.app.action.btn_show_category(item_action));
 
         Carrot.Carrot_Box_Btn_Item btn_act_list = this.item_action.create_item();
         btn_act_list.set_icon(this.app.carrot.icon_carrot_all_category);
@@ -549,7 +550,7 @@ public class Command_storage : MonoBehaviour
             if (sp_icon != null) this.item_icon.set_icon_white(sp_icon);
         }
 
-        if (this.app.icon.count_icon_name()>0)
+        if (this.app.icon.count_icon_name() > 0)
         {
             Carrot_Box_Btn_Item btn_icon_random = this.item_icon.create_item();
             btn_icon_random.set_icon(this.sp_icon_random);
@@ -656,9 +657,9 @@ public class Command_storage : MonoBehaviour
     {
         this.app.carrot.play_sound_click();
         IList list_all_name_animations = this.app.action.get_list_all_name_animations();
-        if (list_all_name_animations==null)
+        if (list_all_name_animations == null)
         {
-            int index_act = UnityEngine.Random.Range(0,this.app.action.list_anim_act_defalt.Length);
+            int index_act = UnityEngine.Random.Range(0, this.app.action.list_anim_act_defalt.Length);
             this.item_action.set_type(Box_Item_Type.box_value_txt);
             this.item_action.check_type();
             this.item_action.set_val(this.app.action.list_anim_act_defalt[index_act]);
@@ -700,7 +701,7 @@ public class Command_storage : MonoBehaviour
                 this.item_icon.img_icon.color = Color.black;
             }
             this.item_icon.txt_val.color = color_icon;
-            this.s_color = "#"+ColorUtility.ToHtmlStringRGBA(color_icon);
+            this.s_color = "#" + ColorUtility.ToHtmlStringRGBA(color_icon);
         }
     }
 
@@ -708,28 +709,28 @@ public class Command_storage : MonoBehaviour
     {
         string s_val_sex = "";
 
-        if (item_sex_sel.name == "item_character_sex") s_val_sex=this.s_sex_character;
-        if (item_sex_sel.name == "item_user_sex") s_val_sex=this.s_sex_user;
+        if (item_sex_sel.name == "item_character_sex") s_val_sex = this.s_sex_character;
+        if (item_sex_sel.name == "item_user_sex") s_val_sex = this.s_sex_user;
 
         this.box_sex_sel_chat = this.app.carrot.Create_Box("sel_sex");
         this.box_sex_sel_chat.set_title(item_sex_sel.txt_name.text);
         this.box_sex_sel_chat.set_icon(item_sex_sel.img_icon.sprite);
 
-        Carrot.Carrot_Box_Item item_sex_boy= this.box_sex_sel_chat.create_item("item_sex_boy");
+        Carrot.Carrot_Box_Item item_sex_boy = this.box_sex_sel_chat.create_item("item_sex_boy");
         item_sex_boy.set_icon(this.app.setting.sp_icon_sex_boy);
-        item_sex_boy.set_title(PlayerPrefs.GetString("user_sex_boy","Boy"));
+        item_sex_boy.set_title(PlayerPrefs.GetString("user_sex_boy", "Boy"));
         item_sex_boy.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
         item_sex_boy.set_act(() => this.act_sel_sex_chat(item_sex_sel, "0"));
 
         if (s_val_sex == "0")
         {
-            Carrot_Box_Btn_Item btn_sel=item_sex_boy.create_item();
+            Carrot_Box_Btn_Item btn_sel = item_sex_boy.create_item();
             btn_sel.set_icon(this.app.carrot.icon_carrot_done);
             btn_sel.set_icon_color(this.app.carrot.color_highlight);
             btn_sel.set_color(Color.white);
         }
 
-        Carrot.Carrot_Box_Item item_sex_girl= this.box_sex_sel_chat.create_item("item_sex_girl");
+        Carrot.Carrot_Box_Item item_sex_girl = this.box_sex_sel_chat.create_item("item_sex_girl");
         item_sex_girl.set_icon(this.app.setting.sp_icon_sex_girl);
         item_sex_girl.set_title(PlayerPrefs.GetString("user_sex_girl", "Girl"));
         item_sex_girl.set_tip(PlayerPrefs.GetString("user_sex_girl", "Female"));
@@ -747,10 +748,10 @@ public class Command_storage : MonoBehaviour
     private void act_sel_sex_chat(Carrot_Box_Item item_sex_sel, string s_val_sex)
     {
         this.app.carrot.play_sound_click();
-        if(item_sex_sel.name== "item_character_sex") this.s_sex_character = s_val_sex;
-        if(item_sex_sel.name == "item_user_sex") this.s_sex_user = s_val_sex;
+        if (item_sex_sel.name == "item_character_sex") this.s_sex_character = s_val_sex;
+        if (item_sex_sel.name == "item_user_sex") this.s_sex_user = s_val_sex;
 
-        if (s_val_sex=="0")
+        if (s_val_sex == "0")
             item_sex_sel.set_tip(PlayerPrefs.GetString("user_sex_boy", "Boy"));
         else
             item_sex_sel.set_tip(PlayerPrefs.GetString("user_sex_girl", "Girl"));
@@ -770,7 +771,7 @@ public class Command_storage : MonoBehaviour
 
     public void add_command_offline(IDictionary data_chat)
     {
-        if (this.get_cm_by_id(data_chat["id"].ToString())==null)
+        if (this.get_cm_by_id(data_chat["id"].ToString()) == null)
         {
             string s = Carrot.Json.Serialize(data_chat);
             this.add_command_offline(s);
@@ -787,11 +788,12 @@ public class Command_storage : MonoBehaviour
     public IDictionary act_call_cm_offline(string cm_cmd, string id_pather = "")
     {
         cm_cmd = cm_cmd.ToLower();
+        
         List<IDictionary> list_chat = new List<IDictionary>();
         for (int i = 0; i < this.length; i++)
         {
             string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
-            if (s_data!= "")
+            if (s_data != "")
             {
                 IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
                 data_chat["index_cm"] = i;
@@ -803,12 +805,14 @@ public class Command_storage : MonoBehaviour
                 {
                     if (cm_cmd.Equals(data_chat["key"].ToString().ToLower()) && data_chat["pater"].ToString() == id_pather) list_chat.Add(data_chat);
                 }
-            }  
+            }
         }
+
+        Debug.Log("act_call_cm_offline found " + list_chat.Count+" pater:"+id_pather+" length:"+this.length+" lang:"+this.app.carrot.lang.get_key_lang()+" user:"+this.app.setting.get_user_sex()+" char:"+this.app.setting.get_character_sex());
 
         if (list_chat.Count > 0)
         {
-            if (list_chat.Count==1)
+            if (list_chat.Count == 1)
             {
                 return list_chat[0];
             }
@@ -826,7 +830,7 @@ public class Command_storage : MonoBehaviour
         for (int i = 0; i < this.length; i++)
         {
             string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
-            if(s_data!="")
+            if (s_data != "")
             {
                 IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
                 if (data_chat["id"].ToString() == id_chat) return data_chat;
@@ -838,13 +842,14 @@ public class Command_storage : MonoBehaviour
     [ContextMenu("Delete all command")]
     public void delete_all_cm()
     {
-        for(int i = 0; i < this.length; i++)  this.act_delete_cm(i);
+        for (int i = 0; i < this.length; i++) this.act_delete_cm(i);
         this.length = 0;
-        PlayerPrefs.SetInt("cm_length",0);
-        string s_title=PlayerPrefs.GetString("brain_list", "List command");
+        PlayerPrefs.SetInt("cm_length", 0);
+        string s_title = PlayerPrefs.GetString("brain_list", "List command");
         this.app.carrot.show_msg(s_title, "Delete all command success!!!");
         this.check_load_command_storage();
         this.app.command_dev.close_all_box();
+        this.app.command.clear_log_chat();
     }
 
     public void show_list_cm(string s_type)
@@ -905,7 +910,7 @@ public class Command_storage : MonoBehaviour
             IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
             if (data_chat["status"] != null)
             {
-                if (data_chat["status"].ToString()=="buy")
+                if (data_chat["status"].ToString() == "buy")
                 {
                     data_chat["index_cm"] = i;
                     list_cm.Add(data_chat);
@@ -915,7 +920,7 @@ public class Command_storage : MonoBehaviour
         return list_cm;
     }
 
-    public void delete_cm(int index,GameObject obj_item)
+    public void delete_cm(int index, GameObject obj_item)
     {
         this.act_delete_cm(index);
         if (obj_item != null)
@@ -963,13 +968,13 @@ public class Command_storage : MonoBehaviour
 
     public void hide_box_add()
     {
-        if(this.box_add_chat!=null) this.box_add_chat.gameObject.SetActive(false);
+        if (this.box_add_chat != null) this.box_add_chat.gameObject.SetActive(false);
     }
 
     #region Mode Test Command
     public void btn_test_command()
     {
-        if (this.item_msg.get_val()=="")
+        if (this.item_msg.get_val() == "")
         {
             this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("error_null_key_and_msg", "Your keywords and content can't be blank!"));
             return;
@@ -984,7 +989,7 @@ public class Command_storage : MonoBehaviour
 
     public void play_one_test_command(IDictionary data_chat)
     {
-        data_chat["status"]= "test";
+        data_chat["status"] = "test";
         this.app.command_dev.set_all_box_active(false);
         this.act_test_command(data_chat);
     }
@@ -1010,9 +1015,9 @@ public class Command_storage : MonoBehaviour
     {
         this.data_chat_test = data_chat;
         this.obj_button_prev_command_replay.SetActive(true);
-        if (data_chat["status"].ToString()== "test_list")
+        if (data_chat["status"].ToString() == "test_list")
         {
-            if(data_chat["index_list"]!=null) this.index_command_test_play = int.Parse(data_chat["index_list"].ToString());
+            if (data_chat["index_list"] != null) this.index_command_test_play = int.Parse(data_chat["index_list"].ToString());
             this.obj_button_next_command_test.SetActive(true);
             this.obj_button_prev_command_test.SetActive(true);
         }
@@ -1028,21 +1033,21 @@ public class Command_storage : MonoBehaviour
         this.app.panel_inp_msg.SetActive(false);
         this.app.panel_chat_func.SetActive(false);
         this.app.panel_chat_msg.SetActive(true);
-        if(this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.app.panel_menu_right.SetActive(false);
+        if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.app.panel_menu_right.SetActive(false);
         this.app.command.act_chat(data_chat, false);
     }
 
     public void btn_play_next_command_test()
     {
         this.index_command_test_play++;
-        if (this.index_command_test_play >=this.app.command_dev.length_list_test()) this.index_command_test_play=0;
+        if (this.index_command_test_play >= this.app.command_dev.length_list_test()) this.index_command_test_play = 0;
         this.app.command_dev.act_play_test_list(this.index_command_test_play);
     }
 
     public void btn_play_prev_command_test()
     {
         this.index_command_test_play--;
-        if (this.index_command_test_play < 0) this.index_command_test_play=(this.app.command_dev.length_list_test()-1);
+        if (this.index_command_test_play < 0) this.index_command_test_play = (this.app.command_dev.length_list_test() - 1);
         this.app.command_dev.act_play_test_list(this.index_command_test_play);
     }
     #endregion
@@ -1058,7 +1063,7 @@ public class Command_storage : MonoBehaviour
         this.item_run_control.gameObject.SetActive(false);
         this.item_character_sex.gameObject.SetActive(false);
         this.item_user_sex.gameObject.SetActive(false);
-        if(this.item_user_create!=null) this.item_user_create.gameObject.SetActive(false);
+        if (this.item_user_create != null) this.item_user_create.gameObject.SetActive(false);
     }
 
     private void act_box_add_model_advanced()
@@ -1066,7 +1071,7 @@ public class Command_storage : MonoBehaviour
         this.is_cm_mode_nomal = false;
         this.btn_model_advanced.set_icon_color(this.app.carrot.color_highlight);
         this.btn_model_nomal.set_icon_color(Color.black);
-        PlayerPrefs.SetInt("is_cm_mode_nomal",1);
+        PlayerPrefs.SetInt("is_cm_mode_nomal", 1);
         this.item_icon.gameObject.SetActive(true);
         this.item_run_cmd.gameObject.SetActive(true);
         this.item_run_control.gameObject.SetActive(true);
@@ -1094,7 +1099,7 @@ public class Command_storage : MonoBehaviour
 
     private string check_keyblock(string s_key_check)
     {
-        foreach(string s_key in this.list_key_block)
+        foreach (string s_key in this.list_key_block)
         {
             if (s_key_check.ToLower().Equals(s_key.ToLower()) || s_key_check.ToLower().Contains(s_key.ToLower()))
             {
@@ -1118,7 +1123,7 @@ public class Command_storage : MonoBehaviour
             link = this.item_run_cmd.get_val(),
             color = this.s_color,
             icon = this.s_id_icon,
-            status =this.s_status,
+            status = this.s_status,
             func = this.item_run_control.get_val(),
             date_create = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ")
         };
@@ -1156,13 +1161,13 @@ public class Command_storage : MonoBehaviour
 
     private IDictionary get_data_chat_editor()
     {
-        IDictionary data_chat = (IDictionary) Json.Deserialize("{}");
-        if(this.s_id!="")
+        IDictionary data_chat = (IDictionary)Json.Deserialize("{}");
+        if (this.s_id != "")
             data_chat["id"] = this.s_id;
         else
-            data_chat["id"] = "chat"+this.app.carrot.generateID();
+            data_chat["id"] = "chat" + this.app.carrot.generateID();
 
-        if (this.item_keyword!=null) data_chat["key"] = this.item_keyword.get_val();
+        if (this.item_keyword != null) data_chat["key"] = this.item_keyword.get_val();
         data_chat["msg"] = this.item_msg.get_val();
         data_chat["act"] = this.item_action.get_val();
         data_chat["face"] = this.item_face.get_val();
@@ -1175,10 +1180,10 @@ public class Command_storage : MonoBehaviour
         data_chat["sex_character"] = this.s_sex_character;
         data_chat["sex_user"] = this.s_sex_user;
 
-        IDictionary data_user = (IDictionary) Json.Deserialize(JsonConvert.SerializeObject(this.get_user_data_editor(this.s_user_id)));
+        IDictionary data_user = (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(this.get_user_data_editor(this.s_user_id)));
         data_chat["user"] = data_user;
-        if (this.s_status!="") 
-            data_chat["status"]=this.s_status;
+        if (this.s_status != "")
+            data_chat["status"] = this.s_status;
         else
             data_chat["status"] = "pending";
         return data_chat;
@@ -1187,32 +1192,32 @@ public class Command_storage : MonoBehaviour
     private void act_done_submit_command()
     {
         this.app.carrot.show_loading();
-        
+
         if (this.type_act == Command_Type_Act.add_command)
         {
             chat c = this.get_data_chat();
             string s_error_key_block = this.check_keyblock(this.item_keyword.get_val());
 
-            if(this.item_keyword.get_val().Trim().Length==0|| this.item_msg.get_val().Trim().Length == 0)
+            if (this.item_keyword.get_val().Trim().Length == 0 || this.item_msg.get_val().Trim().Length == 0)
             {
                 this.app.carrot.hide_loading();
                 this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("error_null_key_and_msg", "Your keywords and content can't be blank!"));
                 return;
             }
 
-            if (s_error_key_block!="")
+            if (s_error_key_block != "")
             {
                 this.app.carrot.hide_loading();
-                this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"),PlayerPrefs.GetString("keyblock_keyword_error", "Added keyword is forbidden, please add more content ("+ s_error_key_block+")"));
+                this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("keyblock_keyword_error", "Added keyword is forbidden, please add more content (" + s_error_key_block + ")"));
                 return;
             }
 
             s_error_key_block = this.check_keyblock(this.item_msg.get_val());
 
-            if (s_error_key_block!="")
+            if (s_error_key_block != "")
             {
                 this.app.carrot.hide_loading();
-                this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("keyblock_msg_error", "Keyword add in response forbidden content, please add more content (" +s_error_key_block+")"));
+                this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("keyblock_msg_error", "Keyword add in response forbidden content, please add more content (" + s_error_key_block + ")"));
                 return;
             }
 
@@ -1302,7 +1307,7 @@ public class Command_storage : MonoBehaviour
         }
 
         if (this.box_add_chat != null) this.box_add_chat.close();
-        if (this.app.carrot.model_app==ModelApp.Publish) this.app.carrot.ads.show_ads_Interstitial();
+        if (this.app.carrot.model_app == ModelApp.Publish) this.app.carrot.ads.show_ads_Interstitial();
     }
 
     private void act_del_patert_chat()
@@ -1314,27 +1319,27 @@ public class Command_storage : MonoBehaviour
 
     public void btn_add_key_tag(string s_tag)
     {
-        string s_val= this.item_msg.get_val() + " " + s_tag + " ";
+        string s_val = this.item_msg.get_val() + " " + s_tag + " ";
         this.item_msg.set_val(s_val);
         if (this.box_parameter_tag != null) this.box_parameter_tag.close();
     }
 
     private void show_list_parameter_tag()
     {
-        this.box_parameter_tag=this.app.carrot.Create_Box("list_tag");   
+        this.box_parameter_tag = this.app.carrot.Create_Box("list_tag");
         this.box_parameter_tag.set_title("Parameter Tag");
         this.box_parameter_tag.set_icon(this.sp_icon_parameter_tag);
 
-        for(int i = 0; i < this.list_parameter_tag_name.Length; i++)
+        for (int i = 0; i < this.list_parameter_tag_name.Length; i++)
         {
             var s_tag = this.list_parameter_tag_name[i];
-            Carrot.Carrot_Box_Item item_tag=this.box_parameter_tag.create_item("item_tag_" + i);
+            Carrot.Carrot_Box_Item item_tag = this.box_parameter_tag.create_item("item_tag_" + i);
             item_tag.set_icon(this.sp_icon_parameter_tag);
             item_tag.set_title(this.list_parameter_tag_name[i]);
             item_tag.set_tip(this.list_parameter_tag_val[i]);
             item_tag.set_act(() => btn_add_key_tag(s_tag));
 
-            Carrot.Carrot_Box_Btn_Item btn_add_tag =item_tag.create_item();
+            Carrot.Carrot_Box_Btn_Item btn_add_tag = item_tag.create_item();
             btn_add_tag.set_icon(this.sp_icon_add_chat);
             btn_add_tag.set_color(this.GetComponent<App>().carrot.color_highlight);
             Destroy(btn_add_tag.GetComponent<UnityEngine.UI.Button>());
@@ -1349,22 +1354,22 @@ public class Command_storage : MonoBehaviour
         }
 
         Carrot.Carrot_Box box_list_key = this.app.carrot.Create_Box("key_block");
-        box_list_key.set_title(PlayerPrefs.GetString("list_banned_keywords","List of prohibited keywords"));
+        box_list_key.set_title(PlayerPrefs.GetString("list_banned_keywords", "List of prohibited keywords"));
         box_list_key.set_icon(this.app.carrot.icon_carrot_bug);
 
-        for(int i = 0; i < this.list_key_block.Count; i++)
+        for (int i = 0; i < this.list_key_block.Count; i++)
         {
-            Carrot.Carrot_Box_Item item_key=box_list_key.create_item("key_block_" + i);
+            Carrot.Carrot_Box_Item item_key = box_list_key.create_item("key_block_" + i);
             item_key.set_icon(this.sp_icon_key);
             item_key.set_title(this.list_key_block[i].ToString());
             item_key.set_tip(this.list_key_block[i].ToString());
-        } 
+        }
     }
 
     private void act_translate(string s_txt)
     {
-        s_txt=UnityWebRequest.EscapeURL(s_txt);
-        string s_tr = "https://translate.google.com/?sl="+this.app.carrot.lang.get_key_lang()+"&tl=vi&text="+s_txt+"&op=translate";
+        s_txt = UnityWebRequest.EscapeURL(s_txt);
+        string s_tr = "https://translate.google.com/?sl=" + this.app.carrot.lang.get_key_lang() + "&tl=vi&text=" + s_txt + "&op=translate";
         Application.OpenURL(s_tr);
     }
 
@@ -1384,7 +1389,7 @@ public class Command_storage : MonoBehaviour
 
         if (index_sel == 16)
         {
-            this.btn_run_control_tags=this.item_run_cmd.create_item();
+            this.btn_run_control_tags = this.item_run_cmd.create_item();
             btn_run_control_tags.set_icon(this.sp_icon_parameter_tag);
             btn_run_control_tags.set_color(this.app.carrot.color_highlight);
             btn_run_control_tags.set_act(() => this.show_list_sys_act_tag());
@@ -1426,7 +1431,7 @@ public class Command_storage : MonoBehaviour
             key = s_key,
             pater = this.app.command.get_id_chat_cur(),
             date_create = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            lang=this.app.carrot.lang.get_key_lang()
+            lang = this.app.carrot.lang.get_key_lang()
         };
         log.key = s_key;
 
@@ -1455,9 +1460,9 @@ public class Command_storage : MonoBehaviour
         this.box_add_chat.set_icon(this.app.carrot.sp_icon_dev);
         this.list_item_key_query = new List<Carrot_Box_Item>();
         string s_data_querys_song = this.app.player_music.playlist.get_data_key_query_music();
-        if (s_data_querys_song=="")
+        if (s_data_querys_song == "")
         {
-            Carrot_Box_Item item_key_query=this.box_add_chat.create_item("item_key_0");
+            Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_0");
             item_key_query.set_title(PlayerPrefs.GetString("music", "Music"));
             item_key_query.set_icon(this.app.command_storage.sp_icon_key);
             item_key_query.set_tip("Keyword used to open the song by name");
@@ -1468,13 +1473,13 @@ public class Command_storage : MonoBehaviour
         else
         {
             string[] list_key = s_data_querys_song.Split(";");
-            for(int i = 0; i < list_key.Length; i++)
+            for (int i = 0; i < list_key.Length; i++)
             {
                 var index_item = i;
                 string s_name_query = list_key[i].ToString();
-                Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_"+i);
+                Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_" + i);
                 item_key_query.set_icon(this.app.command_storage.sp_icon_key);
-                item_key_query.set_title(PlayerPrefs.GetString("music", "Music")+" ("+(i+1)+")");
+                item_key_query.set_title(PlayerPrefs.GetString("music", "Music") + " (" + (i + 1) + ")");
                 item_key_query.set_tip(s_name_query + " {song_name} -> Keyword used to open the song by name");
                 item_key_query.set_type(Box_Item_Type.box_value_input);
                 item_key_query.check_type();
@@ -1484,15 +1489,15 @@ public class Command_storage : MonoBehaviour
                 Carrot_Box_Btn_Item btn_del = item_key_query.create_item();
                 btn_del.set_icon(this.app.carrot.sp_icon_del_data);
                 btn_del.set_color(this.app.carrot.color_highlight);
-                btn_del.set_act(() =>this.delete_query(index_item));
+                btn_del.set_act(() => this.delete_query(index_item));
             }
         }
 
         Carrot_Box_Btn_Item btn_add_key = this.box_add_chat.create_btn_menu_header(this.sp_icon_add_chat);
         btn_add_key.set_act(() => this.add_key_query());
 
-        Carrot_Box_Btn_Panel panel_btn=this.box_add_chat.create_panel_btn();
-        Carrot_Button_Item btn_done=panel_btn.create_btn("btn_done");
+        Carrot_Box_Btn_Panel panel_btn = this.box_add_chat.create_panel_btn();
+        Carrot_Button_Item btn_done = panel_btn.create_btn("btn_done");
         btn_done.set_icon_white(this.app.carrot.icon_carrot_done);
         btn_done.set_bk_color(this.app.carrot.color_highlight);
         btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
@@ -1531,15 +1536,15 @@ public class Command_storage : MonoBehaviour
     private void done_box_setting_query()
     {
         string s_query_data = "";
-        for(int i = 0; i < this.list_item_key_query.Count; i++)
+        for (int i = 0; i < this.list_item_key_query.Count; i++)
         {
             if (this.list_item_key_query[i] != null)
             {
-                s_query_data= s_query_data+this.list_item_key_query[i].get_val()+";";
+                s_query_data = s_query_data + this.list_item_key_query[i].get_val() + ";";
                 Destroy(this.list_item_key_query[i]);
             }
         }
-        s_query_data = s_query_data+"end";
+        s_query_data = s_query_data + "end";
         s_query_data = s_query_data.Replace(";end", "");
         if (s_query_data == "end") s_query_data = "";
         this.app.player_music.playlist.set_data_key_query_music(s_query_data);

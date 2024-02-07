@@ -27,6 +27,7 @@ public class GeminiAPI : MonoBehaviour
 
     IEnumerator PostRequest(string userMessage)
     {
+        Debug.Log("Get chat Gemini(" + userMessage + ")");
         if (this.key_api.Trim() == "") this.key_api = this.key_api_default;
 
         string requestData = "{\"contents\":[{\"parts\":[{\"text\":\""+ userMessage + "\"}]}]}";

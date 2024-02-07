@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public enum Command_Type_Mode{chat,live}
+public enum Command_Type_Mode { chat, live }
 
 public class Command : MonoBehaviour
 {
@@ -27,8 +27,8 @@ public class Command : MonoBehaviour
     public GameObject obj_btn_play_all_log;
     public Transform area_body_log_command;
     public ScrollRect ScrollRect_log_command;
-    public AudioSource sound_command; 
-    public string chat_pater="";
+    public AudioSource sound_command;
+    public string chat_pater = "";
     private bool is_test_command = false;
 
     public Sprite icon_pc_music;
@@ -70,23 +70,23 @@ public class Command : MonoBehaviour
         this.obj_btn_play_all_log.SetActive(false);
         this.obj_btn_clear_all_log.SetActive(false);
     }
-    
+
     public void send_command()
     {
         if (this.inp_command.text.Trim() != "")
         {
-            this.send_chat(this.inp_command.text,true);
+            this.send_chat(this.inp_command.text, true);
             this.inp_command.text = "";
         }
     }
 
-    public void send_chat(string s_key,bool is_log_show=false)
+    public void send_chat(string s_key, bool is_log_show = false)
     {
         s_key = s_key.Trim().ToLower();
-       
+
         this.is_live = false;
         this.s_command_chat_last = s_key;
-        
+
         if (this.mode == Command_Type_Mode.chat)
         {
             if (is_log_show)
@@ -99,13 +99,13 @@ public class Command : MonoBehaviour
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
             if (chat_offline != null)
             {
-                Debug.Log("chat offline (Id father:"+this.id_cur_chat+")");
+                Debug.Log("chat offline (Id father:" + this.id_cur_chat + ")");
                 this.id_cur_chat = chat_offline["id"].ToString();
                 this.act_chat(chat_offline);
             }
             else
             {
-                Debug.Log("chat online (Id father:"+this.id_cur_chat+")");
+                Debug.Log("chat online (Id father:" + this.id_cur_chat + ")");
                 if (this.app.carrot.is_online())
                 {
                     if (this.app.setting.get_index_prioritize() == 0)
@@ -149,7 +149,7 @@ public class Command : MonoBehaviour
                 else
                 {
                     this.show_msg_no_chat();
-                }  
+                }
             }
         }
         else
@@ -160,10 +160,11 @@ public class Command : MonoBehaviour
 
     private void play_chat(string s_key)
     {
+        Debug.Log("Get chat Ai Pater: "+this.id_cur_chat+" (" + s_key + ")");
         Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-        ChatQuery=ChatQuery.WhereEqualTo("key", s_key);
+        ChatQuery = ChatQuery.WhereEqualTo("key", s_key);
 
-        if (this.id_cur_chat.ToString() != "") ChatQuery=ChatQuery.WhereEqualTo("pater", this.id_cur_chat);
+        if (this.id_cur_chat.ToString() != "") ChatQuery = ChatQuery.WhereEqualTo("pater", this.id_cur_chat);
         ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
             QuerySnapshot capitalQuerySnapshot = task.Result;
             if (task.IsFaulted)
@@ -180,7 +181,7 @@ public class Command : MonoBehaviour
                     {
                         IDictionary c = documentSnapshot.ToDictionary();
                         c["id"] = documentSnapshot.Id;
-                        if (c["sex_user"].ToString()==this.app.setting.get_user_sex()&&c["sex_character"].ToString() == this.app.setting.get_character_sex() && c["pater"].ToString()==this.id_cur_chat)
+                        if (c["sex_user"].ToString() == this.app.setting.get_user_sex() && c["sex_character"].ToString() == this.app.setting.get_character_sex() && c["pater"].ToString() == this.id_cur_chat)
                         {
                             list_chat.Add(c);
                             this.app.command_storage.add_command_offline(c);
@@ -296,16 +297,16 @@ public class Command : MonoBehaviour
         c_chat.txt_chat.text = s_inp_command;
         c_chat.txt_chat.color = this.app.carrot.color_highlight;
         c_chat.icon.sprite = this.app.get_icon_sex_user();
-        c_chat.btn_add_app.GetComponent<Image>().color=this.app.carrot.color_highlight;
+        c_chat.btn_add_app.GetComponent<Image>().color = this.app.carrot.color_highlight;
 
-        IDictionary Idata = (IDictionary) Json.Deserialize("{}");
-        Idata["id"] = "chat"+this.app.carrot.generateID();
+        IDictionary Idata = (IDictionary)Json.Deserialize("{}");
+        Idata["id"] = "chat" + this.app.carrot.generateID();
         Idata["key"] = s_inp_command;
         Idata["msg"] = s_inp_command;
-        Idata["status"]= "input";
+        Idata["status"] = "input";
 
         c_chat.idata_chat = Idata;
-        c_chat.set_act_click(()=>this.app.command_storage.show_new_command(s_inp_command));
+        c_chat.set_act_click(() => this.app.command_storage.show_new_command(s_inp_command));
         c_chat.set_act_add(() => this.app.command_storage.show_new_command(s_inp_command));
 
         if (data_chat_cur != null)
@@ -313,7 +314,7 @@ public class Command : MonoBehaviour
             c_chat.btn_extension.GetComponent<Button>().onClick.RemoveAllListeners();
             string s_id = data_chat_cur["id"].ToString();
             string s_msg = data_chat_cur["msg"].ToString();
-            c_chat.btn_extension.GetComponent<Button>().onClick.AddListener(() => this.app.command_storage.show_add_command_with_pater_and_keyword(s_inp_command,s_msg,s_id));
+            c_chat.btn_extension.GetComponent<Button>().onClick.AddListener(() => this.app.command_storage.show_add_command_with_pater_and_keyword(s_inp_command, s_msg, s_id));
         }
         else
         {
@@ -338,7 +339,7 @@ public class Command : MonoBehaviour
         this.ScrollRect_log_command.verticalNormalizedPosition = -1f;
     }
 
-    public Item_command_chat add_item_pc_chat(string s_txt_show,Sprite icon, IDictionary i_data=null)
+    public Item_command_chat add_item_pc_chat(string s_txt_show, Sprite icon, IDictionary i_data = null)
     {
         if (this.item_command_loading != null) Destroy(this.item_command_loading);
 
@@ -351,7 +352,7 @@ public class Command : MonoBehaviour
         Item_command_chat comand_chat = item_command_chat.GetComponent<Item_command_chat>();
         comand_chat.txt_chat.text = s_txt_show;
         comand_chat.icon.sprite = icon;
-        comand_chat.btn_add_app.GetComponent<Image>().color=this.app.carrot.color_highlight;
+        comand_chat.btn_add_app.GetComponent<Image>().color = this.app.carrot.color_highlight;
 
         if (i_data != null)
         {
@@ -375,7 +376,7 @@ public class Command : MonoBehaviour
                 else
                 {
                     comand_chat.set_act_add(() => this.app.command_storage.show_add_command_with_pater(i_data["msg"].ToString(), i_data["id"].ToString()));
-                    comand_chat.set_act_click(() => this.act_chat(i_data,false));
+                    comand_chat.set_act_click(() => this.act_chat(i_data, false));
                 }
             }
         }
@@ -483,7 +484,7 @@ public class Command : MonoBehaviour
             if (index_func == "13") this.app.carrot.delay_function(2f, this.app.view.show_list_background_image);
             if (index_func == "14") this.app.player_music.btn_next();
             if (index_func == "15") this.app.player_music.btn_pause();
-            if (index_func == "16") this.app.carrot.delay_function(1.6f, ()=>this.app.tool.open_content_Intent(data_chat["link"].ToString().Trim()));
+            if (index_func == "16") this.app.carrot.delay_function(1.6f, () => this.app.tool.open_content_Intent(data_chat["link"].ToString().Trim()));
             if (index_func == "17") this.app.tool.on_Flashlight();
             if (index_func == "18") this.app.tool.off_Flashlight();
             if (index_func == "19") this.app.carrot.delay_function(1.6f, () => this.app.tool.OpenApp_by_bundleId(data_chat["link"].ToString().Trim()));
@@ -515,7 +516,7 @@ public class Command : MonoBehaviour
 
     public void act_cm_face(string s_face)
     {
-        if(s_face!="") this.play_face(int.Parse(s_face));
+        if (s_face != "") this.play_face(int.Parse(s_face));
     }
 
     public void play_face(int index)
@@ -558,9 +559,9 @@ public class Command : MonoBehaviour
                 if (this.area_body_log_command.childCount > 0)
                 {
                     this.obj_btn_clear_all_log.SetActive(true);
-                    if(this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
+                    if (this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
                 }
-                if(this.app.player_music.sound_music.isPlaying==false) this.action_waitting();
+                if (this.app.player_music.sound_music.isPlaying == false) this.action_waitting();
             }
         }
 
@@ -588,7 +589,7 @@ public class Command : MonoBehaviour
             this.is_show_text = true;
             this.panel_show_msg_chat.SetActive(true);
             this.panel_show_log_chat.SetActive(false);
-            if(this.is_test_command==false) this.app.show_chat_function();
+            if (this.is_test_command == false) this.app.show_chat_function();
         }
     }
 
@@ -604,7 +605,8 @@ public class Command : MonoBehaviour
             {
                 this.app.textToSpeech.StartSpeak(s_chat);
             }
-        }else if(this.app.setting.get_tts_type() == "2")
+        }
+        else if (this.app.setting.get_tts_type() == "2")
         {
             this.app.textToSpeech.StartSpeak(s_chat);
         }
@@ -628,7 +630,7 @@ public class Command : MonoBehaviour
             else
             {
                 this.play_sound_chat(DownloadHandlerAudioClip.GetContent(www));
-            }  
+            }
         }
     }
 
@@ -653,7 +655,8 @@ public class Command : MonoBehaviour
         return this.id_cur_chat;
     }
 
-    private void play_sound_chat(AudioClip audio_clip) {
+    private void play_sound_chat(AudioClip audio_clip)
+    {
         this.sound_command.clip = audio_clip;
         this.sound_command.pitch = this.app.setting.get_voice_speed();
         this.sound_command.Play();
@@ -661,12 +664,12 @@ public class Command : MonoBehaviour
 
     public void get_msg_hit()
     {
-        this.send_chat("hit",true);
+        this.send_chat("hit", true);
     }
 
     private void get_effect_icon_chat(string s_id_icon)
     {
-        DocumentReference iconRef=this.app.carrot.db.Collection("icon").Document(s_id_icon);
+        DocumentReference iconRef = this.app.carrot.db.Collection("icon").Document(s_id_icon);
         iconRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompleted)
@@ -691,7 +694,8 @@ public class Command : MonoBehaviour
         Destroy(effect_icon, 3f);
     }
 
-    public void clear_log_chat(){
+    public void clear_log_chat()
+    {
         this.app.carrot.clear_contain(this.area_body_log_command);
     }
 
@@ -843,7 +847,7 @@ public class Command : MonoBehaviour
                         else if (s_key == "msg")
                         {
                             s_field_title = PlayerPrefs.GetString("cm_msg", "Feedback message");
-                            s_field_val =s_data_val;
+                            s_field_val = s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_msg);
 
                             Carrot_Box_Btn_Item btn_copy_msg = item_field.create_item();
@@ -867,7 +871,8 @@ public class Command : MonoBehaviour
                                 Color newCol;
                                 if (ColorUtility.TryParseHtmlString(s_data_val, out newCol)) item_field.img_icon.color = newCol;
                             }
-                        }else if (s_key == "icon")
+                        }
+                        else if (s_key == "icon")
                         {
                             s_field_title = PlayerPrefs.GetString("setting_bubble_icon", "Icons");
                             s_field_val = s_data_val;
@@ -889,10 +894,11 @@ public class Command : MonoBehaviour
                             }
                             catch (System.Exception e)
                             {
+                                Debug.Log(e.Message);
                                 s_field_val = "None";
                             }
                         }
-                        else if(s_key== "reports")
+                        else if (s_key == "reports")
                         {
                             IList list_report = (IList)data_chat["reports"];
                             s_field_title = PlayerPrefs.GetString("report_title", "Report");
@@ -925,14 +931,14 @@ public class Command : MonoBehaviour
             if (s_status == "passed")
             {
                 string s_id_chat = data_chat["id"].ToString();
-                string s_link_share = this.app.carrot.mainhost+ "/?p=chat&id="+ s_id_chat + "&lang_chat="+this.app.carrot.lang.get_key_lang();
+                string s_link_share = this.app.carrot.mainhost + "/?p=chat&id=" + s_id_chat + "&lang_chat=" + this.app.carrot.lang.get_key_lang();
                 Carrot_Box_Btn_Panel panel_btn = this.box_list.create_panel_btn();
-                Carrot_Button_Item btn_share=panel_btn.create_btn("item_share");
+                Carrot_Button_Item btn_share = panel_btn.create_btn("item_share");
                 btn_share.set_bk_color(this.app.carrot.color_highlight);
                 btn_share.set_icon_white(this.app.carrot.sp_icon_share);
                 btn_share.set_label_color(Color.white);
                 btn_share.set_label(PlayerPrefs.GetString("share", "Share"));
-                btn_share.set_act_click(()=>this.share_chat(s_link_share));
+                btn_share.set_act_click(() => this.share_chat(s_link_share));
             }
         }
     }
@@ -961,7 +967,7 @@ public class Command : MonoBehaviour
     {
         string s_txt = this.data_chat_cur["msg"].ToString();
         s_txt = UnityWebRequest.EscapeURL(s_txt);
-        string s_tr = "https://translate.google.com/?sl="+this.app.carrot.lang.get_key_lang()+"&tl=en&text=" + s_txt + "&op=translate";
+        string s_tr = "https://translate.google.com/?sl=" + this.app.carrot.lang.get_key_lang() + "&tl=en&text=" + s_txt + "&op=translate";
         Application.OpenURL(s_tr);
     }
 
@@ -969,13 +975,13 @@ public class Command : MonoBehaviour
     {
         IList icons = this.app.icon.get_list_icon_name();
         this.data_chat_cur = (IDictionary)Json.Deserialize("{}");
-        this.data_chat_cur["id"] = "chat"+this.app.carrot.generateID();
+        this.data_chat_cur["id"] = "chat" + this.app.carrot.generateID();
         this.data_chat_cur["msg"] = s_key;
         this.data_chat_cur["action"] = Random.Range(0, 40).ToString();
         this.data_chat_cur["face"] = Random.Range(0, 18).ToString();
         this.data_chat_cur["color"] = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f).CTToHexRGBA();
         this.data_chat_cur["status"] = "live";
-        if (icons!=null)
+        if (icons != null)
         {
             int index_icons = Random.Range(0, icons.Count);
             this.data_chat_cur["icon"] = icons[index_icons];
@@ -997,7 +1003,7 @@ public class Command : MonoBehaviour
         this.app.command.panel_show_msg_chat.SetActive(false);
         this.app.command.panel_show_log_chat.SetActive(true);
         this.obj_btn_clear_all_log.SetActive(true);
-        if(this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
+        if (this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
     }
 
     public void btn_show_sub_menu()

@@ -131,6 +131,10 @@ public class App : MonoBehaviour
         this.panel_inp_msg.SetActive(true);
         this.panel_inp_command_test.SetActive(false);
 
+        this.setting.load_setting();
+        this.check_manager_character();
+        this.command_storage.check_load_command_storage();
+
         this.carrot.Load_Carrot(this.check_app_exit);
         this.carrot.shop.onCarrotPaySuccess += this.onBuySuccessCarrotPay;
         this.carrot.shop.onCarrotRestoreSuccess += this.onRestoreSuccessCarrotPay;
@@ -142,15 +146,14 @@ public class App : MonoBehaviour
         this.act_change_Scene_Rotation();
 
         this.view.on_start();
-        this.setting.load_setting();
+
         this.panel_main.SetActive(true);
         this.player_music.panel_player_mini.SetActive(false);
         this.player_music.playlist.on_load();
         this.show_chat_function();
-        this.check_manager_character();
+
 
         this.command.load();
-        this.command_storage.check_load_command_storage();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
         this.command_dev.check();
 
@@ -185,21 +188,28 @@ public class App : MonoBehaviour
         this.get_character().gameObject.SetActive(true);
         this.sel_menu_func_app(0);
         this.panel_main.SetActive(true);
+        this.get_hi_chat();
     }
 
     public void load(string s_data_lang)
     {
+        this.command.clear_log_chat();
         this.GetComponent<Carrot_lang_show>().load_lang_emp();
         this.panel_main.SetActive(true);
         this.load_weather();
         this.get_character().gameObject.SetActive(true);
         this.sel_menu_func_app(0);
-        this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice", "en"));
+        this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice", "en"));
+        this.get_hi_chat();
+        this.player_music.playlist.on_load();
+        if (!this.is_radio_func) this.button_randio.SetActive(false);
+    }
+
+    private void get_hi_chat()
+    {
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
         this.command.send_chat("hi_" + hour);
-        this.player_music.playlist.on_load();
-        if (!this.is_radio_func) this.button_randio.SetActive(false);
     }
 
     void OnApplicationFocus(bool hasFocus)

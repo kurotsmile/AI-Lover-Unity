@@ -29,6 +29,7 @@ public class OpenAIChatbot : MonoBehaviour
     IEnumerator PostRequest(string userMessage)
     {
         if (this.key_api.Trim() == "") this.key_api = this.get_key_api_random();
+        Debug.Log("Get chat GPT (" + userMessage + ")");
 
         string requestData = "{\"model\": \"gpt-3.5-turbo\",\"messages\":[{\"role\": \"user\",\"content\": \""+userMessage+"\"}]}";
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(requestData);

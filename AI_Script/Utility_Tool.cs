@@ -4,9 +4,12 @@ using UnityEngine.Android;
 
 public class Utility_Tool : MonoBehaviour
 {
+    public App app;
     public String[] list_name_action;
+    public String[] list_package_action;
 #if UNITY_ANDROID
-    public AndroidJavaClass javaObject;
+    private AndroidJavaClass javaObject;
+    private AndroidJavaObject context;
 #endif
 
     public void on_Flashlight()
@@ -25,8 +28,11 @@ public class Utility_Tool : MonoBehaviour
 
     public void on_load()
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
         javaObject = new AndroidJavaClass("com.myflashlight.flashlightlib.Flashlight");
+        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        this.context = activity.Call<AndroidJavaObject>("getApplicationContext");
 #endif
     }
 
@@ -54,16 +60,39 @@ public class Utility_Tool : MonoBehaviour
 
     public void OpenApp_by_bundleId(string bundleId)
     {
+        bool fail = false;
         AndroidJavaClass up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
         AndroidJavaObject packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
+        AndroidJavaObject launchIntent = null;
+        try
+        {
+            launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", bundleId);
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log(e.Message);
+            fail = true;
+        }
 
-        AndroidJavaObject launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", bundleId);
-        ca.Call("startActivity", launchIntent);
+        if (fail)
+        {
+            Application.OpenURL("https://play.google.com/store/apps/details?id=" + bundleId);
+        }
+        else
+        {
+            ca.Call("startActivity", launchIntent);
+        }
+
         up.Dispose();
         ca.Dispose();
         packageManager.Dispose();
         launchIntent.Dispose();
+
     }
 
+    public void test_music()
+    {
+        javaObject.CallStatic("play_music",this.context);
+    }
 }
