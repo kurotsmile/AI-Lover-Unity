@@ -644,7 +644,7 @@ public class Music_playlist : MonoBehaviour
             if (task.IsFaulted)
             {
                 this.app.carrot.hide_loading();
-                this.app.command.send_chat("no_found_song");
+                this.app.command.send_chat_no_father("no_found_song");
             }
 
             if (task.IsCompleted)
@@ -659,13 +659,13 @@ public class Music_playlist : MonoBehaviour
                         data_music["type"] = "online";
                         data_music["index"] = 0;
                         this.app.player_music.act_play_data(data_music);
-                        this.app.command.send_chat("found_song");
+                        this.app.command.send_chat_no_father("found_song");
                         return;
                     };
                 }
                 else
                 {
-                    this.app.command.send_chat("no_found_song");
+                    this.app.command.send_chat_no_father("no_found_song");
                 }
             }
         });

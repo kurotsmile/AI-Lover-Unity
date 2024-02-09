@@ -184,11 +184,7 @@ public class App : MonoBehaviour
 
     public void load_app_where_offline()
     {
-        this.load_weather();
-        this.get_character().gameObject.SetActive(true);
-        this.sel_menu_func_app(0);
-        this.panel_main.SetActive(true);
-        this.get_hi_chat();
+        this.load("");
     }
 
     public void load(string s_data_lang)
@@ -200,16 +196,11 @@ public class App : MonoBehaviour
         this.get_character().gameObject.SetActive(true);
         this.sel_menu_func_app(0);
         this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice", "en"));
-        this.get_hi_chat();
-        this.player_music.playlist.on_load();
-        if (!this.is_radio_func) this.button_randio.SetActive(false);
-    }
-
-    private void get_hi_chat()
-    {
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
         this.command.send_chat("hi_" + hour);
+        this.player_music.playlist.on_load();
+        if (!this.is_radio_func) this.button_randio.SetActive(false);
     }
 
     void OnApplicationFocus(bool hasFocus)
@@ -786,6 +777,7 @@ public class App : MonoBehaviour
 
     public void on_hit()
     {
+        this.command.on_reset_timer_msg_tip();
         this.count_hit++;
         if (this.count_hit >= this.get_character().get_length_ani_hit())
         {

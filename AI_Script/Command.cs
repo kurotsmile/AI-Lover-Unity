@@ -64,6 +64,7 @@ public class Command : MonoBehaviour
     private string id_cur_chat = "";
     private IDictionary data_chat_cur;
     private GameObject item_command_loading;
+    private float timer_msg_tip = 0;
 
     public void load()
     {
@@ -80,12 +81,19 @@ public class Command : MonoBehaviour
         }
     }
 
+    public void send_chat_no_father(string s_key, bool is_log_show = false)
+    {
+        this.id_cur_chat = "";
+        this.send_chat(s_key,is_log_show);
+    }
+
     public void send_chat(string s_key, bool is_log_show = false)
     {
         s_key = s_key.Trim().ToLower();
 
         this.is_live = false;
         this.s_command_chat_last = s_key;
+        this.on_reset_timer_msg_tip();
 
         if (this.mode == Command_Type_Mode.chat)
         {
@@ -143,7 +151,6 @@ public class Command : MonoBehaviour
                             else
                                 this.app.open_AI.send_chat(s_key);
                         }
-
                     }
                 }
                 else
@@ -574,6 +581,23 @@ public class Command : MonoBehaviour
                 this.app.live.next();
             }
         }
+        else
+        {
+            this.timer_msg_tip = this.timer_msg_tip + Time.deltaTime;
+            if (this.timer_msg_tip > 20f)
+            {
+                this.timer_msg_tip = 0;
+                if (this.app.player_music.sound_music.isPlaying==false&&this.app.panel_chat_msg.activeInHierarchy==true)
+                {
+                    this.send_chat_no_father("tip");
+                }
+            }
+        }
+    }
+
+    public void on_reset_timer_msg_tip()
+    {
+        this.timer_msg_tip = 0f;
     }
 
     public void show_effect_txt_msg(string s_txt)
