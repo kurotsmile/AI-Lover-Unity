@@ -44,9 +44,9 @@ public class GeminiAPI : MonoBehaviour
             {
                 IDictionary gemini_ai = (IDictionary)Json.Deserialize(www.downloadHandler.text);
                 IList candidates = (IList)gemini_ai["candidates"];
-                IDictionary candidate = (IDictionary) candidates[0];
-                IDictionary content = (IDictionary) candidate["content"];
-                IList parts = (IList) content["parts"];
+                IDictionary candidate = (IDictionary)candidates[0];
+                IDictionary content = (IDictionary)candidate["content"];
+                IList parts = (IList)content["parts"];
                 IDictionary chat_ai = (IDictionary)parts[0];
 
                 chat_ai["id"] = "chat" + this.app.carrot.generateID();
@@ -82,9 +82,10 @@ public class GeminiAPI : MonoBehaviour
                 if (this.app.setting.get_index_prioritize() == 0)
                 {
                     this.app.command.show_msg_no_chat();
-                }else if (this.app.setting.get_index_prioritize() == 1)
+                }
+                else if (this.app.setting.get_index_prioritize() == 1)
                 {
-                    if(this.app.open_AI.is_active)
+                    if (this.app.open_AI.is_active)
                         this.app.open_AI.send_chat(userMessage);
                     else
                         this.app.command.show_msg_no_chat();
@@ -92,14 +93,15 @@ public class GeminiAPI : MonoBehaviour
                 else if (this.app.setting.get_index_prioritize() == 2)
                 {
                     this.app.command.show_msg_no_chat();
-                }else if (this.app.setting.get_index_prioritize() == 3)
+                }
+                else if (this.app.setting.get_index_prioritize() == 3)
                 {
                     if (this.app.open_AI.is_active)
                         this.app.open_AI.send_chat(userMessage);
                     else
                         this.app.command.show_msg_no_chat();
                 }
-                
+
             }
         }
     }
