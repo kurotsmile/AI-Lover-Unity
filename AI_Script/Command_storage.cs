@@ -1394,6 +1394,14 @@ public class Command_storage : MonoBehaviour
             btn_run_control_tags.set_color(this.app.carrot.color_highlight);
             btn_run_control_tags.set_act(() => this.show_list_sys_act_tag());
         }
+
+        if (index_sel == 19)
+        {
+            this.btn_run_control_tags = this.item_run_cmd.create_item();
+            btn_run_control_tags.set_icon(this.sp_icon_parameter_tag);
+            btn_run_control_tags.set_color(this.app.carrot.color_highlight);
+            btn_run_control_tags.set_act(() => this.show_list_package_tag());
+        }
     }
 
     private void show_list_sys_act_tag()
@@ -1411,9 +1419,41 @@ public class Command_storage : MonoBehaviour
             item_tag.set_tip(this.app.tool.list_name_action[i]);
             item_tag.set_act(() => btn_add_sys_act_tag(s_tag));
 
+            Carrot.Carrot_Box_Btn_Item btn_test_tag = item_tag.create_item();
+            btn_test_tag.set_icon(this.sp_icon_run_control);
+            btn_test_tag.set_color(this.app.carrot.color_highlight);
+            btn_test_tag.set_act(() => this.app.tool.open_content_Intent(s_tag));
+
             Carrot.Carrot_Box_Btn_Item btn_add_tag = item_tag.create_item();
             btn_add_tag.set_icon(this.sp_icon_add_chat);
-            btn_add_tag.set_color(this.GetComponent<App>().carrot.color_highlight);
+            btn_add_tag.set_color(this.app.carrot.color_highlight);
+            Destroy(btn_add_tag.GetComponent<UnityEngine.UI.Button>());
+        }
+    }
+
+    private void show_list_package_tag()
+    {
+        this.box_parameter_tag = this.app.carrot.Create_Box("list_sys_act_tag");
+        this.box_parameter_tag.set_title("sys_action_by_link");
+        this.box_parameter_tag.set_icon(this.sp_icon_parameter_tag);
+
+        for (int i = 0; i < this.app.tool.list_package_action.Length; i++)
+        {
+            var s_tag = this.app.tool.list_package_action[i];
+            Carrot.Carrot_Box_Item item_tag = this.box_parameter_tag.create_item("item_package_" + i);
+            item_tag.set_icon(this.sp_icon_parameter_tag);
+            item_tag.set_title(this.app.tool.list_package_action[i]);
+            item_tag.set_tip(this.app.tool.list_package_action[i]);
+            item_tag.set_act(() => btn_add_sys_act_tag(s_tag));
+
+            Carrot.Carrot_Box_Btn_Item btn_test_tag = item_tag.create_item();
+            btn_test_tag.set_icon(this.sp_icon_run_control);
+            btn_test_tag.set_color(this.app.carrot.color_highlight);
+            btn_test_tag.set_act(() => this.app.tool.OpenApp_by_bundleId(s_tag));
+
+            Carrot.Carrot_Box_Btn_Item btn_add_tag = item_tag.create_item();
+            btn_add_tag.set_icon(this.sp_icon_add_chat);
+            btn_add_tag.set_color(this.app.carrot.color_highlight);
             Destroy(btn_add_tag.GetComponent<UnityEngine.UI.Button>());
         }
     }

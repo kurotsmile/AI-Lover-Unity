@@ -496,6 +496,7 @@ public class Command : MonoBehaviour
             if (index_func == "18") this.app.tool.off_Flashlight();
             if (index_func == "19") this.app.carrot.delay_function(1.6f, () => this.app.tool.OpenApp_by_bundleId(data_chat["link"].ToString().Trim()));
             if (index_func == "20") this.app.carrot.delay_function(1.6f, () => this.app.setting.show_shop());
+            if (index_func == "21") this.app.tool.test_music();
         }
         if (data_chat["icon"] != null)
         {
