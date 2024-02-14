@@ -154,7 +154,7 @@ public class character_manager : MonoBehaviour
 
     }
 
-    public void choise_costumes(string s_id_costumes, string url_costumes)
+    public void choise_costumes(string s_id_costumes)
     {
         Texture2D tex2d_costumes = this.app.carrot.get_tool().get_texture2D_to_playerPrefs(this.get_npc().s_type_costumes + "_" + s_id_costumes);
         if (tex2d_costumes != null)
@@ -165,7 +165,7 @@ public class character_manager : MonoBehaviour
         }
     }
 
-    public void choise_head(string s_id_head, string url_head)
+    public void choise_head(string s_id_head)
     {
         Texture2D tex2d_head = this.app.carrot.get_tool().get_texture2D_to_playerPrefs(this.get_npc().s_type_head + "_" + this.sel_head_style);
         if (tex2d_head != null)

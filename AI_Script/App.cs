@@ -132,7 +132,6 @@ public class App : MonoBehaviour
         this.panel_inp_command_test.SetActive(false);
 
         this.setting.load_setting();
-        this.check_manager_character();
         this.command_storage.check_load_command_storage();
 
         this.carrot.Load_Carrot(this.check_app_exit);
@@ -189,6 +188,7 @@ public class App : MonoBehaviour
 
     public void load(string s_data_lang)
     {
+        this.check_manager_character();
         this.command.clear_log_chat();
         this.GetComponent<Carrot_lang_show>().load_lang_emp();
         this.panel_main.SetActive(true);
@@ -661,7 +661,6 @@ public class App : MonoBehaviour
                 PlayerPrefs.SetString("sex", "1");
             }
         }
-        this.check_manager_character();
         this.load("");
         this.command.clear_log_chat();
         this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));

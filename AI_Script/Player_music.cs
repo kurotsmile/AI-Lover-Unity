@@ -105,6 +105,7 @@ public class Player_music : MonoBehaviour
         this.button_add_playlist.SetActive(false);
         this.button_add_playlist_mini.SetActive(false);
         this.button_repeat_mini.SetActive(false);
+        this.img_repeat_full.gameObject.SetActive(false);
         this.button_share_song.SetActive(false);
         this.button_lyrics.SetActive(false);
         this.button_link_ytb.SetActive(false);
@@ -170,6 +171,7 @@ public class Player_music : MonoBehaviour
             this.panel_player_mini.SetActive(true);
             this.panel_info_more.SetActive(true);
             this.button_repeat_mini.SetActive(true);
+            this.img_repeat_full.gameObject.SetActive(true);
 
             this.is_buy_mp3_present = false;
             this.txt_time_music.text = "";
