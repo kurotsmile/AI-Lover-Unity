@@ -1,4 +1,6 @@
+using Carrot;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Android;
 
@@ -77,7 +79,9 @@ public class Utility_Tool : MonoBehaviour
 
         if (fail)
         {
-            Application.OpenURL("https://play.google.com/store/apps/details?id=" + bundleId);
+            if (this.app.carrot.store_public ==Store.Google_Play) Application.OpenURL("https://play.google.com/store/apps/details?id=" + bundleId);
+            if (this.app.carrot.store_public ==Store.Microsoft_Store) Application.OpenURL("ms-windows-store:navigate?appid=" + bundleId);
+            if (this.app.carrot.store_public ==Store.Amazon_app_store) Application.OpenURL("amzn://apps/android?p=" + bundleId);
         }
         else
         {
@@ -94,5 +98,20 @@ public class Utility_Tool : MonoBehaviour
     public void test_music()
     {
         javaObject.CallStatic("play_music",this.context);
+    }
+
+    public void getAllAudioFromDevice()
+    {
+#if UNITY_ANDROID
+        Carrot.Carrot_Box box_list = this.app.carrot.Create_Box("lis_audio");
+        List<string> list_audio=javaObject.CallStatic<List<string>>("getAllAudioFromDevice", this.context);
+
+        for (int i = 0; i < list_audio.Count; i++)
+        {
+            Carrot.Carrot_Box_Item item_file_audio = box_list.create_item("item_audio_" + i);
+            item_file_audio.set_title(list_audio[i]);
+            item_file_audio.set_tip(list_audio[i]);
+        }
+#endif
     }
 }

@@ -406,6 +406,7 @@ public class Command : MonoBehaviour
 
     public void act_chat(IDictionary data_chat, bool is_add_log = true)
     {
+        this.on_reset_timer_msg_tip();
         this.obj_btn_log.SetActive(true);
         this.obj_btn_info_chat.SetActive(true);
         this.obj_btn_translate.SetActive(true);
@@ -461,6 +462,11 @@ public class Command : MonoBehaviour
         if (data_chat["face"] != null) this.act_cm_face(data_chat["face"].ToString());
         if (data_chat["color"] != null) this.set_color_by_string(data_chat["color"].ToString());
 
+        if (data_chat["ai"]!=null)
+        {
+            this.id_cur_chat = "";
+        }
+
         if (this.app.setting.get_status_sound_voice())
         {
             if (this.app.carrot.is_online())
@@ -496,7 +502,6 @@ public class Command : MonoBehaviour
             if (index_func == "18") this.app.tool.off_Flashlight();
             if (index_func == "19") this.app.carrot.delay_function(1.6f, () => this.app.tool.OpenApp_by_bundleId(data_chat["link"].ToString().Trim()));
             if (index_func == "20") this.app.carrot.delay_function(1.6f, () => this.app.setting.show_shop());
-            if (index_func == "21") this.app.tool.test_music();
         }
         if (data_chat["icon"] != null)
         {
@@ -585,7 +590,7 @@ public class Command : MonoBehaviour
         else
         {
             this.timer_msg_tip = this.timer_msg_tip + Time.deltaTime;
-            if (this.timer_msg_tip > 20f)
+            if (this.timer_msg_tip >30f)
             {
                 this.timer_msg_tip = 0;
                 if (this.app.player_music.sound_music.isPlaying==false&&this.app.panel_chat_msg.activeInHierarchy==true)

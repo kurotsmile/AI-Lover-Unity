@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+enum repeat_music { repeat_none,repeat_one,repeat_all, repeat_random}
+
 public class Player_music : MonoBehaviour
 {
     [Header("Obj Main")]
@@ -32,11 +34,18 @@ public class Player_music : MonoBehaviour
     public Sprite icon_pause;
     public Sprite icon_music_default;
 
+    public Sprite icon_repeat_none;
+    public Sprite icon_repeat_one;
+    public Sprite icon_repeat_all;
+    public Sprite icon_repeat_random;
+
     public Image avatar_music;
     public Image avatar_music_mini;
 
     public Image img_play;
     public Image img_play_mini;
+    public Image img_repeat_mini;
+    public Image img_repeat_full;
 
     public Image img_btn_list_online;
     public Image img_btn_list_offline;
@@ -51,6 +60,8 @@ public class Player_music : MonoBehaviour
     public GameObject button_share_song;
     public GameObject button_add_playlist;
     public GameObject prefab_item_lyrics;
+    public GameObject button_add_playlist_mini;
+    public GameObject button_repeat_mini;
 
     public GameObject obj_btn_nex_mini_player;
 
@@ -76,6 +87,7 @@ public class Player_music : MonoBehaviour
 
     private Carrot.Carrot_Box box_list;
     private IDictionary data_cur = null;
+    private repeat_music repeat = repeat_music.repeat_one;
 
     public void act_play_data(IDictionary data_music)
     {
@@ -91,6 +103,8 @@ public class Player_music : MonoBehaviour
         this.panel_info_year.SetActive(false);
 
         this.button_add_playlist.SetActive(false);
+        this.button_add_playlist_mini.SetActive(false);
+        this.button_repeat_mini.SetActive(false);
         this.button_share_song.SetActive(false);
         this.button_lyrics.SetActive(false);
         this.button_link_ytb.SetActive(false);
@@ -155,6 +169,7 @@ public class Player_music : MonoBehaviour
             this.slider_timer_music.value = 0;
             this.panel_player_mini.SetActive(true);
             this.panel_info_more.SetActive(true);
+            this.button_repeat_mini.SetActive(true);
 
             this.is_buy_mp3_present = false;
             this.txt_time_music.text = "";
@@ -309,7 +324,11 @@ public class Player_music : MonoBehaviour
                 else
                     this.panel_player_mini.SetActive(true);
                 this.check_icon_play_pause();
-                if(this.is_online_music) this.button_add_playlist.SetActive(true);
+                if (this.is_online_music)
+                {
+                    this.button_add_playlist.SetActive(true);
+                    this.button_add_playlist_mini.SetActive(true);
+                }
             }
         }
     }
@@ -330,6 +349,7 @@ public class Player_music : MonoBehaviour
                 this.button_link_ytb.SetActive(false);
                 this.button_lyrics.SetActive(false);
                 this.button_add_playlist.SetActive(false);
+                this.button_add_playlist_mini.SetActive(false);
                 this.button_download_mp3.SetActive(false);
                 this.button_share_song.SetActive(false);
                 this.txt_name_song_full.text = PlayerPrefs.GetString("no_song_play_title", "No song");
@@ -456,6 +476,14 @@ public class Player_music : MonoBehaviour
         this.check_hide_btn_prev();
     }
 
+    private void play_repeat_random()
+    {
+        this.sel_index_music = UnityEngine.Random.Range(0, this.playlist.list_music_cur.Count);
+        this.sound_music.Pause();
+        this.act_play_data(this.playlist.list_music_cur[this.sel_index_music]);
+        this.check_hide_btn_prev();
+    }
+
     public void btn_link_carrotstore_muisc()
     {
         if (this.link_store != "")
@@ -499,7 +527,23 @@ public class Player_music : MonoBehaviour
                 this.slider_timer_music.value = this.sound_music.time;
                 if (this.sound_music.time >= (this.slider_timer_music.maxValue - 0.1f))
                 {
-                    this.sound_music.Stop();
+                    if (this.repeat == repeat_music.repeat_none)
+                    {
+                        this.btn_stop();
+                    }else if (this.repeat == repeat_music.repeat_one)
+                    {
+                        this.sound_music.Play();
+                    }else if (this.repeat == repeat_music.repeat_random)
+                    {
+                        this.play_repeat_random();
+                    }else if (this.repeat == repeat_music.repeat_all)
+                    {
+                        this.btn_next();
+                    }
+                    else
+                    {
+                        this.sound_music.Stop();
+                    }
                     this.check_icon_play_pause();
                 }
             }
@@ -537,6 +581,7 @@ public class Player_music : MonoBehaviour
     public void add_song_to_playlist()
     {
         this.button_add_playlist.SetActive(false);
+        this.button_add_playlist_mini.SetActive(false);
         this.playlist.add_song(this.id_music,this.data_song,this.data_mp3, this.data_avatar);
     }
 
@@ -588,5 +633,21 @@ public class Player_music : MonoBehaviour
     public string get_name_song_last()
     {
         return this.s_name_song_last;
+    }
+
+    public void btn_change_repeat_music()
+    {
+        this.app.carrot.play_sound_click();
+
+        if (this.repeat == repeat_music.repeat_none) this.repeat = repeat_music.repeat_one;
+        else if (this.repeat == repeat_music.repeat_one) this.repeat = repeat_music.repeat_all;
+        else if (this.repeat == repeat_music.repeat_all) this.repeat = repeat_music.repeat_random;
+        else if (this.repeat == repeat_music.repeat_random) this.repeat = repeat_music.repeat_none;
+
+        if (this.repeat == repeat_music.repeat_none) this.img_repeat_mini.sprite = this.icon_repeat_none;
+        if (this.repeat == repeat_music.repeat_one) this.img_repeat_mini.sprite = this.icon_repeat_one;
+        if (this.repeat == repeat_music.repeat_all) this.img_repeat_mini.sprite = this.icon_repeat_all;
+        if (this.repeat == repeat_music.repeat_random) this.img_repeat_mini.sprite = this.icon_repeat_random;
+        this.img_repeat_full.sprite = this.img_repeat_mini.sprite;
     }
 }

@@ -850,6 +850,7 @@ public class Command_storage : MonoBehaviour
         this.check_load_command_storage();
         this.app.command_dev.close_all_box();
         this.app.command.clear_log_chat();
+        this.app.command.obj_btn_clear_all_log.SetActive(false);
     }
 
     public void show_list_cm(string s_type)
