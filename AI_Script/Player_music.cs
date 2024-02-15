@@ -354,6 +354,7 @@ public class Player_music : MonoBehaviour
                 this.button_add_playlist_mini.SetActive(false);
                 this.button_download_mp3.SetActive(false);
                 this.button_share_song.SetActive(false);
+                this.img_repeat_full.gameObject.SetActive(false);
                 this.txt_name_song_full.text = PlayerPrefs.GetString("no_song_play_title", "No song");
             }
         }
