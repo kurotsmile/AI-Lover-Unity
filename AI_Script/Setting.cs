@@ -632,23 +632,54 @@ public class Setting : MonoBehaviour
         item_ai_prioritize.set_act(() => this.show_list_ai_prioritize());
         ai_robot_group.add_item(item_ai_prioritize);
 
-        Carrot_Box_Item item_popup_voice = this.box_setting.create_item("item_popup_voice");
-        item_popup_voice.set_icon(this.app.command_voice.icon_mic_chat);
-        item_popup_voice.set_title("Voice recognition");
-        item_popup_voice.set_tip("Set up voice recognition and speech-to-text input");
-        item_popup_voice.set_lang_data("voice_command_setting", "voice_command_setting_tip");
-        item_popup_voice.load_lang_data();
-        item_popup_voice.set_act(() => this.act_open_voice_inp_setting());
+        Carrot_Box_Item item_recognition_voice = this.box_setting.create_item("item_recognition_voice");
+        item_recognition_voice.set_icon(this.app.command_voice.icon_mic_chat);
+        item_recognition_voice.set_title("Voice recognition");
+        item_recognition_voice.set_tip("Set up voice recognition and speech-to-text input");
+        item_recognition_voice.set_lang_data("voice_command_setting", "voice_command_setting_tip");
+        item_recognition_voice.load_lang_data();
+        item_recognition_voice.set_act(() => this.act_open_voice_inp_setting());
 
-        Carrot_Box_Btn_Item btn_setting_input_voice = item_popup_voice.create_item();
+        Carrot_Box_Btn_Item btn_setting_input_voice = item_recognition_voice.create_item();
         btn_setting_input_voice.set_icon(this.app.carrot.sp_icon_setting);
         btn_setting_input_voice.set_color(this.app.carrot.color_highlight);
         btn_setting_input_voice.set_act(() => this.act_open_voice_inp_setting());
-        ai_robot_group.add_item(item_popup_voice);
+        ai_robot_group.add_item(item_recognition_voice);
+
+        /**
+        Carrot_Box_Item item_box_voice = this.box_setting.create_item("item_box_voice");
+        item_box_voice.set_icon(this.app.command_voice.icon_mic_chat);
+        item_box_voice.set_title("Voice recognition dialog");
+        item_box_voice.set_tip("Hide or show the Voice Recognition Dialog");
+        item_box_voice.set_lang_data("voice_box_setting", "voice_box_setting_tip");
+        item_box_voice.load_lang_data();
+        item_box_voice.set_act(() => this.act_change_status_dialog_recognition());
+
+        Carrot_Box_Btn_Item btn_setting_box_voice = item_box_voice.create_item();
+        if(SpeechToText.Instance.isShowPopupAndroid)
+            btn_setting_box_voice.set_icon(this.sp_icon_on);
+        else
+            btn_setting_box_voice.set_icon(this.sp_icon_off);
+        btn_setting_box_voice.set_color(this.app.carrot.color_highlight);
+        Destroy(btn_setting_box_voice.GetComponent<Button>());
+        ai_robot_group.add_item(item_box_voice);
+        **/
 
         this.box_setting.update_color_table_row();
     }
 
+    /**
+    private void act_change_status_dialog_recognition()
+    {
+        this.app.carrot.play_sound_click();
+        if (SpeechToText.Instance.isShowPopupAndroid)
+            SpeechToText.Instance.isShowPopupAndroid = false;
+        else
+            SpeechToText.Instance.isShowPopupAndroid = true;
+
+        this.show_msg_status("Voice recognition dialog", SpeechToText.Instance.isShowPopupAndroid);
+    }
+    **/
 
     private void play_chat_voice_test()
     {
@@ -657,7 +688,7 @@ public class Setting : MonoBehaviour
 
     private void act_close_setting()
     {
-        this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
+        this.GetComponent<Voice_Command>().set_DetectionLanguage(PlayerPrefs.GetString("key_voice","en"));
         this.app.command_dev.check();
     }
 

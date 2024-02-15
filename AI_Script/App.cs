@@ -151,7 +151,6 @@ public class App : MonoBehaviour
         this.player_music.playlist.on_load();
         this.show_chat_function();
 
-
         this.command.load();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
         this.command_dev.check();
@@ -368,6 +367,7 @@ public class App : MonoBehaviour
         this.panel_inp_command_test.SetActive(false);
         if (this.player_music.sound_music.isPlaying) this.player_music.panel_player_mini.SetActive(true);
         if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.panel_menu_right.SetActive(false);
+        this.command.on_reset_timer_msg_tip();
     }
 
     public void show_func_function()
@@ -378,6 +378,7 @@ public class App : MonoBehaviour
         this.panel_inp_func.SetActive(true);
         this.panel_menu_right.SetActive(true);
         this.panel_inp_command_test.SetActive(false);
+        this.command.on_reset_timer_msg_tip();
     }
 
     public IEnumerator get_weather_buy_address()
@@ -664,6 +665,7 @@ public class App : MonoBehaviour
         this.load("");
         this.command.clear_log_chat();
         this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
+        this.GetComponent<Carrot_lang_show>().load_lang_emp();
     }
 
     [ContextMenu("Delete all data app")]

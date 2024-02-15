@@ -65,11 +65,14 @@ public class Command : MonoBehaviour
     private IDictionary data_chat_cur;
     private GameObject item_command_loading;
     private float timer_msg_tip = 0;
+    private bool is_tts = false;
 
     public void load()
     {
         this.obj_btn_play_all_log.SetActive(false);
         this.obj_btn_clear_all_log.SetActive(false);
+        this.app.textToSpeech.onStartCallBack = this.act_start_speech;
+        this.app.textToSpeech.onDoneCallback = this.act_done_speech;
     }
 
     public void send_command()
@@ -556,6 +559,7 @@ public class Command : MonoBehaviour
                 {
                     this.is_show_text = false;
                     this.is_hide_text = true;
+                    this.on_reset_timer_msg_tip();
                 }
             }
         }
@@ -569,6 +573,7 @@ public class Command : MonoBehaviour
                 this.is_hide_text = false;
                 this.panel_show_msg_chat.SetActive(false);
                 this.panel_show_log_chat.SetActive(true);
+                this.on_reset_timer_msg_tip();
                 if (this.area_body_log_command.childCount > 0)
                 {
                     this.obj_btn_clear_all_log.SetActive(true);
@@ -593,7 +598,7 @@ public class Command : MonoBehaviour
             if (this.timer_msg_tip >30f)
             {
                 this.timer_msg_tip = 0;
-                if (this.app.player_music.sound_music.isPlaying==false&&this.app.panel_chat_msg.activeInHierarchy==true)
+                if (this.app.player_music.sound_music.isPlaying==false&&this.app.panel_chat_msg.activeInHierarchy==true&&this.is_show_text==false&&this.is_tts==false)
                 {
                     this.send_chat_no_father("tip");
                 }
@@ -1039,6 +1044,16 @@ public class Command : MonoBehaviour
     public void btn_show_sub_menu()
     {
         this.app.command_dev.sub_menu(this.data_chat_cur);
+    }
+
+    public void act_start_speech()
+    {
+        this.is_tts = true;
+    }
+
+    public void act_done_speech()
+    {
+        this.is_tts = false;
     }
 
     #region Live Chat

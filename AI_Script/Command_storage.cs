@@ -787,6 +787,19 @@ public class Command_storage : MonoBehaviour
 
     public IDictionary act_call_cm_offline(string cm_cmd, string id_pather = "")
     {
+        IDictionary cm_offline = this.get_cm_offline(cm_cmd, id_pather);
+        if (cm_offline == null)
+        {
+            return this.get_cm_offline(cm_cmd,"");
+        }
+        else
+        {
+            return cm_offline;
+        }
+    }
+
+    public IDictionary get_cm_offline(string cm_cmd, string id_pather = "")
+    {
         cm_cmd = cm_cmd.ToLower();
         
         List<IDictionary> list_chat = new List<IDictionary>();
@@ -1223,9 +1236,10 @@ public class Command_storage : MonoBehaviour
             }
 
             this.app.carrot.hide_loading();
+            string s_id_chat_new = "chat" + this.app.carrot.generateID();
+
             if (this.app.carrot.is_online())
             {
-                string s_id_chat_new = "chat" + this.app.carrot.generateID();
                 CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
                 if (this.app.carrot.model_app == ModelApp.Publish)
                 {
@@ -1247,8 +1261,8 @@ public class Command_storage : MonoBehaviour
             }
             else
             {
-                string s_data_chat_new = JsonConvert.SerializeObject(c);
-                this.add_command_offline(s_data_chat_new);
+                IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
+                this.add_command_offline(chat_data);
             }
 
             if (this.app.carrot.model_app == ModelApp.Publish)
