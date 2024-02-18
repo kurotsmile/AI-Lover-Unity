@@ -1,5 +1,4 @@
-﻿using Firebase.Extensions;
-using Firebase.Firestore;
+﻿using Carrot;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -100,7 +99,7 @@ public class character_manager : MonoBehaviour
 
         }
 
-        this.select_character(this.sel_character);
+        this.Select_character(this.sel_character);
 
         if (this.sel_costumes_style != "")
         {
@@ -131,13 +130,13 @@ public class character_manager : MonoBehaviour
         PlayerPrefs.SetString("character_name_" + this.name_sex, s_new_name);
     }
 
-    private void select_character(int sel_index)
+    private void Select_character(int sel_index)
     {
         this.app.carrot.clear_contain(this.transform);
         this.obj_npc = Instantiate(this.obj_character_phone[sel_index]);
         this.obj_npc.transform.SetParent(this.transform);
         this.obj_npc.transform.localPosition = Vector3.zero;
-        this.obj_npc.gameObject.SetActive(true);
+        obj_npc.SetActive(true);
     }
 
     public void choise_character(int sel_index)
@@ -145,13 +144,12 @@ public class character_manager : MonoBehaviour
         this.reset_item_ui_list(this.list_character);
         this.list_character[sel_index].set_color_bk(this.app.carrot.color_highlight);
         this.sel_character = sel_index;
-        this.select_character(this.sel_character);
+        this.Select_character(this.sel_character);
         PlayerPrefs.SetInt("sel_character_" + this.name_sex, this.sel_character);
         if (this.app.s_data_json_costumes_temp != "")
             this.load_costumes_by_style_character_query();
         else
             this.load_costumes_by_style_character_s_data(this.sel_costumes_style);
-
     }
 
     public void choise_costumes(string s_id_costumes)
@@ -200,7 +198,7 @@ public class character_manager : MonoBehaviour
     {
         this.sel_character++;
         if (this.sel_character >= this.obj_character_phone.Length) this.sel_character = 0;
-        this.select_character(this.sel_character);
+        this.Select_character(this.sel_character);
         PlayerPrefs.SetInt("sel_character_" + this.name_sex, this.sel_character);
     }
 
@@ -208,10 +206,9 @@ public class character_manager : MonoBehaviour
     {
         this.sel_character--;
         if (this.sel_character <= -1) this.sel_character = this.obj_character_phone.Length - 1;
-        this.select_character(this.sel_character);
+        this.Select_character(this.sel_character);
         PlayerPrefs.SetInt("sel_character_" + this.name_sex, this.sel_character);
     }
-
 
     public void play_speak()
     {
@@ -266,40 +263,44 @@ public class character_manager : MonoBehaviour
         this.panel_costumes.SetActive(false);
         this.panel_head.SetActive(false);
 
-        Query SkinQuery = this.app.carrot.db.Collection("character_fashion").WhereEqualTo("type", this.get_npc().s_type_costumes);
-        SkinQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
-            QuerySnapshot SkinQuerySnapshot = task.Result;
-            if (task.IsFaulted)
-            {
-                this.panel_costumes.SetActive(false);
-                this.load_head_by_style_character();
-            }
-
-            if (task.IsCompleted)
-            {
-                if (SkinQuerySnapshot.Count > 0)
-                {
-                    this.list_costumes = new List<Item_character>();
-                    this.panel_costumes.SetActive(true);
-
-                    List<IDictionary> list_costumes_data = new List<IDictionary>();
-                    foreach (DocumentSnapshot documentSnapshot in SkinQuerySnapshot.Documents)
-                    {
-                        IDictionary data_costumes = documentSnapshot.ToDictionary();
-                        data_costumes["id"] = documentSnapshot.Id;
-                        this.add_item_to_list_costumes(data_costumes);
-                        list_costumes_data.Add(data_costumes);
-                    };
-                    this.s_data_json_costumes_offline = Carrot.Json.Serialize(list_costumes_data);
-                    this.app.s_data_json_costumes_temp = this.s_data_json_costumes_offline;
-                    PlayerPrefs.SetString("s_data_json_costumes_offline", this.s_data_json_costumes_offline);
-                }
-                this.load_head_by_style_character();
-            }
-        });
+        StructuredQuery q = new("character_fashion");
+        q.Set_where("type", Query_OP.EQUAL, this.get_npc().s_type_costumes);
+        this.app.carrot.server.Get_doc(q.ToJson(), Act_load_costumes_by_style_character_query_done, Act_load_costumes_by_style_character_query_fail);
     }
 
-    private void load_head_by_style_character()
+    private void Act_load_costumes_by_style_character_query_done(string s_data)
+    {
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
+        {
+            this.list_costumes = new();
+            this.panel_costumes.SetActive(true);
+            List<IDictionary> list_costumes_data = new();
+            for (int i = 0; i < fc.fire_document.Length; i++)
+            {
+                IDictionary data_costumes = fc.fire_document[i].Get_IDictionary();
+                this.add_item_to_list_costumes(data_costumes);
+                list_costumes_data.Add(data_costumes);
+            };
+            this.s_data_json_costumes_offline = Carrot.Json.Serialize(list_costumes_data);
+            this.app.s_data_json_costumes_temp = this.s_data_json_costumes_offline;
+            PlayerPrefs.SetString("s_data_json_costumes_offline", this.s_data_json_costumes_offline);
+            this.Load_head_by_style_character();
+        }
+        else
+        {
+            this.panel_costumes.SetActive(false);
+            this.Load_head_by_style_character();
+        }
+    }
+
+    private void Act_load_costumes_by_style_character_query_fail(string s_error)
+    {
+        this.panel_costumes.SetActive(false);
+        this.Load_head_by_style_character();
+    }
+
+    private void Load_head_by_style_character()
     {
         if (this.app.s_data_json_head_temp == "")
             this.load_head_by_style_character_query();
@@ -325,7 +326,7 @@ public class character_manager : MonoBehaviour
                 this.add_item_to_list_costumes(data_costumes);
             };
         }
-        this.load_head_by_style_character();
+        this.Load_head_by_style_character();
     }
 
     private void add_item_to_list_costumes(IDictionary data_costumes)
@@ -385,35 +386,36 @@ public class character_manager : MonoBehaviour
     {
         this.app.carrot.clear_contain(this.body_all_item_head_style);
         this.panel_head.SetActive(false);
+        StructuredQuery q = new("character_fashion");
+        q.Set_where("type", Query_OP.EQUAL, this.get_npc().s_type_head);
+        this.app.carrot.server.Get_doc(q.ToJson(), Act_load_head_by_style_character_query_done, Act_load_head_by_style_character_query_fail);
+    }
 
-        Query SkinQuery = this.app.carrot.db.Collection("character_fashion").WhereEqualTo("type", this.get_npc().s_type_head);
-        SkinQuery.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+    private void Act_load_head_by_style_character_query_done(string s_data)
+    {
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
         {
-            QuerySnapshot HeadQuerySnapshot = task.Result;
-            if (task.IsFaulted) this.panel_head.SetActive(false);
+            List<IDictionary> list_head_data = new List<IDictionary>();
 
-            if (task.IsCompleted)
+            this.panel_head.SetActive(true);
+            this.list_head = new List<Item_character>();
+            for(int i=0;i<fc.fire_document.Length;i++)
             {
-                if (HeadQuerySnapshot.Count > 0)
-                {
-                    List<IDictionary> list_head_data = new List<IDictionary>();
+                IDictionary data_head = fc.fire_document[i].Get_IDictionary();
+                this.add_item_to_list_head(data_head);
+                list_head_data.Add(data_head);
+            };
 
-                    this.panel_head.SetActive(true);
-                    this.list_head = new List<Item_character>();
-                    foreach (DocumentSnapshot documentSnapshot in HeadQuerySnapshot.Documents)
-                    {
-                        IDictionary data_head = documentSnapshot.ToDictionary();
-                        data_head["id"] = documentSnapshot.Id;
-                        this.add_item_to_list_head(data_head);
-                        list_head_data.Add(data_head);
-                    };
+            this.s_data_json_head_offline = Carrot.Json.Serialize(list_head_data);
+            this.app.s_data_json_head_temp = this.s_data_json_head_offline;
+            PlayerPrefs.SetString("s_data_json_head_offline", this.s_data_json_head_offline);
+        }
+    }
 
-                    this.s_data_json_head_offline = Carrot.Json.Serialize(list_head_data);
-                    this.app.s_data_json_head_temp = this.s_data_json_head_offline;
-                    PlayerPrefs.SetString("s_data_json_head_offline", this.s_data_json_head_offline);
-                }
-            }
-        });
+    private void Act_load_head_by_style_character_query_fail(string s_error)
+    {
+        this.panel_head.SetActive(false);
     }
 
     private void load_head_by_style_character_s_data(string s_data)
@@ -496,23 +498,21 @@ public class character_manager : MonoBehaviour
 
     private IEnumerator get_img_costumes_url(string s_id_costumes, string s_url_img)
     {
-        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(s_url_img))
+        using UnityWebRequest www = UnityWebRequestTexture.GetTexture(s_url_img);
+        www.SendWebRequest();
+        while (!www.isDone)
         {
-            www.SendWebRequest();
-            while (!www.isDone)
-            {
-                yield return null;
-            }
+            yield return null;
+        }
 
-            if (www.result == UnityWebRequest.Result.Success)
-            {
-                this.sel_costumes_style = s_id_costumes;
-                PlayerPrefs.SetString("sel_costumes_style" + this.name_sex, this.sel_costumes_style);
-                Texture2D tex = ((DownloadHandlerTexture)www.downloadHandler).texture;
-                this.get_npc().set_skinned_costumes(tex);
-                this.app.carrot.hide_loading();
-                this.app.carrot.get_tool().PlayerPrefs_Save_texture2D(this.get_npc().s_type_costumes + "_" + this.sel_costumes_style, tex);
-            }
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            this.sel_costumes_style = s_id_costumes;
+            PlayerPrefs.SetString("sel_costumes_style" + this.name_sex, this.sel_costumes_style);
+            Texture2D tex = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            this.get_npc().set_skinned_costumes(tex);
+            this.app.carrot.hide_loading();
+            this.app.carrot.get_tool().PlayerPrefs_Save_texture2D(this.get_npc().s_type_costumes + "_" + this.sel_costumes_style, tex);
         }
     }
 
@@ -525,20 +525,18 @@ public class character_manager : MonoBehaviour
 
     private IEnumerator get_img_head_url(string id_head, string s_url_img)
     {
-        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(s_url_img))
-        {
-            www.SendWebRequest();
-            while (!www.isDone) yield return null;
+        using UnityWebRequest www = UnityWebRequestTexture.GetTexture(s_url_img);
+        www.SendWebRequest();
+        while (!www.isDone) yield return null;
 
-            if (www.result == UnityWebRequest.Result.Success)
-            {
-                this.sel_head_style = id_head;
-                PlayerPrefs.SetString("sel_head_style" + this.name_sex, this.sel_head_style);
-                Texture2D tex = ((DownloadHandlerTexture)www.downloadHandler).texture;
-                this.get_npc().set_skinned_head(tex);
-                this.app.carrot.hide_loading();
-                this.app.carrot.get_tool().PlayerPrefs_Save_texture2D(this.get_npc().s_type_head + "_" + this.sel_head_style, tex);
-            }
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            this.sel_head_style = id_head;
+            PlayerPrefs.SetString("sel_head_style" + this.name_sex, this.sel_head_style);
+            Texture2D tex = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            this.get_npc().set_skinned_head(tex);
+            this.app.carrot.hide_loading();
+            this.app.carrot.get_tool().PlayerPrefs_Save_texture2D(this.get_npc().s_type_head + "_" + this.sel_head_style, tex);
         }
     }
 
@@ -547,8 +545,7 @@ public class character_manager : MonoBehaviour
         GameObject item_c = Instantiate(this.prefab_character_item);
         item_c.transform.SetParent(tr_father);
         item_c.transform.localScale = new Vector3(1f, 1f, 1f);
-        item_c.transform.localPosition = new Vector3(item_c.transform.localPosition.x, item_c.transform.localPosition.y, 0f);
-        item_c.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        item_c.transform.SetLocalPositionAndRotation(new Vector3(item_c.transform.localPosition.x, item_c.transform.localPosition.y, 0f), Quaternion.Euler(Vector3.zero));
         Item_character c_obj = item_c.GetComponent<Item_character>();
         return c_obj;
     }

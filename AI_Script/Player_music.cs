@@ -300,37 +300,35 @@ public class Player_music : MonoBehaviour
     {
         Debug.Log(s_url_audio);
         this.s_link_download_mp3 = s_url_audio;
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG))
+        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG);
+        www.SendWebRequest();
+        while (!www.isDone)
         {
-            www.SendWebRequest();
-            while (!www.isDone)
-            {
-                slider_download_music.value = www.downloadProgress;
-                yield return null;
-            }
+            slider_download_music.value = www.downloadProgress;
+            yield return null;
+        }
 
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log(www.error);
-            }
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            this.data_mp3 = www.downloadHandler.data;
+            this.sound_music.clip = DownloadHandlerAudioClip.GetContent(www);
+            this.slider_timer_music.maxValue = this.sound_music.clip.length;
+            this.sound_music.Play();
+            this.slider_download_music.gameObject.SetActive(false);
+            this.app.get_character().play_ani_dance();
+            if (this.app.get_index_sel_func() == 2)
+                this.panel_player_mini.SetActive(false);
             else
+                this.panel_player_mini.SetActive(true);
+            this.check_icon_play_pause();
+            if (this.is_online_music)
             {
-                this.data_mp3 = www.downloadHandler.data;
-                this.sound_music.clip = DownloadHandlerAudioClip.GetContent(www);
-                this.slider_timer_music.maxValue = this.sound_music.clip.length;
-                this.sound_music.Play();
-                this.slider_download_music.gameObject.SetActive(false);
-                this.app.get_character().play_ani_dance();
-                if (this.app.get_index_sel_func() == 2)
-                    this.panel_player_mini.SetActive(false);
-                else
-                    this.panel_player_mini.SetActive(true);
-                this.check_icon_play_pause();
-                if (this.is_online_music)
-                {
-                    this.button_add_playlist.SetActive(true);
-                    this.button_add_playlist_mini.SetActive(true);
-                }
+                this.button_add_playlist.SetActive(true);
+                this.button_add_playlist_mini.SetActive(true);
             }
         }
     }
@@ -585,7 +583,7 @@ public class Player_music : MonoBehaviour
     {
         this.button_add_playlist.SetActive(false);
         this.button_add_playlist_mini.SetActive(false);
-        this.playlist.add_song(this.id_music,this.data_song,this.data_mp3, this.data_avatar);
+        this.playlist.Add_song(this.id_music,this.data_song,this.data_mp3, this.data_avatar);
     }
 
     public Sprite get_avatar_music(string s_id_m)

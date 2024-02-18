@@ -1,9 +1,7 @@
 ﻿using Carrot;
 using Crosstales;
-using Firebase.Extensions;
-using Firebase.Firestore;
 using System.Collections;
-using System.Collections.Generic;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -96,15 +94,15 @@ public class Command : MonoBehaviour
 
         this.is_live = false;
         this.s_command_chat_last = s_key;
-        this.on_reset_timer_msg_tip();
+        this.On_reset_timer_msg_tip();
 
         if (this.mode == Command_Type_Mode.chat)
         {
             if (is_log_show)
             {
-                this.add_item_log_chat(s_key);
+                this.Add_item_log_chat(s_key);
                 this.add_item_log_loading();
-                if (this.app.player_music.playlist.check_query_key(s_key)) return;
+                if (this.app.player_music.playlist.Check_query_key(s_key)) return;
             }
 
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
@@ -170,73 +168,53 @@ public class Command : MonoBehaviour
 
     private void play_chat(string s_key)
     {
-        Debug.Log("Get chat Ai Pater: "+this.id_cur_chat+" (" + s_key + ")");
-        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-        ChatQuery = ChatQuery.WhereEqualTo("key", s_key);
-
-        if (this.id_cur_chat.ToString() != "") ChatQuery = ChatQuery.WhereEqualTo("pater", this.id_cur_chat);
-        ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
-            QuerySnapshot capitalQuerySnapshot = task.Result;
-            if (task.IsFaulted)
-            {
-                this.show_msg_error(task.Exception.Message);
-            }
-
-            if (task.IsCompleted)
-            {
-                if (capitalQuerySnapshot.Count > 0)
-                {
-                    List<IDictionary> list_chat = new List<IDictionary>();
-                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
-                    {
-                        IDictionary c = documentSnapshot.ToDictionary();
-                        c["id"] = documentSnapshot.Id;
-                        if (c["sex_user"].ToString() == this.app.setting.get_user_sex() && c["sex_character"].ToString() == this.app.setting.get_character_sex() && c["pater"].ToString() == this.id_cur_chat)
-                        {
-                            list_chat.Add(c);
-                            this.app.command_storage.add_command_offline(c);
-                        }
-                    };
-
-                    if (list_chat.Count == 0)
-                    {
-                        this.send_to_all_ai(s_key);
-                    }
-                    else
-                    {
-                        if (list_chat.Count > 1)
-                        {
-                            int index_random = Random.Range(0, list_chat.Count);
-                            this.act_chat(list_chat[index_random]);
-                        }
-                        else
-                        {
-                            this.act_chat(list_chat[0]);
-                        }
-                    }
-                }
-                else
-                {
-                    if (this.id_cur_chat != "")
-                    {
-                        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
-                        {
-                            if (this.app.carrot.lang.get_key_lang() == "vi") this.app.command_storage.add_log(s_key);
-                        }
-
-                        this.id_cur_chat = "";
-                        this.play_chat(s_key);
-                    }
-                    else
-                    {
-                        this.send_to_all_ai(s_key);
-                    }
-                }
-            }
-        });
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        q.Add_where("key", Query_OP.EQUAL, s_key);
+        q.Add_where("sex_user", Query_OP.EQUAL, this.app.setting.get_user_sex());
+        q.Add_where("sex_character", Query_OP.EQUAL, this.app.setting.get_character_sex());
+        q.Add_where("pater", Query_OP.EQUAL, this.id_cur_chat);
+        q.Set_limit(10);
+        this.app.carrot.server.Get_doc(q.ToJson(), Act_doc_done, Act_doc_fail);
     }
 
-    private void send_to_all_ai(string s_key)
+    private void Act_doc_done(string s_data)
+    {
+        Fire_Collection fc = new(s_data);
+        if (this.id_cur_chat != "")
+        {
+            if (fc.is_null)
+            {
+                this.id_cur_chat = "";
+                this.play_chat(this.s_command_chat_last);
+            }
+            else
+            {
+                this.act_chat(fc.Get_doc_random().Get_IDictionary());
+            }
+        }
+        else
+        {
+            if (fc.is_null)
+                this.Send_to_all_ai(this.s_command_chat_last);
+            else
+                this.act_chat(fc.Get_doc_random().Get_IDictionary());
+        }
+
+        if (!fc.is_null)
+        {
+            for(int i = 0; i < fc.fire_document.Length; i++)
+            {
+                this.app.command_storage.add_command_offline(fc.fire_document[i].Get_IDictionary());
+            }
+        }
+    }
+
+    private void Act_doc_fail(string s_data)
+    {
+        this.Send_to_all_ai(this.s_command_chat_last);
+    }
+
+    private void Send_to_all_ai(string s_key)
     {
         if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
         {
@@ -258,11 +236,10 @@ public class Command : MonoBehaviour
                 else
                     this.app.open_AI.send_chat(s_key);
             }
-
         }
     }
 
-    private void hide_all_obj_msg()
+    private void Hide_all_obj_msg()
     {
         this.id_cur_chat = "";
         this.obj_btn_info_chat.SetActive(false);
@@ -278,13 +255,13 @@ public class Command : MonoBehaviour
     {
         if (this.item_command_loading != null) Destroy(this.item_command_loading);
         this.data_chat_cur = null;
-        this.hide_all_obj_msg();
+        this.Hide_all_obj_msg();
         this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
     }
 
     private void show_msg_error(string s_msg_error)
     {
-        this.hide_all_obj_msg();
+        this.Hide_all_obj_msg();
         this.show_effect_txt_msg(s_msg_error);
     }
 
@@ -294,7 +271,7 @@ public class Command : MonoBehaviour
         this.send_command();
     }
 
-    private void add_item_log_chat(string s_inp_command)
+    private void Add_item_log_chat(string s_inp_command)
     {
         GameObject item_command_chat = Instantiate(this.prefab_item_command_chat);
         item_command_chat.transform.SetParent(this.area_body_log_command);
@@ -409,7 +386,7 @@ public class Command : MonoBehaviour
 
     public void act_chat(IDictionary data_chat, bool is_add_log = true)
     {
-        this.on_reset_timer_msg_tip();
+        this.On_reset_timer_msg_tip();
         this.obj_btn_log.SetActive(true);
         this.obj_btn_info_chat.SetActive(true);
         this.obj_btn_translate.SetActive(true);
@@ -518,7 +495,7 @@ public class Command : MonoBehaviour
                 }
                 else
                 {
-                    if (s_id_icon != "") this.get_effect_icon_chat(s_id_icon);
+                    if(s_id_icon != "") this.get_effect_icon_chat(s_id_icon);
                 }
             }
         }
@@ -540,7 +517,7 @@ public class Command : MonoBehaviour
         this.app.get_character().play_ani_face(index);
     }
 
-    private void action_waitting()
+    private void Action_waitting()
     {
         this.app.get_character().play_ani_waitting();
     }
@@ -559,7 +536,7 @@ public class Command : MonoBehaviour
                 {
                     this.is_show_text = false;
                     this.is_hide_text = true;
-                    this.on_reset_timer_msg_tip();
+                    this.On_reset_timer_msg_tip();
                 }
             }
         }
@@ -573,13 +550,13 @@ public class Command : MonoBehaviour
                 this.is_hide_text = false;
                 this.panel_show_msg_chat.SetActive(false);
                 this.panel_show_log_chat.SetActive(true);
-                this.on_reset_timer_msg_tip();
+                this.On_reset_timer_msg_tip();
                 if (this.area_body_log_command.childCount > 0)
                 {
                     this.obj_btn_clear_all_log.SetActive(true);
                     if (this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
                 }
-                if (this.app.player_music.sound_music.isPlaying == false) this.action_waitting();
+                if (this.app.player_music.sound_music.isPlaying == false) this.Action_waitting();
             }
         }
 
@@ -606,7 +583,7 @@ public class Command : MonoBehaviour
         }
     }
 
-    public void on_reset_timer_msg_tip()
+    public void On_reset_timer_msg_tip()
     {
         this.timer_msg_tip = 0f;
     }
@@ -654,34 +631,30 @@ public class Command : MonoBehaviour
     public IEnumerator get_audio_chat_form_txt(string txt_chat, string s_lang)
     {
         string s_url_audio = "https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=" + txt_chat.Length + "&client=tw-ob&q=" + txt_chat + "&tl=" + s_lang;
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG))
+        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG);
+        yield return www.SendWebRequest();
+        if (www.result != UnityWebRequest.Result.Success)
         {
-            yield return www.SendWebRequest();
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log(www.error);
-                this.app.textToSpeech.StartSpeak(txt_chat);
-            }
-            else
-            {
-                this.play_sound_chat(DownloadHandlerAudioClip.GetContent(www));
-            }
+            Debug.Log(www.error);
+            this.app.textToSpeech.StartSpeak(txt_chat);
+        }
+        else
+        {
+            this.play_sound_chat(DownloadHandlerAudioClip.GetContent(www));
         }
     }
 
     public IEnumerator get_audio_chat_form_url(string s_url_audio)
     {
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG))
+        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(s_url_audio, AudioType.MPEG);
+        yield return www.SendWebRequest();
+        if (www.result != UnityWebRequest.Result.Success)
         {
-            yield return www.SendWebRequest();
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                this.play_sound_chat(DownloadHandlerAudioClip.GetContent(www));
-            }
+            Debug.Log(www.error);
+        }
+        else
+        {
+            this.play_sound_chat(DownloadHandlerAudioClip.GetContent(www));
         }
     }
 
@@ -704,16 +677,14 @@ public class Command : MonoBehaviour
 
     private void get_effect_icon_chat(string s_id_icon)
     {
-        DocumentReference iconRef = this.app.carrot.db.Collection("icon").Document(s_id_icon);
-        iconRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCompleted)
-            {
-                DocumentSnapshot collectionIcon = task.Result;
-                IDictionary icon_data = collectionIcon.ToDictionary();
-                this.app.carrot.get_img_and_save_playerPrefs(icon_data["icon"].ToString(), null, s_id_icon, act_play_effect_icon_chat);
-            }
-        });
+        this.app.carrot.server.Get_doc_by_path("icon", s_id_icon, act_get_effect_icon_chat_done);
+    }
+
+    private void act_get_effect_icon_chat_done(string s_data)
+    {
+        Fire_Document fd = new(s_data);
+        IDictionary icon_data = fd.Get_IDictionary();
+        this.app.carrot.get_img_and_save_playerPrefs(icon_data["icon"].ToString(), null,fd.Get_id(), act_play_effect_icon_chat);
     }
 
     private void act_play_effect_icon_chat(Texture2D tex_icon)
@@ -767,34 +738,24 @@ public class Command : MonoBehaviour
     {
         IDictionary data_chat_info = this.app.command_storage.get_cm_by_id(s_id);
         if (data_chat_cur == null)
-        {
-            DocumentReference docDef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).Document(s_id);
-            docDef.GetSnapshotAsync().ContinueWithOnMainThread(task => {
-                DocumentSnapshot docData = task.Result;
-                if (task.IsFaulted)
-                {
-                    this.app.carrot.show_msg("Chat Info", "The data retrieval process encountered a problem!", Carrot.Msg_Icon.Error);
-                }
-
-                if (task.IsCompleted)
-                {
-                    if (docData.Exists)
-                    {
-                        IDictionary data_info = docData.ToDictionary();
-                        data_info["id"] = s_id;
-                        this.box_info_chat(data_info);
-                    }
-                    else
-                    {
-                        this.app.carrot.show_msg("Chat Info", PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
-                    }
-                }
-            });
-        }
+            this.app.carrot.server.Get_doc_by_path("chat-" + this.app.carrot.lang.get_key_lang(), s_id, Act_show_info_chat_by_id_done, Act_show_info_chat_by_id_fail);
         else
-        {
             this.box_info_chat(data_chat_info);
-        }
+    }
+
+    private void Act_show_info_chat_by_id_done(string s_data)
+    {
+        Fire_Document doc = new(s_data);
+        IDictionary data_info = doc.Get_IDictionary();
+        if (data_info!=null)
+            this.box_info_chat(data_info);
+        else
+            this.app.carrot.show_msg("Chat Info", PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
+    }
+
+    private void Act_show_info_chat_by_id_fail(string s_error)
+    {
+        this.app.carrot.show_msg("Chat Info", "The data retrieval process encountered a problem!", Carrot.Msg_Icon.Error);
     }
 
     public void box_info_chat(IDictionary data_chat)
@@ -1008,7 +969,7 @@ public class Command : MonoBehaviour
 
     private void send_live(string s_key)
     {
-        IList icons = this.app.icon.get_list_icon_name();
+        IList icons = this.app.icon.Get_list_icon_name();
         this.data_chat_cur = (IDictionary)Json.Deserialize("{}");
         this.data_chat_cur["id"] = "chat" + this.app.carrot.generateID();
         this.data_chat_cur["msg"] = s_key;

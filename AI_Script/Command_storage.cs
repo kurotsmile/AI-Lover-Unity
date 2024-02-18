@@ -1,6 +1,4 @@
 ﻿using Carrot;
-using Firebase.Extensions;
-using Firebase.Firestore;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -19,57 +17,34 @@ public enum Command_Type_Act
     edit_command_from_log
 }
 
-[FirestoreData]
 public struct chat
 {
     public string id { get; set; }
-    [FirestoreProperty]
     public string key { get; set; }
-    [FirestoreProperty]
     public string msg { get; set; }
-    [FirestoreProperty]
     public string act { get; set; }
-    [FirestoreProperty]
     public string face { get; set; }
-    [FirestoreProperty]
     public string limit { get; set; }
-    [FirestoreProperty]
     public string mp3 { get; set; }
-    [FirestoreProperty]
     public string sex_user { get; set; }
-    [FirestoreProperty]
     public string sex_character { get; set; }
-    [FirestoreProperty]
     public string status { get; set; }
-    [FirestoreProperty]
     public string pater { get; set; }
-    [FirestoreProperty]
     public string link { get; set; }
-    [FirestoreProperty]
     public string color { get; set; }
-    [FirestoreProperty]
     public string icon { get; set; }
-    [FirestoreProperty]
     public Carrot_Rate_user_data user { get; set; }
-    [FirestoreProperty]
     public string func { get; set; }
-    [FirestoreProperty]
     public string date_create { get; set; }
 }
 
-[FirestoreData]
 public struct Chat_Log
 {
     public string id { get; set; }
-    [FirestoreProperty]
     public string key { get; set; }
-    [FirestoreProperty]
     public string pater { get; set; }
-    [FirestoreProperty]
     public string lang { get; set; }
-    [FirestoreProperty]
     public Carrot_Rate_user_data user { get; set; }
-    [FirestoreProperty]
     public string date_create { get; set; }
 }
 
@@ -521,7 +496,7 @@ public class Command_storage : MonoBehaviour
         item_icon.set_tip("Choose icons and colors in the system's icon store to increase the liveliness of the dialogue");
         item_icon.set_lang_data("setting_bubble_icon", "setting_bubble_icon_tip");
         item_icon.load_lang_data();
-        item_icon.set_act(() => this.app.icon.btn_show_list_emoji_and_color(item_icon));
+        item_icon.set_act(() => this.app.icon.Btn_show_list_emoji_and_color(item_icon));
         item_icon.set_val("#" + this.s_color);
         if (this.is_cm_mode_nomal)
             this.item_icon.gameObject.SetActive(false);
@@ -550,7 +525,7 @@ public class Command_storage : MonoBehaviour
             if (sp_icon != null) this.item_icon.set_icon_white(sp_icon);
         }
 
-        if (this.app.icon.count_icon_name() > 0)
+        if (this.app.icon.Count_icon_name() > 0)
         {
             Carrot_Box_Btn_Item btn_icon_random = this.item_icon.create_item();
             btn_icon_random.set_icon(this.sp_icon_random);
@@ -683,7 +658,7 @@ public class Command_storage : MonoBehaviour
     private void change_icon_random()
     {
         this.app.carrot.play_sound_click();
-        IList icons = this.app.icon.get_list_icon_name();
+        IList icons = this.app.icon.Get_list_icon_name();
         if (icons != null)
         {
             Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
@@ -959,25 +934,34 @@ public class Command_storage : MonoBehaviour
 
     public void download_command_shop()
     {
-        Query DownloadChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).WhereEqualTo("sex_user", this.app.setting.get_user_sex()).WhereEqualTo("sex_character", this.app.setting.get_character_sex());
-        DownloadChatQuery.Limit(50).GetSnapshotAsync().ContinueWithOnMainThread(task => {
-            QuerySnapshot capitalQuerySnapshot = task.Result;
-            if (task.IsCompleted)
+        this.app.carrot.show_loading();
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        q.Add_where("sex_user", Query_OP.EQUAL, this.app.setting.get_user_sex());
+        q.Add_where("sex_character", Query_OP.EQUAL, this.app.setting.get_character_sex());
+        this.app.carrot.server.Get_doc(q.ToJson(), Act_download_command_shop_done, Act_download_command_shop_fail);
+    }
+
+    private void Act_download_command_shop_done(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
+        {
+            List<IDictionary> list_chat = new List<IDictionary>();
+            for(int i=0;i<fc.fire_document.Length;i++)
             {
-                if (capitalQuerySnapshot.Count > 0)
-                {
-                    List<IDictionary> list_chat = new List<IDictionary>();
-                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
-                    {
-                        IDictionary c = documentSnapshot.ToDictionary();
-                        c["id"] = documentSnapshot.Id;
-                        c["status"] = "buy";
-                        this.app.command_storage.add_command_offline(c);
-                    };
-                    this.app.carrot.show_msg(PlayerPrefs.GetString("brain_download", "Download commands"), PlayerPrefs.GetString("shop_buy_success", "Purchase successful! the function you purchased has been activated. Please restart the application to use it"), Carrot.Msg_Icon.Success);
-                }
-            }
-        });
+                IDictionary c = fc.fire_document[i].Get_IDictionary();
+                c["status"] = "buy";
+                this.app.command_storage.add_command_offline(c);
+            };
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_download", "Download commands"), PlayerPrefs.GetString("shop_buy_success", "Purchase successful! the function you purchased has been activated. Please restart the application to use it"), Carrot.Msg_Icon.Success);
+        }
+    }
+
+    private void Act_download_command_shop_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        this.app.carrot.show_msg(s_error);
     }
 
     public void hide_box_add()
@@ -1098,21 +1082,27 @@ public class Command_storage : MonoBehaviour
     {
         if (this.list_key_block == null)
         {
-            DocumentReference keyblockRef = this.app.carrot.db.Collection("block").Document(this.app.carrot.lang.get_key_lang());
-            keyblockRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    DocumentSnapshot collectionSnapshot = task.Result;
-                    IDictionary key_block = collectionSnapshot.ToDictionary();
-                    this.list_key_block = (IList)key_block["chat"];
-                }
-            });
+            this.app.carrot.server.Get_doc_by_path("block", this.app.carrot.lang.get_key_lang(), Act_get_list_key_block_done);
+        }
+    }
+
+    private void Act_get_list_key_block_done(string s_data)
+    {
+        IDictionary data_block = (IDictionary)Json.Deserialize(s_data);
+        IDictionary fields = (IDictionary) data_block["fields"];
+        IDictionary chat = (IDictionary) fields["chat"];
+        IDictionary arrayValue = (IDictionary)chat["arrayValue"];
+        IList values = (IList)arrayValue["values"];
+        this.list_key_block = (IList) Json.Deserialize("[]");
+        foreach (IDictionary block in values)
+        {
+            this.list_key_block.Add(block["stringValue"].ToString());
         }
     }
 
     private string check_keyblock(string s_key_check)
     {
+        if (this.list_key_block == null) return "";
         foreach (string s_key in this.list_key_block)
         {
             if (s_key_check.ToLower().Equals(s_key.ToLower()) || s_key_check.ToLower().Contains(s_key.ToLower()))
@@ -1237,12 +1227,15 @@ public class Command_storage : MonoBehaviour
 
             this.app.carrot.hide_loading();
             string s_id_chat_new = "chat" + this.app.carrot.generateID();
-
+            c.id = s_id_chat_new;
             if (this.app.carrot.is_online())
             {
-                CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
                 if (this.app.carrot.model_app == ModelApp.Publish)
                 {
+                    IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
+                    string s_json=this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+                    this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat_new,s_json);
+                    /**
                     DocumentReference chatRef = chatDbRef.Document(s_id_chat_new);
                     c.id = s_id_chat_new;
                     IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
@@ -1250,13 +1243,15 @@ public class Command_storage : MonoBehaviour
                         if (task.IsFaulted) this.add_command_offline(chat_data);
                         if (task.IsCompleted) this.add_command_offline(chat_data);
                     });
+                    **/
                 }
 
                 if (this.app.carrot.model_app == ModelApp.Develope)
                 {
-                    DocumentReference chatRef = chatDbRef.Document(c.id);
                     c.status = "passed";
-                    chatRef.SetAsync(c);
+                    IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
+                    string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+                    this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat_new, s_json);
                 }
             }
             else
@@ -1279,11 +1274,11 @@ public class Command_storage : MonoBehaviour
         if (this.type_act == Command_Type_Act.edit_pass)
         {
             this.app.carrot.hide_loading();
-            CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
             chat c = this.get_data_chat();
-            DocumentReference chatRef = chatDbRef.Document(c.id);
             c.status = "passed";
-            chatRef.SetAsync(c);
+            IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
+            string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+            this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), c.id, s_json);
             this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "Chat update published successfully! (Dev)");
             if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
         }
@@ -1291,11 +1286,11 @@ public class Command_storage : MonoBehaviour
         if (this.type_act == Command_Type_Act.edit_pending_to_pass)
         {
             this.app.carrot.hide_loading();
-            CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
             chat c = this.get_data_chat();
-            DocumentReference chatRef = chatDbRef.Document(c.id);
             c.status = "passed";
-            chatRef.SetAsync(c);
+            IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
+            string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+            this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), c.id, s_json);
             this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "Convert draft dialogue into successfully published conversation! (Dev)");
             if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
             this.act_delete_cm(this.index_cm_update);
@@ -1501,10 +1496,10 @@ public class Command_storage : MonoBehaviour
         }
 
         string s_id_log = "log" + this.app.carrot.generateID();
-        CollectionReference chatDbRef = this.app.carrot.db.Collection("chat-log");
-        DocumentReference chatRef = chatDbRef.Document(s_id_log);
         log.id = s_id_log;
-        chatRef.SetAsync(log);
+        IDictionary log_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(log));
+        string s_json = this.app.carrot.server.Convert_IDictionary_to_json(log_data);
+        this.app.carrot.server.Add_Document_To_Collection("chat-log", s_id_log, s_json);
     }
 
     #region Query Key Setting
@@ -1514,7 +1509,7 @@ public class Command_storage : MonoBehaviour
         this.box_add_chat.set_title(PlayerPrefs.GetString("cm_query_setting", "Customize command query keywords"));
         this.box_add_chat.set_icon(this.app.carrot.sp_icon_dev);
         this.list_item_key_query = new List<Carrot_Box_Item>();
-        string s_data_querys_song = this.app.player_music.playlist.get_data_key_query_music();
+        string s_data_querys_song = this.app.player_music.playlist.Get_data_key_query_music();
         if (s_data_querys_song == "")
         {
             Carrot_Box_Item item_key_query = this.box_add_chat.create_item("item_key_0");
@@ -1602,7 +1597,7 @@ public class Command_storage : MonoBehaviour
         s_query_data = s_query_data + "end";
         s_query_data = s_query_data.Replace(";end", "");
         if (s_query_data == "end") s_query_data = "";
-        this.app.player_music.playlist.set_data_key_query_music(s_query_data);
+        this.app.player_music.playlist.Set_data_key_query_music(s_query_data);
         this.app.carrot.play_sound_click();
         if (this.box_add_chat != null) this.box_add_chat.close();
     }

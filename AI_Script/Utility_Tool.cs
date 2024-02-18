@@ -50,6 +50,7 @@ public class Utility_Tool : MonoBehaviour
 
     public void open_content_Intent(string s_action = "android.settings.SETTINGS")
     {
+#if UNITY_ANDROID
         using (var unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         using (AndroidJavaObject currentActivityObject = unityClass.GetStatic<AndroidJavaObject>("currentActivity"))
         {
@@ -58,10 +59,12 @@ public class Utility_Tool : MonoBehaviour
                 currentActivityObject.Call("startActivity", intentObject);
             }
         }
+#endif
     }
 
     public void OpenApp_by_bundleId(string bundleId)
     {
+#if UNITY_ANDROID
         bool fail = false;
         AndroidJavaClass up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
@@ -92,12 +95,14 @@ public class Utility_Tool : MonoBehaviour
         ca.Dispose();
         packageManager.Dispose();
         launchIntent.Dispose();
-
+#endif
     }
 
     public void test_music()
     {
+#if UNITY_ANDROID
         javaObject.CallStatic("play_music",this.context);
+#endif
     }
 
     public void getAllAudioFromDevice()

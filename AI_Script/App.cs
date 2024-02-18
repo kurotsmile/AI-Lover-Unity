@@ -144,18 +144,18 @@ public class App : MonoBehaviour
         this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().check_show_emp_by_resolution();
         this.act_change_Scene_Rotation();
 
-        this.view.on_start();
+        this.view.On_start();
 
         this.panel_main.SetActive(true);
         this.player_music.panel_player_mini.SetActive(false);
-        this.player_music.playlist.on_load();
+        this.player_music.playlist.On_load();
         this.show_chat_function();
 
         this.command.load();
         this.command.sound_command.pitch = this.setting.get_voice_speed();
         this.command_dev.check();
 
-        this.icon.load();
+        this.icon.On_load();
         this.open_AI.on_load();
         this.gemini_AI.on_load();
         this.action.on_load();
@@ -198,7 +198,7 @@ public class App : MonoBehaviour
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
         this.command.send_chat("hi_" + hour);
-        this.player_music.playlist.on_load();
+        this.player_music.playlist.On_load();
         if (!this.is_radio_func) this.button_randio.SetActive(false);
     }
 
@@ -367,7 +367,7 @@ public class App : MonoBehaviour
         this.panel_inp_command_test.SetActive(false);
         if (this.player_music.sound_music.isPlaying) this.player_music.panel_player_mini.SetActive(true);
         if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.panel_menu_right.SetActive(false);
-        this.command.on_reset_timer_msg_tip();
+        this.command.On_reset_timer_msg_tip();
     }
 
     public void show_func_function()
@@ -378,7 +378,7 @@ public class App : MonoBehaviour
         this.panel_inp_func.SetActive(true);
         this.panel_menu_right.SetActive(true);
         this.panel_inp_command_test.SetActive(false);
-        this.command.on_reset_timer_msg_tip();
+        this.command.On_reset_timer_msg_tip();
     }
 
     public IEnumerator get_weather_buy_address()
@@ -400,19 +400,17 @@ public class App : MonoBehaviour
 
     public IEnumerator get_weather_buy_lot_and_lat(float weather_longitude,float weather_latitude)
     {
-        using (UnityWebRequest www = UnityWebRequest.Get("https://api.openweathermap.org/data/2.5/onecall?lat="+ weather_longitude + "&lon="+ weather_latitude + "&exclude=hourly,daily&appid=" + this.get_key_weather_api() + "&lang=" + PlayerPrefs.GetString("lang", "vi") + "&mode=json&units=metric&cnt=3"))
+        using UnityWebRequest www = UnityWebRequest.Get("https://api.openweathermap.org/data/2.5/onecall?lat=" + weather_longitude + "&lon=" + weather_latitude + "&exclude=hourly,daily&appid=" + this.get_key_weather_api() + "&lang=" + PlayerPrefs.GetString("lang", "vi") + "&mode=json&units=metric&cnt=3");
+        yield return www.SendWebRequest();
+        if (www.result != UnityWebRequest.Result.Success)
         {
-            yield return www.SendWebRequest();
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                PlayerPrefs.SetString("weather_" + System.DateTime.Now.ToString("dd_MM_yyyy") + "_" + PlayerPrefs.GetString("lang", "vi"), www.downloadHandler.text);
-                this.load_info_weather(www.downloadHandler.text);
-                this.setting.set_text_weather_pin(weather_longitude+","+ weather_latitude);
-            }
+            Debug.Log(www.error);
+        }
+        else
+        {
+            PlayerPrefs.SetString("weather_" + System.DateTime.Now.ToString("dd_MM_yyyy") + "_" + PlayerPrefs.GetString("lang", "vi"), www.downloadHandler.text);
+            this.load_info_weather(www.downloadHandler.text);
+            this.setting.set_text_weather_pin(weather_longitude + "," + weather_latitude);
         }
     }
 
@@ -607,7 +605,7 @@ public class App : MonoBehaviour
 
         if (this.sel_func == 4)
         {
-            this.view.on_load();
+            this.view.On_load();
             if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait())
                 this.panel_menu_right_act.SetActive(false);
             else
@@ -778,7 +776,7 @@ public class App : MonoBehaviour
 
     public void on_hit()
     {
-        this.command.on_reset_timer_msg_tip();
+        this.command.On_reset_timer_msg_tip();
         this.count_hit++;
         if (this.count_hit >= this.get_character().get_length_ani_hit())
         {
@@ -884,7 +882,7 @@ public class App : MonoBehaviour
         {
             this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.player_music.act_download_mp3_form_shop();
-            this.player_music.playlist.on_pay_success();
+            this.player_music.playlist.On_pay_success();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(3))
@@ -904,7 +902,7 @@ public class App : MonoBehaviour
         if (id_product == this.carrot.shop.get_id_by_index(this.icon.index_buy_category_icon))
         {
             this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
-            this.icon.act_buy_category_success();
+            this.icon.Act_buy_category_success();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(this.action.index_product_buy_act))

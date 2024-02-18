@@ -1,5 +1,4 @@
-using Firebase.Extensions;
-using Firebase.Firestore;
+using Carrot;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -39,12 +38,19 @@ public class Environment : MonoBehaviour
     private int index_type_rotate_character = 0;
     private bool is_view_portrait = true;
 
-    private QuerySnapshot BackgroundQuerySnapshot;
-    private QuerySnapshot FloorQuerySnapshot;
     private string s_id_floor = "";
 
-    public void on_start()
+    private string s_data_json_bk_offline = "";
+    private string s_data_json_floor_offline="";
+
+    public void On_start()
     {
+        if (this.app.carrot.is_offline())
+        {
+            this.s_data_json_bk_offline = PlayerPrefs.GetString("s_data_json_bk_offline");
+            this.s_data_json_floor_offline= PlayerPrefs.GetString("s_data_json_floor_offline");
+        }
+
         Color32 color_default = this.app.color_bk_default;
         this.s_color_bk = PlayerPrefs.GetString("s_color_bk",ColorUtility.ToHtmlStringRGBA(color_default));
         this.index_type_rotate_character = PlayerPrefs.GetInt("type_rotate_character", 0);
@@ -54,13 +60,13 @@ public class Environment : MonoBehaviour
         this.s_id_floor = PlayerPrefs.GetString("s_id_floor", "");
         if (this.s_id_floor != "") this.sel_bk_floor(this.s_id_floor);
         
-        this.load_file_background();
+        this.Load_file_background();
 
         this.check_index_func_rotate_character();
         this.check_func_rotate_character();
     }
 
-    public void on_load()
+    public void On_load()
     {
         if (this.is_view_portrait)
             this.slider_zoom.value=PlayerPrefs.GetFloat("bk_zoom_view_portrait", 10f);
@@ -77,7 +83,7 @@ public class Environment : MonoBehaviour
         }
     }
 
-    public void load_file_background()
+    public void Load_file_background()
     {
         string name_file_bk;
         if (Application.isEditor)
@@ -139,23 +145,36 @@ public class Environment : MonoBehaviour
     public void show_list_background_image()
     {
         this.app.carrot.show_loading();
-        if (this.BackgroundQuerySnapshot==null)
+        if (this.s_data_json_bk_offline=="")
         {
-            CollectionReference IconRef = this.app.carrot.db.Collection("background");
-            IconRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
-            {
-                this.BackgroundQuerySnapshot = task.Result;
-                act_load_list_background(this.BackgroundQuerySnapshot);
-            });
+            StructuredQuery q = new("background");
+            this.app.carrot.server.Get_doc(q.ToJson(), Act_get_list_bk_done, Act_get_list_bk_fail);
         }
         else
         {
-            act_load_list_background(this.BackgroundQuerySnapshot);
+            this.Act_load_list_bk(this.s_data_json_bk_offline);
         }
     }
 
-    private void act_load_list_background(QuerySnapshot query_background)
+    private void Act_get_list_bk_done(string s_data)
     {
+        this.s_data_json_bk_offline = s_data;
+        PlayerPrefs.SetString("s_data_json_bk_offline",s_data);
+        this.Act_load_list_bk(s_data);
+    }
+
+    private void Act_get_list_bk_fail(string s_error)
+    {
+        if (this.s_data_json_bk_offline != "")
+            this.Act_load_list_bk(this.s_data_json_bk_offline);
+        else
+            this.app.carrot.show_msg(s_error);
+    }
+
+    private void Act_load_list_bk(string s_data)
+    {
+        Fire_Collection fc = new(s_data);
+
         this.app.carrot.hide_loading();
         if (this.box_list != null) this.box_list.close();
         this.box_list = this.app.carrot.show_grid(this.icon_list_background);
@@ -165,16 +184,14 @@ public class Environment : MonoBehaviour
         btn_freshen.set_act(() => show_list_background_image());
 
         this.box_list.set_item_size(new Vector2(105, 130));
-
-        foreach (DocumentSnapshot document in query_background)
+        for (int i = 0; i < fc.fire_document.Length; i++)
         {
-            IDictionary data_bk = (IDictionary)document.ToDictionary();
-            data_bk["id"] = document.Id;
+            IDictionary data_bk = fc.fire_document[i].Get_IDictionary();
             string s_link_icon = data_bk["icon"].ToString();
 
-            Carrot.Carrot_Box_Item item_bk = this.box_list.create_item(document.Id);
+            Carrot.Carrot_Box_Item item_bk = this.box_list.create_item(data_bk["id"].ToString());
 
-            Sprite pic_background = this.app.carrot.get_tool().get_sprite_to_playerPrefs(document.Id);
+            Sprite pic_background = this.app.carrot.get_tool().get_sprite_to_playerPrefs(data_bk["id"].ToString());
             if (pic_background != null)
             {
                 item_bk.img_icon.sprite = pic_background;
@@ -182,7 +199,7 @@ public class Environment : MonoBehaviour
             }
             else
             {
-                this.app.carrot.get_img_and_save_playerPrefs(s_link_icon, item_bk.img_icon, document.Id);
+                this.app.carrot.get_img_and_save_playerPrefs(s_link_icon, item_bk.img_icon, data_bk["id"].ToString());
             }
             item_bk.set_act(() => this.set_background(item_bk.img_icon.sprite.texture));
         }
@@ -197,7 +214,7 @@ public class Environment : MonoBehaviour
     private void download_background(Texture2D tex2D)
     {
         this.app.carrot.get_tool().save_file("background", tex2D.EncodeToPNG());
-        this.load_file_background();
+        this.Load_file_background();
         this.app.carrot.close();
         this.app.get_character().get_npc().gameObject.SetActive(true);
     }
@@ -205,7 +222,7 @@ public class Environment : MonoBehaviour
     public void delete_background_image()
     {
         GameObject.Find("app").GetComponent<App>().carrot.get_tool().delete_file("background");
-        this.load_file_background();
+        this.Load_file_background();
     }
 
     public void show_list_photo_camera()
@@ -222,7 +239,7 @@ public class Environment : MonoBehaviour
     {
         this.img_background_app.sprite = GameObject.Find("app").GetComponent<App>().carrot.get_tool().Texture2DtoSprite(pic);
         GameObject.Find("app").GetComponent<App>().carrot.get_tool().save_file("background", pic.EncodeToPNG());
-        this.load_file_background();
+        this.Load_file_background();
         GameObject.Find("app").GetComponent<App>().carrot.close();
     }
 
@@ -260,41 +277,55 @@ public class Environment : MonoBehaviour
 
     public void show_list_floor()
     {
-        if (this.FloorQuerySnapshot == null)
+        if (this.s_data_json_floor_offline=="")
         {
-            Query FloorQuery = this.app.carrot.db.Collection("floor");
-            FloorQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
-                this.FloorQuerySnapshot = task.Result;
-                this.act_load_floor(this.FloorQuerySnapshot);
-            });
+            this.app.carrot.show_loading();
+            StructuredQuery q = new("floor");
+            this.app.carrot.server.Get_doc(q.ToJson(), Act_get_and_load_floor_done, Act_get_and_load_floor_fail);
         }
         else
         {
-            this.act_load_floor(this.FloorQuerySnapshot);
+            this.Act_load_list_floor(this.s_data_json_floor_offline);
         }
     }
 
-    private void act_load_floor(QuerySnapshot FQuery)
+    private void Act_get_and_load_floor_done(string s_data)
     {
-        if (FQuery.Count > 0)
+        PlayerPrefs.SetString("s_data_json_floor_offline", this.s_data_json_floor_offline);
+        this.s_data_json_floor_offline = s_data;
+        this.Act_load_list_floor(s_data);
+    }
+
+    private void Act_get_and_load_floor_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        if (this.s_data_json_floor_offline != "")
+            this.Act_load_list_floor(this.s_data_json_floor_offline);
+        else
+            this.app.carrot.show_msg(s_error);
+    }
+
+    private void Act_load_list_floor(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
         {
             if (this.box_list != null) this.box_list.close();
             this.box_list = this.app.carrot.show_grid();
-            this.box_list.set_title(PlayerPrefs.GetString("bk_floor","List Floor"));
+            this.box_list.set_title(PlayerPrefs.GetString("bk_floor", "List Floor"));
             this.box_list.set_icon(this.icon_floor);
 
-            foreach (DocumentSnapshot document_floor in FQuery.Documents)
+            for (int i = 0; i < fc.fire_document.Length; i++)
             {
-                string s_id_floor = document_floor.Id;
-                IDictionary data_floor = document_floor.ToDictionary();
+                IDictionary data_floor = fc.fire_document[i].Get_IDictionary();
                 Carrot.Carrot_Box_Item item_floor = this.box_list.create_item();
-                Sprite sp_floor = this.app.carrot.get_tool().get_sprite_to_playerPrefs(s_id_floor);
+                Sprite sp_floor = this.app.carrot.get_tool().get_sprite_to_playerPrefs(data_floor["id"].ToString());
                 if (sp_floor != null)
                     item_floor.set_icon_white(sp_floor);
                 else
-                    this.app.carrot.get_img_and_save_playerPrefs(data_floor["icon"].ToString(), item_floor.img_icon, s_id_floor);
-
-                item_floor.set_act(() => act_sel_floor(s_id_floor));
+                    this.app.carrot.get_img_and_save_playerPrefs(data_floor["icon"].ToString(), item_floor.img_icon, data_floor["id"].ToString());
+                item_floor.set_act(() => act_sel_floor(data_floor["id"].ToString()));
             };
         }
     }
@@ -369,5 +400,4 @@ public class Environment : MonoBehaviour
     {
 
     }
-
 }
