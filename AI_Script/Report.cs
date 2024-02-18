@@ -1,19 +1,11 @@
 ﻿using Carrot;
-using Firebase.Extensions;
-using Firebase.Firestore;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[FirestoreData]
 public struct Ai_Chat_Report_Data
 {
-    [FirestoreProperty]
     public Carrot_Rate_user_data user { get; set; }
-    [FirestoreProperty]
     public string comment { get; set; }
-    [FirestoreProperty]
     public string date { get; set; }
 }
 
@@ -82,6 +74,7 @@ public class Report : MonoBehaviour
 
     public void done()
     {
+        /**
         this.app.carrot.show_loading();
         CollectionReference ChatDbRef = this.app.carrot.db.Collection("chat-"+this.app.carrot.lang.get_key_lang());
         DocumentReference ChatRef = ChatDbRef.Document(this.id_chat);
@@ -126,6 +119,7 @@ public class Report : MonoBehaviour
                 if (this.box_report != null) this.box_report.close();
             }
         });
+        **/
     }
 
     public void show_list_report(IList list_report)

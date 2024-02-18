@@ -1,12 +1,8 @@
 using Carrot;
-using Firebase.Extensions;
-using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public enum Command_Dev_Type {storage,pending,by_user, by_user_field, by_father,same_key}
-
 public class Command_Dev : MonoBehaviour
 {
     [Header("Main Obj")]
@@ -25,11 +21,11 @@ public class Command_Dev : MonoBehaviour
 
     private Command_Dev_Type type = Command_Dev_Type.storage;
     private List<GameObject> list_obj_box = new List<GameObject>();
-    private IList<IDictionary> list_data_test=new List<IDictionary>();
+    private IList<IDictionary> list_data_test = new List<IDictionary>();
     private Carrot_Window_Input box_inp_text;
     private OrderBy_Type order;
     private string s_id_fiel_view_cur = "";
-
+    private string s_key_chat_temp = "";
     public void set_type(Command_Dev_Type type_cmd)
     {
         this.type = type_cmd;
@@ -52,51 +48,46 @@ public class Command_Dev : MonoBehaviour
     {
         this.type = Command_Dev_Type.pending;
         this.app.carrot.show_loading();
-        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-        ChatQuery = ChatQuery.WhereEqualTo("status", "pending");
+
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        q.Add_where("status", Query_OP.EQUAL, "pending");
 
         if (this.order == OrderBy_Type.date_desc)
-            ChatQuery = ChatQuery.OrderByDescending("date_create");
+            q.Add_order("date_create", Query_Order_Direction.DESCENDING);
         else if (this.order == OrderBy_Type.date_asc)
-            ChatQuery = ChatQuery.OrderBy("date_create");
+            q.Add_order("date_create", Query_Order_Direction.ASCENDING);
         else if (this.order == OrderBy_Type.name_desc)
-            ChatQuery = ChatQuery.OrderByDescending("key");
+            q.Add_order("key", Query_Order_Direction.DESCENDING);
         else
-            ChatQuery = ChatQuery.OrderBy("key");
+            q.Add_order("key", Query_Order_Direction.ASCENDING);
 
-        ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {  
-            QuerySnapshot capitalQuerySnapshot = task.Result;
-            if (task.IsFaulted) this.app.carrot.hide_loading();
+        this.app.carrot.server.Get_doc(q.ToJson());
+    }
 
-            if (task.IsCompleted)
+    private void Act_get_list_cm_done(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
+        {
+            List<IDictionary> list_chat = new List<IDictionary>();
+            for(int i=0;i<fc.fire_document.Length;i++)
             {
-                this.app.carrot.hide_loading();
-
-                if (capitalQuerySnapshot.Count > 0)
-                {
-                    List<IDictionary> list_chat = new List<IDictionary>();
-                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
-                    {
-                        IDictionary chat_data = documentSnapshot.ToDictionary();
-                        chat_data["id"] = documentSnapshot.Id;
-                        list_chat.Add(chat_data);
-                    }
-
-                    Carrot_Box box=this.box_list(list_chat);
-                    box.set_icon(this.app.command.icon_info_chat);
-                    box.set_title("Chat Pending (Dev)");
-
-                    Carrot_Box_Btn_Item btn_dev_user=box.create_btn_menu_header(this.app.carrot.user.icon_user_login_true);
-                    btn_dev_user.set_act(()=>this.show_chat_by_user());
-                }
+                IDictionary chat_data = fc.fire_document[i].Get_IDictionary();
+                list_chat.Add(chat_data);
             }
-        });
+            Carrot_Box box = this.box_list(list_chat);
+            box.set_icon(this.app.command.icon_info_chat);
+            box.set_title("Chat Pending (Dev)");
+
+            Carrot_Box_Btn_Item btn_dev_user = box.create_btn_menu_header(this.app.carrot.user.icon_user_login_true);
+            btn_dev_user.set_act(() => this.show_chat_by_user());
+        }
     }
 
     public void delete(string s_id_chat,GameObject obj_item_chat=null)
     {
-        DocumentReference chatRef = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).Document(s_id_chat);
-        chatRef.DeleteAsync();
+        this.app.carrot.server.Delete_Doc("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat);
         this.app.carrot.show_msg("Chat", "Delete Success", Msg_Icon.Success);
         if (obj_item_chat != null)
         {
@@ -107,37 +98,39 @@ public class Command_Dev : MonoBehaviour
 
     public void show_chat_key_same(string s_key_chat)
     {
+        this.s_key_chat_temp = s_key_chat;
         this.type = Command_Dev_Type.same_key;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
-        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang()).WhereEqualTo("key", s_key_chat);
-        ChatQuery.GetSnapshotAsync().ContinueWithOnMainThread(task => {
-            QuerySnapshot capitalQuerySnapshot = task.Result;
-            if (task.IsFaulted)
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        q.Add_where("key",Query_OP.EQUAL, s_key_chat);
+        q.Set_limit(20);
+        this.app.carrot.server.Get_doc(q.ToJson(), Act_show_chat_key_same_done, Act_show_chat_key_same_fail);
+    }
+
+    private void Act_show_chat_key_same_done(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
+        {
+            List<IDictionary> list_chat = new();
+            for(int i=0;i<fc.fire_document.Length;i++)
             {
-                this.app.carrot.hide_loading();
+                IDictionary chat_data = fc.fire_document[i].Get_IDictionary();
+                list_chat.Add(chat_data);
             }
 
-            if (task.IsCompleted)
-            {
-                this.app.carrot.hide_loading();
+            Carrot_Box box = this.box_list(list_chat);
+            box.set_title(this.s_key_chat_temp);
+            box.set_icon(this.sp_icon_key_same);
+        }
+    }
 
-                if (capitalQuerySnapshot.Count > 0)
-                {
-                    List<IDictionary> list_chat = new List<IDictionary>();
-                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
-                    {
-                        IDictionary chat_data = documentSnapshot.ToDictionary();
-                        chat_data["id"] = documentSnapshot.Id;
-                        list_chat.Add(chat_data);
-                    }
-
-                    Carrot_Box box=this.box_list(list_chat);
-                    box.set_title(s_key_chat);
-                    box.set_icon(this.sp_icon_key_same);
-                }
-            }
-        });
+    private void Act_show_chat_key_same_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        this.app.carrot.show_msg("Error", s_error, Msg_Icon.Error);
     }
 
     public void set_all_box_active(bool is_act)
@@ -165,41 +158,39 @@ public class Command_Dev : MonoBehaviour
         this.type = Command_Dev_Type.by_user;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
-        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-        ChatQuery = ChatQuery.WhereEqualTo("user.id",this.app.carrot.user.get_id_user_login());
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        q.Add_where("user.id",Query_OP.EQUAL,this.app.carrot.user.get_id_user_login());
+        q.Set_limit(20);
+        this.app.carrot.server.Get_doc("chat-" + this.app.carrot.lang.get_key_lang(), Act_show_chat_pass_by_user_done, Act_show_chat_pass_by_user_fail);
+    }
 
-        ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
-            QuerySnapshot capitalQuerySnapshot = task.Result;
-            if (task.IsFaulted)
+    private void Act_show_chat_pass_by_user_done(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
+        {
+            List<IDictionary> list_chat = new();
+            for(int i=0;i<fc.fire_document.Length;i++)
             {
-                this.app.carrot.hide_loading();
+                IDictionary chat_data = fc.fire_document[i].Get_IDictionary();
+                list_chat.Add(chat_data);
             }
+            Carrot_Box box = this.box_list(list_chat);
+            box.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
+            box.set_icon(this.sp_icon_chat_passed);
+        }
+        else
+        {
+            this.app.carrot.hide_loading();
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+        }
+    }
 
-            if (task.IsCompleted)
-            {
-                this.app.carrot.hide_loading();
-
-                if (capitalQuerySnapshot.Count > 0)
-                {
-
-                    List<IDictionary> list_chat = new List<IDictionary>();
-                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
-                    {
-                        IDictionary chat_data = documentSnapshot.ToDictionary();
-                        chat_data["id"] = documentSnapshot.Id;
-                        list_chat.Add(chat_data);
-                    }
-                    Carrot_Box box=this.box_list(list_chat);
-                    box.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
-                    box.set_icon(this.sp_icon_chat_passed);
-                }
-                else
-                {
-                    this.app.carrot.hide_loading();
-                    this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
-                }
-            }
-        });
+    private void Act_show_chat_pass_by_user_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        this.app.carrot.show_msg("Error", s_error, Msg_Icon.Error);
     }
 
     public void show_chat_by_father(string s_id_fathe)
@@ -207,50 +198,48 @@ public class Command_Dev : MonoBehaviour
         this.type = Command_Dev_Type.by_father;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
-        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-        ChatQuery = ChatQuery.WhereEqualTo("pater", s_id_fathe);
-
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        q.Set_limit(20);
+        q.Add_where("pater",Query_OP.EQUAL, s_id_fathe);
         if (this.order == OrderBy_Type.date_desc)
-            ChatQuery = ChatQuery.OrderByDescending("date_create");
+            q.Add_order("date_create", Query_Order_Direction.DESCENDING);
         else if (this.order == OrderBy_Type.date_asc)
-            ChatQuery = ChatQuery.OrderBy("date_create");
+            q.Add_order("date_create", Query_Order_Direction.ASCENDING);
         else if (this.order == OrderBy_Type.name_desc)
-            ChatQuery = ChatQuery.OrderByDescending("key");
+            q.Add_order("key", Query_Order_Direction.DESCENDING);
         else
-            ChatQuery = ChatQuery.OrderBy("key");
+            q.Add_order("key", Query_Order_Direction.ASCENDING);
 
-        ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
-            QuerySnapshot capitalQuerySnapshot = task.Result;
-            if (task.IsFaulted)
+        this.app.carrot.server.Get_doc(q.ToJson(), Act_show_chat_by_father_done, Act_show_chat_by_father_fail);
+    }
+
+    private void Act_show_chat_by_father_done(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
+        {
+            List<IDictionary> list_chat = new();
+            for(int i=0;i<fc.fire_document.Length;i++)
             {
-                this.app.carrot.hide_loading();
+                IDictionary chat_data = fc.fire_document[i].Get_IDictionary();
+                list_chat.Add(chat_data);
             }
+            Carrot_Box box = this.box_list(list_chat);
+            box.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
+            box.set_icon(this.sp_icon_chat_passed);
+        }
+        else
+        {
+            this.app.carrot.hide_loading();
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+        }
+    }
 
-            if (task.IsCompleted)
-            {
-                this.app.carrot.hide_loading();
-
-                if (capitalQuerySnapshot.Count > 0)
-                {
-
-                    List<IDictionary> list_chat = new List<IDictionary>();
-                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
-                    {
-                        IDictionary chat_data = documentSnapshot.ToDictionary();
-                        chat_data["id"] = documentSnapshot.Id;
-                        list_chat.Add(chat_data);
-                    }
-                    Carrot_Box box = this.box_list(list_chat);
-                    box.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
-                    box.set_icon(this.sp_icon_chat_passed);
-                }
-                else
-                {
-                    this.app.carrot.hide_loading();
-                    this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
-                }
-            }
-        });
+    private void Act_show_chat_by_father_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        this.app.carrot.show_msg("Error", s_error, Msg_Icon.Error);
     }
 
     public Carrot_Box box_list(IList<IDictionary> list_data)
@@ -551,53 +540,55 @@ public class Command_Dev : MonoBehaviour
 
     private void show_chat_by_user_id(string s_user_name)
     {
+        this.s_key_chat_temp = s_user_name;
         this.s_id_fiel_view_cur = s_user_name;
         this.type = Command_Dev_Type.by_user_field;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
-        Query ChatQuery = this.app.carrot.db.Collection("chat-" + this.app.carrot.lang.get_key_lang());
-        ChatQuery = ChatQuery.WhereEqualTo("user.name", s_user_name);
+
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        q.Add_where("user.name", Query_OP.EQUAL, s_user_name);
+        q.Set_limit(20);
 
         if (this.order == OrderBy_Type.date_desc)
-            ChatQuery = ChatQuery.OrderByDescending("date_create");
+            q.Add_order("date_create", Query_Order_Direction.DESCENDING);
         else if (this.order == OrderBy_Type.date_asc)
-            ChatQuery = ChatQuery.OrderBy("date_create");
+            q.Add_order("date_create", Query_Order_Direction.ASCENDING);
         else if (this.order == OrderBy_Type.name_desc)
-            ChatQuery = ChatQuery.OrderByDescending("key");
+            q.Add_order("key", Query_Order_Direction.DESCENDING);
         else
-            ChatQuery = ChatQuery.OrderBy("key");
+            q.Add_order("key", Query_Order_Direction.ASCENDING);
 
-        ChatQuery.Limit(20).GetSnapshotAsync().ContinueWithOnMainThread(task => {
-            QuerySnapshot capitalQuerySnapshot = task.Result;
-            if (task.IsFaulted)
+        this.app.carrot.server.Get_doc(q.ToJson(), Act_show_chat_by_user_id_done, Act_show_chat_by_user_id_fail);
+    }
+
+    private void Act_show_chat_by_user_id_done(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
+        {
+            List<IDictionary> list_chat = new List<IDictionary>();
+            for(int i=0;i<fc.fire_document.Length;i++)
             {
-                this.app.carrot.hide_loading();
+                IDictionary chat_data = fc.fire_document[i].Get_IDictionary();
+                list_chat.Add(chat_data);
             }
+            Carrot_Box box = this.box_list(list_chat);
+            box.set_title(this.s_key_chat_temp);
+            box.set_icon(this.sp_icon_chat_passed);
+        }
+        else
+        {
+            this.app.carrot.hide_loading();
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+        }
+    }
 
-            if (task.IsCompleted)
-            {
-                this.app.carrot.hide_loading();
-                if (capitalQuerySnapshot.Count > 0)
-                {
-
-                    List<IDictionary> list_chat = new List<IDictionary>();
-                    foreach (DocumentSnapshot documentSnapshot in capitalQuerySnapshot.Documents)
-                    {
-                        IDictionary chat_data = documentSnapshot.ToDictionary();
-                        chat_data["id"] = documentSnapshot.Id;
-                        list_chat.Add(chat_data);
-                    }
-                    Carrot_Box box = this.box_list(list_chat);
-                    box.set_title(s_user_name);
-                    box.set_icon(this.sp_icon_chat_passed);
-                }
-                else
-                {
-                    this.app.carrot.hide_loading();
-                    this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
-                }
-            }
-        });
+    private void Act_show_chat_by_user_id_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        this.app.carrot.show_msg("Error", s_error, Msg_Icon.Error);
     }
 
     #region Command Test 
