@@ -1,6 +1,5 @@
 using Carrot;
 using System.Collections;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -29,7 +28,7 @@ public class character_actions : MonoBehaviour
     private string s_act_animation_dance = "002_SIM01_Final";
     private Act_List_Func func;
 
-    public void on_load()
+    public void On_load()
     {
         this.s_act_animation_dance = PlayerPrefs.GetString("act_animation_dance", "002_SIM01_Final");
     }
@@ -52,66 +51,64 @@ public class character_actions : MonoBehaviour
 
     IEnumerator DownloadAndLoadCaetgoryAndAnimation(UnityAction act_call_back)
     {
-        using (UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url,1,0))
+        using UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url, 1, 0);
+        this.app.carrot.show_loading();
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
         {
-            this.app.carrot.show_loading();
-            yield return request.SendWebRequest();
+            this.app.carrot.hide_loading();
+            this.bundle = DownloadHandlerAssetBundle.GetContent(request);
+            bool is_unlock_animation = this.app.setting.check_buy_product(this.index_product_buy_all_act);
 
-            if (request.result == UnityWebRequest.Result.Success)
+            TextAsset jsonFile = bundle.LoadAsset<TextAsset>("data_animations");
+            string jsonString = jsonFile.text;
+            this.list_category_animations = (IList)Json.Deserialize(jsonString);
+            this.list_name_animation = (IList)Json.Deserialize("[]");
+            for (int i = 0; i < list_category_animations.Count; i++)
             {
-                this.app.carrot.hide_loading();
-                this.bundle = DownloadHandlerAssetBundle.GetContent(request);
-                bool is_unlock_animation = this.app.setting.check_buy_product(this.index_product_buy_all_act);
-
-                TextAsset jsonFile = bundle.LoadAsset<TextAsset>("data_animations");
-                string jsonString = jsonFile.text;
-                this.list_category_animations = (IList)Json.Deserialize(jsonString);
-                this.list_name_animation = (IList)Json.Deserialize("[]");
-                for (int i = 0; i < list_category_animations.Count; i++)
+                IDictionary data_item_anim = (IDictionary)list_category_animations[i];
+                IList data_animations = (IList)data_item_anim["data"];
+                for (int y = 0; y < data_animations.Count; y++)
                 {
-                    IDictionary data_item_anim = (IDictionary)list_category_animations[i];
-                    IList data_animations = (IList)data_item_anim["data"];
-                    for(int y = 0; y < data_animations.Count; y++)
+                    IDictionary data_anim = (IDictionary)data_animations[y];
+                    string s_name_item_anim = data_anim["name"].ToString();
+                    bool is_used = false;
+                    if (is_unlock_animation)
                     {
-                        IDictionary data_anim = (IDictionary) data_animations[y];
-                        string s_name_item_anim = data_anim["name"].ToString();
-                        bool is_used = false;
-                        if (is_unlock_animation)
+                        is_used = true;
+                    }
+                    else
+                    {
+                        if (data_anim["buy"].ToString() != "0")
                         {
-                            is_used = true;
-                        }
-                        else
-                        {
-                            if (data_anim["buy"].ToString() != "0")
-                            {
-                                if (PlayerPrefs.GetInt("is_user_act_" + s_name_item_anim) == 1)
-                                {
-                                    is_used = true;
-                                }
-                                else
-                                {
-                                    is_used = false;
-                                }
-                            }
-                            else
+                            if (PlayerPrefs.GetInt("is_user_act_" + s_name_item_anim) == 1)
                             {
                                 is_used = true;
                             }
+                            else
+                            {
+                                is_used = false;
+                            }
                         }
-
-                        if(is_used) this.list_name_animation.Add(s_name_item_anim);
+                        else
+                        {
+                            is_used = true;
+                        }
                     }
 
-                    if (data_item_anim["name"].ToString() == "Dance") this.obj_list_dance_animation = data_item_anim;
+                    if (is_used) this.list_name_animation.Add(s_name_item_anim);
                 }
-                Debug.Log("Download Data Category and list Animation");
-                if (act_call_back != null) act_call_back();
+
+                if (data_item_anim["name"].ToString() == "Dance") this.obj_list_dance_animation = data_item_anim;
             }
-            else
-            {
-                this.app.carrot.hide_loading();
-                Debug.LogError(request.error);
-            }
+            Debug.Log("Download Data Category and list Animation");
+            if (act_call_back != null) act_call_back();
+        }
+        else
+        {
+            this.app.carrot.hide_loading();
+            Debug.LogError(request.error);
         }
     }
 
@@ -315,7 +312,6 @@ public class character_actions : MonoBehaviour
                     StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(() => this.play_act_anim(s_name_animation)));
                 }
             }
-
         }
     }
 

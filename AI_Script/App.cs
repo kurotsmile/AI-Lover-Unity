@@ -158,7 +158,7 @@ public class App : MonoBehaviour
         this.icon.On_load();
         this.open_AI.on_load();
         this.gemini_AI.on_load();
-        this.action.on_load();
+        this.action.On_load();
         this.tool.on_load();
     }
 
