@@ -137,6 +137,7 @@ public class Command_storage : MonoBehaviour
 
     private IList list_key_block;
     private IDictionary data_chat_test;
+    private IDictionary chat_data_temp;
 
     private Carrot_Box box_parameter_tag;
     private Carrot_Box box_sex_sel_chat;
@@ -613,7 +614,7 @@ public class Command_storage : MonoBehaviour
         Carrot.Carrot_Box_Btn_Panel obj_panel_btn = box_add_chat.create_panel_btn();
 
         Carrot.Carrot_Button_Item obj_btn_done = obj_panel_btn.create_btn("btn_done");
-        obj_btn_done.set_act_click(act_done_submit_command);
+        obj_btn_done.set_act_click(Act_done_submit_command);
         obj_btn_done.set_bk_color(this.app.carrot.color_highlight);
         obj_btn_done.set_label_color(Color.white);
         obj_btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
@@ -1193,7 +1194,7 @@ public class Command_storage : MonoBehaviour
         return data_chat;
     }
 
-    private void act_done_submit_command()
+    private void Act_done_submit_command()
     {
         this.app.carrot.show_loading();
 
@@ -1233,17 +1234,9 @@ public class Command_storage : MonoBehaviour
                 if (this.app.carrot.model_app == ModelApp.Publish)
                 {
                     IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
+                    this.data_chat_test = chat_data;
                     string s_json=this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
-                    this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat_new,s_json);
-                    /**
-                    DocumentReference chatRef = chatDbRef.Document(s_id_chat_new);
-                    c.id = s_id_chat_new;
-                    IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
-                    chatRef.SetAsync(c).ContinueWithOnMainThread(task => {
-                        if (task.IsFaulted) this.add_command_offline(chat_data);
-                        if (task.IsCompleted) this.add_command_offline(chat_data);
-                    });
-                    **/
+                    this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat_new,s_json, Act_done_submit_command_done,Act_done_submit_command_fail);
                 }
 
                 if (this.app.carrot.model_app == ModelApp.Develope)
@@ -1251,23 +1244,13 @@ public class Command_storage : MonoBehaviour
                     c.status = "passed";
                     IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
                     string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
-                    this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat_new, s_json);
+                    this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat_new, s_json,Act_done_submit_command_done,Act_done_submit_command_fail);
                 }
             }
             else
             {
                 IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
                 this.add_command_offline(chat_data);
-            }
-
-            if (this.app.carrot.model_app == ModelApp.Publish)
-            {
-                this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("brain_add_success", "Your chat has been published successfully!"));
-            }
-            else
-            {
-                this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "The chat has been published successfully! (Dev)");
-                if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
             }
         }
 
@@ -1318,6 +1301,27 @@ public class Command_storage : MonoBehaviour
 
         if (this.box_add_chat != null) this.box_add_chat.close();
         if (this.app.carrot.model_app == ModelApp.Publish) this.app.carrot.ads.show_ads_Interstitial();
+    }
+
+    private void Act_done_submit_command_done(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        if (this.app.carrot.model_app == ModelApp.Publish)
+        {
+            this.add_command_offline(this.chat_data_temp);
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), PlayerPrefs.GetString("brain_add_success", "Your chat has been published successfully!"));
+        }
+        else
+        {
+            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "The chat has been published successfully! (Dev)");
+            if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
+        }
+    }
+
+    private void Act_done_submit_command_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        this.add_command_offline(this.chat_data_temp);
     }
 
     private void act_del_patert_chat()
