@@ -12,7 +12,10 @@ public class character_actions : MonoBehaviour
     public App app;
 
     [Header("Character_Actions")]
-    public string url = "";
+    private string url = "";
+    public string url_asset_android = "";
+    public string url_asset_StandaloneWindows = "";
+    public string url_asset_WSAPlayers = "";
     public int index_product_buy_act = 8;
     public int index_product_buy_all_act = 9;
     public string[] list_anim_act_defalt;
@@ -31,6 +34,13 @@ public class character_actions : MonoBehaviour
     public void On_load()
     {
         this.s_act_animation_dance = PlayerPrefs.GetString("act_animation_dance", "002_SIM01_Final");
+
+        if (app.carrot.os_app == OS.Android)
+            this.url = this.url_asset_android;
+        else if (app.carrot.os_app == OS.Window)
+            this.url = this.url_asset_WSAPlayers;
+        else
+            this.url = this.url_asset_StandaloneWindows;
     }
 
     public void btn_show_category(Carrot_Box_Item item_set_data)

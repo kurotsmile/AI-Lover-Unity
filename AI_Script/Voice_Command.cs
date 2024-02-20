@@ -7,6 +7,10 @@ public class Voice_Command : MonoBehaviour
 	[Header("Obj main")]
 	public App app;
 
+    [Header("Ui Obj")]
+    public GameObject obj_mic_inp;
+    public GameObject obj_ai_inp;
+
     [Header("Voice Obj")]
 	public Image img_mic_inp_home;
     public Image img_mic_fun_brain;
@@ -19,6 +23,20 @@ public class Voice_Command : MonoBehaviour
         SpeechToText.Instance.Setting("en-US");
         SpeechToText.Instance.onResultCallback = OnFinalResult;
         this.check_icon_input_command();
+    }
+
+    public void On_load()
+    {
+        if (this.app.carrot.os_app == Carrot.OS.Window)
+        {
+            this.obj_ai_inp.SetActive(true);
+            this.obj_mic_inp.SetActive(false);
+        }
+        else
+        {
+            this.obj_ai_inp.SetActive(false);
+            this.obj_mic_inp.SetActive(true);
+        }
     }
 
     public void btn_start()

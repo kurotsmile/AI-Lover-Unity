@@ -155,6 +155,8 @@ public class App : MonoBehaviour
         this.command.sound_command.pitch = this.setting.get_voice_speed();
         this.command_dev.check();
 
+        this.command_voice.On_load();
+
         this.icon.On_load();
         this.open_AI.on_load();
         this.gemini_AI.on_load();

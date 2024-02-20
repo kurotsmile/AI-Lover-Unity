@@ -61,7 +61,6 @@ public class Command_storage : MonoBehaviour
     private int length;
 
     private Carrot_Box_Item item_command_edit_temp;
-    private Item_command_chat item_command_log_temp;
     private int index_cm_update = -1;
     private bool is_cm_mode_nomal = true;
 
@@ -220,7 +219,6 @@ public class Command_storage : MonoBehaviour
     public void show_edit_command_from_log(IDictionary data, Item_command_chat item_edit_cm_log)
     {
         this.reset_all_s_data();
-        this.item_command_log_temp = item_edit_cm_log;
         this.type_act = Command_Type_Act.edit_command_from_log;
         this.show_edit_by_data(data);
     }
@@ -303,10 +301,13 @@ public class Command_storage : MonoBehaviour
         btn_model_advanced.set_act(() => this.act_box_add_model_advanced());
         if (this.is_cm_mode_nomal == false) btn_model_advanced.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
 
-        if (this.type_act != Command_Type_Act.edit_live)
+        if (this.app.carrot.os_app != OS.Window)
         {
-            Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_bug);
-            btn_list_key_block.set_act(() => this.show_list_block_key_chat());
+            if (this.type_act != Command_Type_Act.edit_live)
+            {
+                Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_bug);
+                btn_list_key_block.set_act(() => this.show_list_block_key_chat());
+            }
         }
 
         if (data_chat["pater"] != null)
@@ -353,10 +354,13 @@ public class Command_storage : MonoBehaviour
             item_keyword.load_lang_data();
             this.item_keyword.set_val(data_chat["key"].ToString());
 
-            Carrot_Box_Btn_Item btn_key_mic = this.item_keyword.create_item();
-            btn_key_mic.set_icon(this.app.command_voice.icon_mic_chat);
-            btn_key_mic.set_color(this.app.carrot.color_highlight);
-            btn_key_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_keyword.inp_val));
+            if (this.app.carrot.os_app != OS.Window)
+            {
+                Carrot_Box_Btn_Item btn_key_mic = this.item_keyword.create_item();
+                btn_key_mic.set_icon(this.app.command_voice.icon_mic_chat);
+                btn_key_mic.set_color(this.app.carrot.color_highlight);
+                btn_key_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_keyword.inp_val));
+            }
 
             if (this.app.carrot.model_app == ModelApp.Develope)
             {
@@ -382,10 +386,13 @@ public class Command_storage : MonoBehaviour
         item_msg.load_lang_data();
         if (data_chat["msg"] != null) this.item_msg.set_val(data_chat["msg"].ToString());
 
-        Carrot_Box_Btn_Item btn_msg_mic = this.item_msg.create_item();
-        btn_msg_mic.set_icon(this.app.command_voice.icon_mic_chat);
-        btn_msg_mic.set_color(this.app.carrot.color_highlight);
-        btn_msg_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_msg.inp_val));
+        if (this.app.carrot.os_app != OS.Window)
+        {
+            Carrot_Box_Btn_Item btn_msg_mic = this.item_msg.create_item();
+            btn_msg_mic.set_icon(this.app.command_voice.icon_mic_chat);
+            btn_msg_mic.set_color(this.app.carrot.color_highlight);
+            btn_msg_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_msg.inp_val));
+        }
 
         if (this.app.carrot.model_app == ModelApp.Develope)
         {
