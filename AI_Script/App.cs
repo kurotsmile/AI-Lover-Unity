@@ -231,8 +231,9 @@ public class App : MonoBehaviour
             {
                 if (this.link_deep_app.Contains("ailover:"))
                 {
-                    string data_link = this.link_deep_app.Split("?"[0])[1];
-                    data_link = UnityWebRequest.UnEscapeURL(data_link);
+                    string data_link = this.link_deep_app.Replace("ailover://show/", "");
+                    string[] paramet_chat= data_link.Split('/');
+                    this.command.Play_chat_by_ID(paramet_chat[0], paramet_chat[1]);
                     this.link_deep_app = "";
                 }
 
@@ -240,13 +241,7 @@ public class App : MonoBehaviour
                 {
                     string data_link = this.link_deep_app.Replace("music://show/", "");
                     string[] paramet_music = data_link.Split('/');
-                    this.link_deep_app = "";
-                }
-
-                if (this.link_deep_app.Contains("flower:"))
-                {
-                    string data_link = this.link_deep_app.Replace("flower://show/", "");
-                    string[] paramet_music = data_link.Split('/');
+                    this.player_music.Play_song_by_id(paramet_music[0]);
                     this.link_deep_app = "";
                 }
 
@@ -264,10 +259,9 @@ public class App : MonoBehaviour
     [ContextMenu("Test Link")]
     public void test_link()
     {
-        //this.onDeepLinkActivated("ailover://data?%7B%22function%22%3A%22show_chat%22%2C%22lang%22%3A%22vi%22%2C%22id%22%3A%2277018%22%2C%22type%22%3A%22chat%22%2C%22host%22%3A%22carrotstore.com%22%7D");
-        //this.onDeepLinkActivated("music://show/57416/vi");
-        //this.onDeepLinkActivated("flower://show/74501/vi");
-        this.onDeepLinkActivated("contactstore://show/a920b4f61c211172e6e621a69abe7299/vi");
+        this.onDeepLinkActivated("ailover://show/chat3b264a6928384f6a925ed1ff5de5dc00/vi");
+        //this.onDeepLinkActivated("music://show/song1692934624687");
+        //this.onDeepLinkActivated("contactstore://show/user9dd108c1acca4f8e8fefa8dec39d5a9d/vi");
     }
 
     public void check_manager_character()

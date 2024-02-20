@@ -101,7 +101,7 @@ public class Command : MonoBehaviour
             if (is_log_show)
             {
                 this.Add_item_log_chat(s_key);
-                this.add_item_log_loading();
+                this.Add_item_log_loading();
                 if (this.app.player_music.playlist.Check_query_key(s_key)) return;
             }
 
@@ -259,12 +259,6 @@ public class Command : MonoBehaviour
         this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
     }
 
-    private void show_msg_error(string s_msg_error)
-    {
-        this.Hide_all_obj_msg();
-        this.show_effect_txt_msg(s_msg_error);
-    }
-
     public void send_command_by_text(string s_text)
     {
         this.inp_command.text = s_text;
@@ -309,7 +303,7 @@ public class Command : MonoBehaviour
         }
     }
 
-    private void add_item_log_loading()
+    private void Add_item_log_loading()
     {
         if (this.item_command_loading != null)
         {
@@ -1015,6 +1009,22 @@ public class Command : MonoBehaviour
     public void act_done_speech()
     {
         this.is_tts = false;
+    }
+
+    public void Play_chat_by_ID(string s_id,string s_lang)
+    {
+        this.app.carrot.server.Get_doc_by_path("chat-" + s_lang, s_id, Act_play_chat_by_ID_done, Act_play_chat_by_ID_fail);
+    }
+
+    private void Act_play_chat_by_ID_done(string s_data)
+    {
+        Fire_Document fd = new(s_data);
+        this.act_chat(fd.Get_IDictionary());
+    }
+
+    private void Act_play_chat_by_ID_fail(string s_error)
+    {
+        this.app.carrot.show_msg("Chat Info", PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
     }
 
     #region Live Chat

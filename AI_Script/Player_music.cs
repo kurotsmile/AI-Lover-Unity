@@ -1,4 +1,5 @@
-﻿using Crosstales.Radio;
+﻿using Carrot;
+using Crosstales.Radio;
 using System;
 using System.Collections;
 using System.Text.RegularExpressions;
@@ -121,7 +122,11 @@ public class Player_music : MonoBehaviour
         if (this.radio.isAudioPlaying) this.radio.Stop();
 
         this.id_music = data_music["id"].ToString();
-        this.sel_index_music = int.Parse(data_music["index"].ToString());
+
+        if (data_music["index"] != null)
+            this.sel_index_music = int.Parse(data_music["index"].ToString());
+        else
+            this.sel_index_music = 0;
 
         this.obj_btn_nex_mini_player.SetActive(false);
         if (this.playlist.list_music_cur != null)
@@ -549,6 +554,24 @@ public class Player_music : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void Play_song_by_id(string s_id)
+    {
+        this.app.carrot.server.Get_doc_by_path("song", s_id, Act_play_song_by_id_done, Act_play_song_by_id_fail);
+    }
+
+    private void Act_play_song_by_id_done(string s_data)
+    {
+        Fire_Document fd = new(s_data);
+        IDictionary data_song = fd.Get_IDictionary();
+        data_song["type"] = "music";
+        this.act_play_data(data_song);
+    }
+
+    private void Act_play_song_by_id_fail(string s_error)
+    {
+        this.app.carrot.show_msg(PlayerPrefs.GetString("search_results", "Search Results"), "No songs found!", Carrot.Msg_Icon.Alert);
     }
 
     public void play_new_song()  
