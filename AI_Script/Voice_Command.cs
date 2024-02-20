@@ -1,15 +1,12 @@
 ﻿using TextSpeech;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Windows.Speech;
 
 public class Voice_Command : MonoBehaviour
 {
 	[Header("Obj main")]
 	public App app;
-
-    [Header("Ui Obj")]
-    public GameObject obj_mic_inp;
-    public GameObject obj_ai_inp;
 
     [Header("Voice Obj")]
 	public Image img_mic_inp_home;
@@ -18,24 +15,36 @@ public class Voice_Command : MonoBehaviour
     public Sprite icon_mic_live;
     private InputField inp_mic = null;
 
+    private DictationRecognizer dictationRecognizer;
+
     void Start()
 	{
-        SpeechToText.Instance.Setting("en-US");
-        SpeechToText.Instance.onResultCallback = OnFinalResult;
-        this.check_icon_input_command();
-    }
-
-    public void On_load()
-    {
         if (this.app.carrot.os_app == Carrot.OS.Window)
         {
-            this.obj_ai_inp.SetActive(true);
-            this.obj_mic_inp.SetActive(false);
+            dictationRecognizer = new DictationRecognizer();
+            dictationRecognizer.DictationResult += (text, confidence) => {
+                Debug.LogFormat("Content: {0}, level: {1}", text, confidence);
+                this.OnFinalResult(text);
+            };
+
+            dictationRecognizer.DictationComplete += (completionCause) => {
+                this.img_mic_inp_home.color = Color.white;
+            };
         }
         else
         {
-            this.obj_ai_inp.SetActive(false);
-            this.obj_mic_inp.SetActive(true);
+            SpeechToText.Instance.Setting("en-US");
+            SpeechToText.Instance.onResultCallback = OnFinalResult;
+            this.check_icon_input_command();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (dictationRecognizer != null)
+        {
+            dictationRecognizer.Stop();
+            dictationRecognizer.Dispose();
         }
     }
 
@@ -43,7 +52,15 @@ public class Voice_Command : MonoBehaviour
     {
         this.inp_mic = null;
         this.app.textToSpeech.StopSpeak();
-        SpeechToText.Instance.StartRecording(PlayerPrefs.GetString("voice_command_ready", "Say something :-)"));
+        this.img_mic_inp_home.color = this.app.carrot.color_highlight;
+        if (this.app.carrot.os_app == Carrot.OS.Window)
+        {
+            dictationRecognizer.Start();
+        }
+        else
+        {
+            SpeechToText.Instance.StartRecording(PlayerPrefs.GetString("voice_command_ready", "Say something :-)"));
+        }
     }
 
     public void btn_stop()
@@ -59,6 +76,8 @@ public class Voice_Command : MonoBehaviour
 
     void OnFinalResult(string _data)
 	{
+        this.img_mic_inp_home.color = Color.white;
+
         if (this.inp_mic == null)
             this.app.command.send_chat(_data, true);
         else
@@ -67,6 +86,7 @@ public class Voice_Command : MonoBehaviour
 
 	public void OnPartialResult(string _data)
 	{
+        this.img_mic_inp_home.color = Color.white;
         if (this.inp_mic == null)
             this.app.command.send_chat(_data, true);
         else
