@@ -736,7 +736,9 @@ public class App : MonoBehaviour
     public string s_rep_key(string s_chat)
     {
         s_chat = s_chat.Replace("{ten_user}", PlayerPrefs.GetString("ten_user") + " ");
+        s_chat = s_chat.Replace("{name_user}", PlayerPrefs.GetString("ten_user") + " ");
         s_chat = s_chat.Replace("{ten_nv}", this.get_character().get_name_character());
+        s_chat = s_chat.Replace("{name_nv}", this.get_character().get_name_character());
         s_chat = s_chat.Replace("{gio}", DateTime.Now.Hour.ToString());
         s_chat = s_chat.Replace("{phut}", DateTime.Now.Minute.ToString());
         s_chat = s_chat.Replace("{thu}", DateTime.Now.DayOfWeek.ToString());
@@ -751,19 +753,6 @@ public class App : MonoBehaviour
     public string s_rep_run(string s_input, string s_key_word, string s_run)
     {
         return s_run.Replace("{key_word}", s_input.Replace(s_key_word, ""));
-    }
-
-    public WWWForm frm_act(string s_func)
-    {
-        WWWForm frm = this.carrot.frm_act(s_func);
-        frm.AddField("sex", PlayerPrefs.GetString("sex", "0"));
-        frm.AddField("limit_chat", PlayerPrefs.GetInt("setting_limit_chat", 3));
-        frm.AddField("limit_day", DateTime.Now.DayOfWeek.ToString());
-        frm.AddField("limit_date", DateTime.Now.Date.ToString());
-        frm.AddField("limit_month", DateTime.Now.Month.ToString());
-        frm.AddField("character_sex", PlayerPrefs.GetString("character_sex", "1"));
-        if (this.carrot.user.get_id_user_login() != "") frm.AddField("user_id", this.carrot.user.get_id_user_login());
-        return frm;
     }
 
     public void show_setting() { this.setting.show_setting(); }
