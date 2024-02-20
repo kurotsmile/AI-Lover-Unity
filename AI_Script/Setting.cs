@@ -1149,7 +1149,10 @@ public class Setting : MonoBehaviour
     private void act_open_voice_inp_setting()
     {
         this.app.carrot.play_sound_click();
-        this.app.tool.open_content_Intent("android.settings.VOICE_INPUT_SETTINGS");
+        if (this.app.carrot.os_app == OS.Window)
+            Application.OpenURL("ms-settings:speech");
+        else
+            this.app.tool.open_content_Intent("android.settings.VOICE_INPUT_SETTINGS");
     }
 
     private void show_msg_status(string s_title,bool is_active)

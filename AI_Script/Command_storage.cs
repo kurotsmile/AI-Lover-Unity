@@ -1436,8 +1436,17 @@ public class Command_storage : MonoBehaviour
             var s_tag = this.app.tool.list_name_action[i];
             Carrot.Carrot_Box_Item item_tag = this.box_parameter_tag.create_item("item_tag_" + i);
             item_tag.set_icon(this.sp_icon_parameter_tag);
-            item_tag.set_title(this.app.tool.list_name_action[i]);
-            item_tag.set_tip(this.app.tool.list_name_action[i]);
+            if (this.app.carrot.os_app == OS.Window)
+            {
+                item_tag.set_title(this.app.tool.list_name_action_window[i]);
+                item_tag.set_tip(this.app.tool.list_name_action[i]);
+            }
+            else
+            {
+                item_tag.set_title(this.app.tool.list_name_action[i]);
+                item_tag.set_tip(this.app.tool.list_name_action_window[i]);
+            }
+
             item_tag.set_act(() => btn_add_sys_act_tag(s_tag));
 
             Carrot.Carrot_Box_Btn_Item btn_test_tag = item_tag.create_item();

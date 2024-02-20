@@ -185,7 +185,7 @@ public class App : MonoBehaviour
         this.load("");
     }
 
-    public void load(string s_data_lang)
+    private void load(string s_data_lang)
     {
         this.check_manager_character();
         this.command.clear_log_chat();

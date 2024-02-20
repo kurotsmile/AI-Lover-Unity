@@ -33600,8 +33600,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
-  obj_mic_inp: {fileID: 2755477472440120047}
-  obj_ai_inp: {fileID: 0}
   img_mic_inp_home: {fileID: 2755477472440120049}
   img_mic_fun_brain: {fileID: 3402988698307525653}
   icon_mic_chat: {fileID: 21300000, guid: 963c17897fc44b94e9a84e94fee3b9f0, type: 3}
@@ -34080,6 +34078,97 @@ MonoBehaviour:
   - android.settings.panel.action.NFC
   - android.settings.panel.action.VOLUME
   - android.settings.panel.action.WIFI
+  list_name_action_window:
+  - ms-settings:signinoptions
+  - ms-settings:mobile-devices
+  - ms-settings:sound-devices
+  - ms-settings:powersleep
+  - ms-settings:personalization-background
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - ms-settings:printers
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - ms-settings:batterysaver
+  - ms-settings:bluetooth
+  - 
+  - 
+  - 
+  - 
+  - 
+  - ms-settings:dateandtime
+  - ms-settings:about
+  - ms-settings:display
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - ms-settings:notifications
+  - 
+  - 
+  - 
+  - 
+  - ms-settings:windowsdefender
+  - 'ms-settings:'
+  - 
+  - ms-settings:sound
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - ms-settings:wifi-provisioning
+  - ms-settings:wifi-provisioning
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   list_package_action:
   - com.zing.zalo
   - com.ss.android.ugc.trill
