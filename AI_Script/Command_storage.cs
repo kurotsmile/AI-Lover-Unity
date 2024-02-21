@@ -618,9 +618,9 @@ public class Command_storage : MonoBehaviour
             }
         }
 
-        Carrot.Carrot_Box_Btn_Panel obj_panel_btn = box_add_chat.create_panel_btn();
+        Carrot_Box_Btn_Panel obj_panel_btn = box_add_chat.create_panel_btn();
 
-        Carrot.Carrot_Button_Item obj_btn_done = obj_panel_btn.create_btn("btn_done");
+        Carrot_Button_Item obj_btn_done = obj_panel_btn.create_btn("btn_done");
         obj_btn_done.set_act_click(Act_done_submit_command);
         obj_btn_done.set_bk_color(this.app.carrot.color_highlight);
         obj_btn_done.set_label_color(Color.white);
@@ -754,6 +754,7 @@ public class Command_storage : MonoBehaviour
 
     public void add_command_offline(IDictionary data_chat)
     {
+        Debug.Log("add_command_offline:" + data_chat["id"].ToString());
         if (this.get_cm_by_id(data_chat["id"].ToString()) == null)
         {
             string s = Carrot.Json.Serialize(data_chat);
@@ -868,15 +869,15 @@ public class Command_storage : MonoBehaviour
             box.set_title(PlayerPrefs.GetString("brain_list_buy", "Purchase command"));
         }
 
-        Carrot.Carrot_Box_Btn_Item btn_command_teach = box.create_btn_menu_header(this.sp_icon_command_teach);
+        Carrot_Box_Btn_Item btn_command_teach = box.create_btn_menu_header(this.sp_icon_command_teach);
         btn_command_teach.set_act(() => this.show_list_cm("0"));
         if (s_type != "0") btn_command_teach.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
 
-        Carrot.Carrot_Box_Btn_Item btn_command_purchased = box.create_btn_menu_header(this.sp_icon_command_purchased);
+        Carrot_Box_Btn_Item btn_command_purchased = box.create_btn_menu_header(this.sp_icon_command_purchased);
         btn_command_purchased.set_act(() => this.show_list_cm("1"));
         if (s_type != "1") btn_command_purchased.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
 
-        Carrot.Carrot_Box_Btn_Item btn_del_all = box.create_btn_menu_header(this.GetComponent<App>().carrot.sp_icon_del_data);
+        Carrot_Box_Btn_Item btn_del_all = box.create_btn_menu_header(this.GetComponent<App>().carrot.sp_icon_del_data);
         btn_del_all.set_act(() => this.delete_all_cm());
         btn_del_all.set_icon_color(Color.red);
     }
@@ -955,7 +956,6 @@ public class Command_storage : MonoBehaviour
         Fire_Collection fc = new(s_data);
         if (!fc.is_null)
         {
-            List<IDictionary> list_chat = new List<IDictionary>();
             for(int i=0;i<fc.fire_document.Length;i++)
             {
                 IDictionary c = fc.fire_document[i].Get_IDictionary();
@@ -1240,24 +1240,23 @@ public class Command_storage : MonoBehaviour
             {
                 if (this.app.carrot.model_app == ModelApp.Publish)
                 {
-                    IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
-                    this.data_chat_test = chat_data;
-                    string s_json=this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+                    this.chat_data_temp = (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(c));
+                    string s_json=this.app.carrot.server.Convert_IDictionary_to_json(this.chat_data_temp);
                     this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat_new,s_json, Act_done_submit_command_done,Act_done_submit_command_fail);
                 }
 
                 if (this.app.carrot.model_app == ModelApp.Develope)
                 {
                     c.status = "passed";
-                    IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
-                    string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+                    this.chat_data_temp = (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(c));
+                    string s_json = this.app.carrot.server.Convert_IDictionary_to_json(this.chat_data_temp);
                     this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat_new, s_json,Act_done_submit_command_done,Act_done_submit_command_fail);
                 }
             }
             else
             {
-                IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
-                this.add_command_offline(chat_data);
+                this.chat_data_temp= (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(c));
+                this.add_command_offline(this.chat_data_temp);
             }
         }
 
@@ -1266,8 +1265,8 @@ public class Command_storage : MonoBehaviour
             this.app.carrot.hide_loading();
             chat c = this.get_data_chat();
             c.status = "passed";
-            IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
-            string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+            this.chat_data_temp= (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(c));
+            string s_json = this.app.carrot.server.Convert_IDictionary_to_json(this.chat_data_temp);
             this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), c.id, s_json);
             this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "Chat update published successfully! (Dev)");
             if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
@@ -1278,8 +1277,8 @@ public class Command_storage : MonoBehaviour
             this.app.carrot.hide_loading();
             chat c = this.get_data_chat();
             c.status = "passed";
-            IDictionary chat_data = (IDictionary)Carrot.Json.Deserialize(JsonConvert.SerializeObject(c));
-            string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+            this.chat_data_temp = (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(c));
+            string s_json = this.app.carrot.server.Convert_IDictionary_to_json(this.chat_data_temp);
             this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(), c.id, s_json);
             this.app.carrot.show_msg(PlayerPrefs.GetString("brain_add", "Create a new command"), "Convert draft dialogue into successfully published conversation! (Dev)");
             if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);

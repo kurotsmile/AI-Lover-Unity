@@ -251,7 +251,7 @@ public class App : MonoBehaviour
     [ContextMenu("Test Link")]
     public void test_link()
     {
-        this.onDeepLinkActivated("ailover://show/chat3b264a6928384f6a925ed1ff5de5dc00/vi");
+        this.onDeepLinkActivated("ailover://show/chat1694508606259/en");
         //this.onDeepLinkActivated("music://show/song1692934624687");
         //this.onDeepLinkActivated("contactstore://show/user9dd108c1acca4f8e8fefa8dec39d5a9d/vi");
     }
@@ -776,7 +776,7 @@ public class App : MonoBehaviour
 
     public void check_Scene_Rotation()
     {
-        if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait())
+        if (this.GetComponent<Carrot_DeviceOrientationChange>().get_status_portrait())
         {
             this.tr_scene_main.SetParent(this.area_scene_main_portait);
             this.tr_scene_menu_right.SetParent(this.area_scene_menu_right_portait);

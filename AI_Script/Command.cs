@@ -482,14 +482,17 @@ public class Command : MonoBehaviour
             if (data_chat["icon"].ToString() != "")
             {
                 string s_id_icon = data_chat["icon"].ToString();
-                Sprite sp_icon_chat = this.app.carrot.get_tool().get_sprite_to_playerPrefs(s_id_icon);
-                if (sp_icon_chat != null)
+                if(s_id_icon!= "undefined")
                 {
-                    this.act_play_effect_icon_chat(sp_icon_chat.texture);
-                }
-                else
-                {
-                    if(s_id_icon != "") this.get_effect_icon_chat(s_id_icon);
+                    Sprite sp_icon_chat = this.app.carrot.get_tool().get_sprite_to_playerPrefs(s_id_icon);
+                    if (sp_icon_chat != null)
+                    {
+                        this.act_play_effect_icon_chat(sp_icon_chat.texture);
+                    }
+                    else
+                    {
+                        if (s_id_icon != "") this.get_effect_icon_chat(s_id_icon);
+                    }
                 }
             }
         }
@@ -1018,6 +1021,7 @@ public class Command : MonoBehaviour
 
     private void Act_play_chat_by_ID_done(string s_data)
     {
+        Debug.Log("Play_chat_by_ID:" + s_data);
         Fire_Document fd = new(s_data);
         this.act_chat(fd.Get_IDictionary());
     }

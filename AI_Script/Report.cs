@@ -1,5 +1,8 @@
 ﻿using Carrot;
+using Newtonsoft.Json;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public struct Ai_Chat_Report_Data
@@ -21,8 +24,8 @@ public class Report : MonoBehaviour
     public Sprite icon_report_music;
     public Sprite icon_report_other;
 
-    private Carrot.Carrot_Box_Item item_other_report;
-    private Carrot.Carrot_Box box_report;
+    private Carrot_Box_Item item_other_report;
+    private Carrot_Box box_report;
 
     private int index_report_edit = -1;
 
@@ -74,52 +77,62 @@ public class Report : MonoBehaviour
 
     public void done()
     {
-        /**
         this.app.carrot.show_loading();
-        CollectionReference ChatDbRef = this.app.carrot.db.Collection("chat-"+this.app.carrot.lang.get_key_lang());
-        DocumentReference ChatRef = ChatDbRef.Document(this.id_chat);
-        ChatRef.GetSnapshotAsync().ContinueWithOnMainThread((task) => {
-            var snapshot = task.Result;
-            if (snapshot.Exists)
-            {
-                this.app.carrot.hide_loading();
-                IDictionary app = snapshot.ToDictionary();
-                IList reports;
-                if (app["reports"] != null) reports = (IList)app["reports"];
-                else reports = (IList)Json.Deserialize("[]");
+        this.app.carrot.server.Get_doc_by_path("chat-" + this.app.carrot.lang.get_key_lang(), this.id_chat, Get_data_chat_done, Get_data_chat_fail);
+    }
 
-                Ai_Chat_Report_Data report_chat = new Ai_Chat_Report_Data();
-                report_chat.comment = this.item_other_report.get_val();
-                report_chat.date = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                if (this.app.carrot.user.get_id_user_login() != "")
-                {
-                    Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
-                    user_login.name = this.app.carrot.user.get_data_user_login("name");
-                    user_login.id = this.app.carrot.user.get_id_user_login();
-                    user_login.lang = this.app.carrot.user.get_lang_user_login();
-                    user_login.avatar = this.app.carrot.user.get_data_user_login("avatar");
-                    report_chat.user = user_login;
-                }
+    private void Get_data_chat_done(string s_data)
+    {
+        Debug.Log("Get_data_chat_done:" + s_data);
+        this.app.carrot.hide_loading();
+        Fire_Document fd = new(s_data);
+        IDictionary data_chat = fd.Get_IDictionary();
+        IList reports;
+        if (data_chat["reports"] != null) reports = (IList)data_chat["reports"];
+        else reports = (IList)Json.Deserialize("[]");
 
+        Ai_Chat_Report_Data report_chat = new Ai_Chat_Report_Data();
+        report_chat.comment = this.item_other_report.get_val();
+        report_chat.date = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+        if (this.app.carrot.user.get_id_user_login() != "")
+        {
+            Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
+            user_login.name = this.app.carrot.user.get_data_user_login("name");
+            user_login.id = this.app.carrot.user.get_id_user_login();
+            user_login.lang = this.app.carrot.user.get_lang_user_login();
+            user_login.avatar = this.app.carrot.user.get_data_user_login("avatar");
+            report_chat.user = user_login;
+        }
 
-                if (this.index_report_edit != -1)
-                    reports[this.index_report_edit] = report_chat;
-                else
-                    reports.Add(report_chat);
+        if (this.index_report_edit != -1)
+            reports[this.index_report_edit] = report_chat;
+        else
+            reports.Add(report_chat);
 
-                this.app.carrot.log("Index Report:" + this.index_report_edit);
-                Dictionary<string, object> UpdateData = new Dictionary<string, object> { { "reports", reports } };
-                ChatRef.UpdateAsync(UpdateData);
-                this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("report_title", "Report"), PlayerPrefs.GetString("report_success"));
-                if (this.box_report != null) this.box_report.close();
-            }
-            else
-            {
-                this.app.carrot.show_msg("Report",String.Format("Document {0} does not exist!", snapshot.Id),Msg_Icon.Error);
-                if (this.box_report != null) this.box_report.close();
-            }
-        });
-        **/
+        this.app.carrot.log("Index Report:" + this.index_report_edit);
+        data_chat["reports"] = reports;
+        IDictionary chat_data = (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(data_chat));
+        string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
+        this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(),this.id_chat, s_json, Submit_Report_done, Submit_Report_fail);
+    }
+
+    private void Submit_Report_done(string s_data)
+    {
+        this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("report_title", "Report"), PlayerPrefs.GetString("report_success"));
+        if (this.box_report != null) this.box_report.close();
+    }
+
+    private void Submit_Report_fail(string s_error)
+    {
+        this.app.carrot.show_msg(PlayerPrefs.GetString("report_title", "Report"), s_error, Msg_Icon.Error);
+        if (this.box_report != null) this.box_report.close();
+    }
+
+    private void Get_data_chat_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        this.app.carrot.show_msg(PlayerPrefs.GetString("report_title", "Report"), string.Format("Document {0} does not exist!",this.id_chat), Msg_Icon.Error);
+        if (this.box_report != null) this.box_report.close();
     }
 
     public void show_list_report(IList list_report)
