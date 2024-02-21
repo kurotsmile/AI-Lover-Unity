@@ -1,7 +1,6 @@
 ﻿using Carrot;
 using Crosstales;
 using System.Collections;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -64,6 +63,7 @@ public class Command : MonoBehaviour
     private GameObject item_command_loading;
     private float timer_msg_tip = 0;
     private bool is_tts = false;
+    private bool is_ready_msg_tip = false;
 
     public void load()
     {
@@ -565,11 +565,11 @@ public class Command : MonoBehaviour
         }
         else
         {
-            this.timer_msg_tip = this.timer_msg_tip + Time.deltaTime;
+            this.timer_msg_tip += Time.deltaTime;
             if (this.timer_msg_tip >30f)
             {
                 this.timer_msg_tip = 0;
-                if (this.app.player_music.sound_music.isPlaying==false&&this.app.panel_chat_msg.activeInHierarchy==true&&this.is_show_text==false&&this.is_tts==false)
+                if (this.app.player_music.sound_music.isPlaying==false&&this.app.panel_chat_msg.activeInHierarchy==true&&this.is_show_text==false&&this.is_tts==false&&this.is_ready_msg_tip==true)
                 {
                     this.send_chat_no_father("tip");
                 }
@@ -1025,6 +1025,11 @@ public class Command : MonoBehaviour
     private void Act_play_chat_by_ID_fail(string s_error)
     {
         this.app.carrot.show_msg("Chat Info", PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
+    }
+
+    public void Set_ready_msg_tip()
+    {
+        this.is_ready_msg_tip = true;
     }
 
     #region Live Chat

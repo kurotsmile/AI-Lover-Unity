@@ -41,7 +41,7 @@ public class character_manager : MonoBehaviour
     private string s_data_json_head_offline;
     private string s_data_json_costumes_offline;
 
-    public void load_character()
+    public void Load_character()
     {
         this.s_data_json_costumes_offline = PlayerPrefs.GetString("s_data_json_costumes_offline");
         this.s_data_json_head_offline = PlayerPrefs.GetString("s_data_json_head_offline");
@@ -141,7 +141,7 @@ public class character_manager : MonoBehaviour
 
     public void choise_character(int sel_index)
     {
-        this.reset_item_ui_list(this.list_character);
+        this.Reset_item_ui_list(this.list_character);
         this.list_character[sel_index].set_color_bk(this.app.carrot.color_highlight);
         this.sel_character = sel_index;
         this.Select_character(this.sel_character);
@@ -149,7 +149,7 @@ public class character_manager : MonoBehaviour
         if (this.app.s_data_json_costumes_temp != "")
             this.load_costumes_by_style_character_query();
         else
-            this.load_costumes_by_style_character_s_data(this.sel_costumes_style);
+            this.Load_costumes_by_style_character_s_data(this.sel_costumes_style);
     }
 
     public void choise_costumes(string s_id_costumes)
@@ -279,7 +279,7 @@ public class character_manager : MonoBehaviour
             for (int i = 0; i < fc.fire_document.Length; i++)
             {
                 IDictionary data_costumes = fc.fire_document[i].Get_IDictionary();
-                this.add_item_to_list_costumes(data_costumes);
+                this.Add_item_to_list_costumes(data_costumes);
                 list_costumes_data.Add(data_costumes);
             };
             this.s_data_json_costumes_offline = Carrot.Json.Serialize(list_costumes_data);
@@ -303,12 +303,12 @@ public class character_manager : MonoBehaviour
     private void Load_head_by_style_character()
     {
         if (this.app.s_data_json_head_temp == "")
-            this.load_head_by_style_character_query();
+            this.Load_head_by_style_character_query();
         else
-            this.load_head_by_style_character_s_data(this.app.s_data_json_head_temp);
+            this.Load_head_by_style_character_s_data(this.app.s_data_json_head_temp);
     }
 
-    public void load_costumes_by_style_character_s_data(string s_data)
+    public void Load_costumes_by_style_character_s_data(string s_data)
     {
         IList list_costumes = (IList)Carrot.Json.Deserialize(s_data);
         this.app.carrot.clear_contain(this.body_all_item_costumes_style);
@@ -323,13 +323,13 @@ public class character_manager : MonoBehaviour
             for (int i = 0; i < list_costumes.Count; i++)
             {
                 IDictionary data_costumes = (IDictionary)list_costumes[i];
-                this.add_item_to_list_costumes(data_costumes);
+                this.Add_item_to_list_costumes(data_costumes);
             };
         }
         this.Load_head_by_style_character();
     }
 
-    private void add_item_to_list_costumes(IDictionary data_costumes)
+    private void Add_item_to_list_costumes(IDictionary data_costumes)
     {
         Item_character item_costumes = this.create_item(this.body_all_item_costumes_style);
         string s_id_skin = data_costumes["id"].ToString();
@@ -372,7 +372,7 @@ public class character_manager : MonoBehaviour
         if (item_costumes.is_free == true)
         {
             item_costumes.btn_buy.SetActive(false);
-            if (s_img != "") item_costumes.set_act(() => this.act_get_img_costumes(item_costumes, s_id_skin, s_img));
+            if (s_img != "") item_costumes.set_act(() => this.Act_get_img_costumes(item_costumes, s_id_skin, s_img));
         }
         else
         {
@@ -382,7 +382,7 @@ public class character_manager : MonoBehaviour
         this.list_costumes.Add(item_costumes);
     }
 
-    private void load_head_by_style_character_query()
+    private void Load_head_by_style_character_query()
     {
         this.app.carrot.clear_contain(this.body_all_item_head_style);
         this.panel_head.SetActive(false);
@@ -396,14 +396,14 @@ public class character_manager : MonoBehaviour
         Fire_Collection fc = new(s_data);
         if (!fc.is_null)
         {
-            List<IDictionary> list_head_data = new List<IDictionary>();
+            List<IDictionary> list_head_data = new();
 
             this.panel_head.SetActive(true);
             this.list_head = new List<Item_character>();
             for(int i=0;i<fc.fire_document.Length;i++)
             {
                 IDictionary data_head = fc.fire_document[i].Get_IDictionary();
-                this.add_item_to_list_head(data_head);
+                this.Add_item_to_list_head(data_head);
                 list_head_data.Add(data_head);
             };
 
@@ -418,24 +418,24 @@ public class character_manager : MonoBehaviour
         this.panel_head.SetActive(false);
     }
 
-    private void load_head_by_style_character_s_data(string s_data)
+    private void Load_head_by_style_character_s_data(string s_data)
     {
         this.app.carrot.clear_contain(this.body_all_item_head_style);
         this.panel_head.SetActive(false);
 
-        IList list_head = (IList) Carrot.Json.Deserialize(s_data);
+        IList list_head = (IList)Json.Deserialize(s_data);
         if (list_head.Count > 0)
         {
             this.panel_head.SetActive(true);
             for (int i = 0; i < list_head.Count; i++)
             {
                 IDictionary data_head = (IDictionary)list_head[i];
-                this.add_item_to_list_head(data_head);
+                this.Add_item_to_list_head(data_head);
             }
         }
     } 
 
-    private void add_item_to_list_head(IDictionary data_head)
+    private void Add_item_to_list_head(IDictionary data_head)
     {
         string s_id_head = data_head["id"].ToString();
         Item_character item_head = this.create_item(this.body_all_item_head_style);
@@ -489,14 +489,14 @@ public class character_manager : MonoBehaviour
         this.list_head.Add(item_head);
     }
 
-    private void act_get_img_costumes(Item_character item_change ,string s_id_costumes, string s_url_img)
+    private void Act_get_img_costumes(Item_character item_change ,string s_id_costumes, string s_url_img)
     {
-        this.reset_item_ui_list(this.list_costumes);
+        this.Reset_item_ui_list(this.list_costumes);
         item_change.set_color_bk(this.app.carrot.color_highlight);
-        this.app.carrot.show_loading(get_img_costumes_url(s_id_costumes, s_url_img));
+        this.app.carrot.show_loading(Get_img_costumes_url(s_id_costumes, s_url_img));
     }
 
-    private IEnumerator get_img_costumes_url(string s_id_costumes, string s_url_img)
+    private IEnumerator Get_img_costumes_url(string s_id_costumes, string s_url_img)
     {
         using UnityWebRequest www = UnityWebRequestTexture.GetTexture(s_url_img);
         www.SendWebRequest();
@@ -518,7 +518,7 @@ public class character_manager : MonoBehaviour
 
     private void act_get_img_head(Item_character item_change, string s_id_header, string s_url_img)
     {
-        this.reset_item_ui_list(this.list_head);
+        this.Reset_item_ui_list(this.list_head);
         item_change.set_color_bk(this.app.carrot.color_highlight);
         this.app.carrot.show_loading(get_img_head_url(s_id_header, s_url_img));
     }
@@ -550,22 +550,22 @@ public class character_manager : MonoBehaviour
         return c_obj;
     }
 
-    public void check_buy_success_character()
+    public void Check_buy_success_character()
     {
-        this.reload_ui_character();
+        this.Reload_ui_character();
     }
 
-    private void reset_item_ui_list(List<Item_character> list_item)
+    private void Reset_item_ui_list(List<Item_character> list_item)
     {
         for(int i = 0; i < list_item.Count; i++) list_item[i].set_color_bk(Color.white);
     }
 
-    public void reload_ui_character()
+    public void Reload_ui_character()
     {
-        this.load_character();
+        this.Load_character();
         if (this.app.s_data_json_costumes_temp == "")
             this.load_costumes_by_style_character_query();
         else
-            this.load_costumes_by_style_character_s_data(this.app.s_data_json_costumes_temp);
+            this.Load_costumes_by_style_character_s_data(this.app.s_data_json_costumes_temp);
     }
 }

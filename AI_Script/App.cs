@@ -171,22 +171,23 @@ public class App : MonoBehaviour
     {
         if (PlayerPrefs.GetString("lang", "") == "")
         {
-            this.carrot.show_list_lang(this.load);
+            this.carrot.show_list_lang(this.Load);
             this.get_character().gameObject.SetActive(false);
         }
         else
         {
-            this.load("");
+            this.Load("");
         }
     }
 
     public void load_app_where_offline()
     {
-        this.load("");
+        this.Load("");
     }
 
-    private void load(string s_data_lang)
+    private void Load(string s_data_lang)
     {
+        Debug.Log("Load:" + s_data_lang);
         this.check_manager_character();
         this.command.clear_log_chat();
         this.GetComponent<Carrot_lang_show>().load_lang_emp();
@@ -198,6 +199,7 @@ public class App : MonoBehaviour
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
         this.command.send_chat("hi_" + hour);
+        this.command.Set_ready_msg_tip();
         this.player_music.playlist.On_load();
         if (!this.is_radio_func) this.button_randio.SetActive(false);
     }
@@ -211,16 +213,6 @@ public class App : MonoBehaviour
     {
         this.link_deep_app = url;
         if (this.carrot != null) this.carrot.delay_function(1f, this.check_link_deep_app);
-    }
-
-    private void act_deep_link_handle(string s_data)
-    {
-        if (s_data != "")
-        {
-            IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
-            this.GetComponent<Command>().act_chat(data_chat);
-        }
-        this.link_deep_app = "";
     }
 
     public void check_link_deep_app()
@@ -270,7 +262,7 @@ public class App : MonoBehaviour
         this.character[0].gameObject.SetActive(false);
         this.character[1].gameObject.SetActive(false);
         this.character[this.sel_character_sex].gameObject.SetActive(true);
-        this.character[this.sel_character_sex].load_character();
+        this.character[this.sel_character_sex].Load_character();
     }
 
     public void show_character_on_test(string s_character_sex)
@@ -279,7 +271,7 @@ public class App : MonoBehaviour
         this.character[0].gameObject.SetActive(false);
         this.character[1].gameObject.SetActive(false);
         this.character[this.sel_character_sex].gameObject.SetActive(true);
-        this.character[this.sel_character_sex].load_character();
+        this.character[this.sel_character_sex].Load_character();
     }
 
     public character_manager get_character()
@@ -590,7 +582,7 @@ public class App : MonoBehaviour
 
         if (this.sel_func == 3)
         {
-            this.get_character().reload_ui_character();
+            this.get_character().Reload_ui_character();
             if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait())
                 this.panel_menu_right_act.SetActive(false);
             else
@@ -654,7 +646,7 @@ public class App : MonoBehaviour
                 PlayerPrefs.SetString("sex", "1");
             }
         }
-        this.load("");
+        this.Load("");
         this.command.clear_log_chat();
         this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
         this.GetComponent<Carrot_lang_show>().load_lang_emp();
@@ -811,6 +803,7 @@ public class App : MonoBehaviour
         this.set_rect_main_tr(this.tr_scene_menu_right);
         this.set_rect_main_tr(this.tr_scene_music_mini);
         this.set_rect_main_tr(this.tr_scene_character);
+        this.view.mouseOrbit_Improved.Reset_pos();
     }
 
     private void set_rect_main_tr(Transform tr_area)
@@ -844,7 +837,7 @@ public class App : MonoBehaviour
         if (id_product == this.carrot.shop.get_id_by_index(6))
         {
             this.carrot.show_msg(PlayerPrefs.GetString("shop_fahsion", "Open all outfits"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
-            this.get_character().check_buy_success_character();
+            this.get_character().Check_buy_success_character();
             this.act_inapp_unlock_all_character();
         }
 
@@ -872,14 +865,14 @@ public class App : MonoBehaviour
         {
             this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
             PlayerPrefs.SetInt("is_buy_3", 1);
-            this.get_character().check_buy_success_character();
+            this.get_character().Check_buy_success_character();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(5))
         {
             this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
             PlayerPrefs.SetInt("is_buy_5", 1);
-            this.get_character().check_buy_success_character();
+            this.get_character().Check_buy_success_character();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(this.icon.index_buy_category_icon))
@@ -958,7 +951,7 @@ public class App : MonoBehaviour
     public void act_inapp_unlock_all_character()
     {
         PlayerPrefs.SetInt("is_buy_6", 1);
-        this.get_character().check_buy_success_character();
+        this.get_character().Check_buy_success_character();
     }
     #endregion
 }

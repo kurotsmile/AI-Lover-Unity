@@ -41,10 +41,13 @@ public class Voice_Command : MonoBehaviour
 
     void OnDestroy()
     {
-        if (dictationRecognizer != null)
+        if (this.app.carrot.os_app == Carrot.OS.Window)
         {
-            dictationRecognizer.Stop();
-            dictationRecognizer.Dispose();
+            if (dictationRecognizer != null)
+            {
+                dictationRecognizer.Stop();
+                dictationRecognizer.Dispose();
+            }
         }
     }
 
