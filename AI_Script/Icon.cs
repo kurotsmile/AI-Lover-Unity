@@ -2,8 +2,6 @@ using Carrot;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-using UnityEngine.Rendering.LookDev;
-using System.Xml.Linq;
 
 public class Icon : MonoBehaviour
 {
