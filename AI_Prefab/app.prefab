@@ -34084,91 +34084,91 @@ MonoBehaviour:
   - ms-settings:sound-devices
   - ms-settings:powersleep
   - ms-settings:personalization-background
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - explorer
+  - ms-settings:privacy-microphone
+  - ms-settings:privacy-voiceactivation
+  - ms-settings:search-permissions
+  - ms-settings:personalization-background
+  - ms-settings:easeofaccess-audio
+  - ms-settings:network-wifi
+  - soundrecorder
+  - ms-settings:search-moredetails
+  - ms-settings:speech
+  - ms-settings:nightlight
+  - explorer
+  - 'microsoft.windows.camera:'
+  - 'microsoft.windows.camera:'
+  - ms-settings:easeofaccess-narrator
+  - ms-settings:notifications
   - ms-settings:printers
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - ms-settings:mobile-devices-addphone
+  - ms-settings:network-airplanemode
+  - ms-settings:network-ethernet
+  - ms-settings:network-wifisettings
+  - ms-settings:developers
+  - ms-settings:appsfeatures
+  - ms-settings:notifications
   - ms-settings:batterysaver
   - ms-settings:bluetooth
-  - 
-  - 
-  - 
-  - 
-  - 
+  - ms-settings:easeofaccess-closedcaptioning
+  - ms-settings:connecteddevices
+  - ms-settings:privacy-notifications
+  - ms-settings:datausage
+  - ms-settings:datausage
   - ms-settings:dateandtime
   - ms-settings:about
   - ms-settings:display
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - ms-settings:lockscreen
+  - ms-settings:network
+  - ms-settings:signinoptions-launchfingerprintenrollment
+  - ms-settings:keyboard
+  - ms-settings:quiethours
+  - ms-settings:batterysaver-usagedetails
+  - ms-settings:batterysaver
+  - ms-settings:typing
+  - ms-settings:devicestyping-hwkbtextsuggestions
+  - ms-settings:network-directaccess
+  - ms-settings:regionlanguage
+  - ms-settings:privacy-location
+  - ms-settings:appsfeatures
+  - ms-settings:appsfeatures-app
+  - ms-settings:appsfeatures
+  - ms-settings:startupapps
+  - ms-settings:storagesense
+  - ms-settings:network-advancedsettings
+  - ms-settings:nfctransactions
+  - ms-settings:nfctransactions
+  - ms-settings:nfctransactions
+  - ms-settings:nightlight
   - ms-settings:notifications
-  - 
-  - 
-  - 
-  - 
+  - ms-settings:privacy
+  - compmgmtlauncher
+  - ms-settings:batterysaver-settings
+  - services.msc
   - ms-settings:windowsdefender
   - 'ms-settings:'
-  - 
+  - ms-settings:yourinfo
   - ms-settings:sound
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - ms-settings:storagerecommendations
+  - ms-settings:sync
+  - ms-settings:deviceusage
+  - ms-settings:devicestyping-hwkbtextsuggestions
+  - ms-settings:network-airplanemode
+  - ms-settings:privacy-voiceactivation
+  - ms-settings:privacy-voiceactivation
+  - ms-settings:privacy-voiceactivation
+  - ms-settings:network-vpn
+  - ms-settings:privacy-holographic-environment
+  - ms-settings:appsforwebsites
+  - ms-settings:network-wifisettings
   - ms-settings:wifi-provisioning
   - ms-settings:wifi-provisioning
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - ms-settings:network-wifisettings
+  - ms-settings:optionalfeatures
+  - ms-settings:surfacehub-devicemanagenen
+  - ms-settings:nfctransactions
+  - ms-settings:apps-volume
+  - ms-settings:network-wifi
   list_package_action:
   - com.zing.zalo
   - com.ss.android.ugc.trill

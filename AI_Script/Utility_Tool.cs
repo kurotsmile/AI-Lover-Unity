@@ -129,7 +129,7 @@ public class Utility_Tool : MonoBehaviour
 
     private void open_action_window_by_name(string s_id_name_act)
     {
-        int index_func = this.get_index_window_func(s_id_name_act);
+        int index_func = this.Get_index_window_func(s_id_name_act);
         if (index_func != -1)
         {
             string url_act_func = this.list_name_action_window[index_func];
@@ -137,7 +137,7 @@ public class Utility_Tool : MonoBehaviour
         }
     }
 
-    private int get_index_window_func(string s_id_name_act)
+    private int Get_index_window_func(string s_id_name_act)
     {
         for(int i = 0; i < this.list_name_action.Length; i++)
         {
