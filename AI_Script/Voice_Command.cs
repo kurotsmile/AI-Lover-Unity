@@ -1,7 +1,9 @@
 ﻿using TextSpeech;
 using UnityEngine;
 using UnityEngine.UI;
+#if !UNITY_ANDROID
 using UnityEngine.Windows.Speech;
+#endif
 
 public class Voice_Command : MonoBehaviour
 {
@@ -15,12 +17,15 @@ public class Voice_Command : MonoBehaviour
     public Sprite icon_mic_live;
     private InputField inp_mic = null;
 
+    #if !UNITY_ANDROID
     private DictationRecognizer dictationRecognizer;
+    #endif
 
     void Start()
 	{
         if (this.app.carrot.os_app == Carrot.OS.Window)
         {
+#if !UNITY_ANDROID
             dictationRecognizer = new DictationRecognizer();
             dictationRecognizer.DictationResult += (text, confidence) => {
                 Debug.LogFormat("Content: {0}, level: {1}", text, confidence);
@@ -30,6 +35,7 @@ public class Voice_Command : MonoBehaviour
             dictationRecognizer.DictationComplete += (completionCause) => {
                 this.img_mic_inp_home.color = Color.white;
             };
+#endif
         }
         else
         {
@@ -39,6 +45,7 @@ public class Voice_Command : MonoBehaviour
         }
     }
 
+#if !UNITY_ANDROID
     void OnDestroy()
     {
         if (this.app.carrot.os_app == Carrot.OS.Window)
@@ -50,6 +57,7 @@ public class Voice_Command : MonoBehaviour
             }
         }
     }
+#endif
 
     public void btn_start()
     {
@@ -58,7 +66,9 @@ public class Voice_Command : MonoBehaviour
         this.img_mic_inp_home.color = this.app.carrot.color_highlight;
         if (this.app.carrot.os_app == Carrot.OS.Window)
         {
+            #if !UNITY_ANDROID
             dictationRecognizer.Start();
+            #endif
         }
         else
         {
