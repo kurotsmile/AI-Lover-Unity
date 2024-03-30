@@ -683,7 +683,7 @@ public class Setting : MonoBehaviour
 
     private void play_chat_voice_test()
     {
-        this.app.command.play_text_audio(PlayerPrefs.GetString("chat_voice_test_text", "Here is the sample voice you installed and customized!"));
+        this.app.command.play_text_audio(app.carrot.L("chat_voice_test_text", "Here is the sample voice you installed and customized!"));
     }
 
     private void act_close_setting()
@@ -694,8 +694,8 @@ public class Setting : MonoBehaviour
 
     private void act_show_box_edit_weather_pin()
     {
-        string s_title = PlayerPrefs.GetString("setting_weather_pin", "Address to see the weather");
-        string s_tip = PlayerPrefs.GetString("setting_weather_pin_tip", "Update your location to use the weather view function (format: road, city, country)");
+        string s_title =app.carrot.L("setting_weather_pin", "Address to see the weather");
+        string s_tip = app.carrot.L("setting_weather_pin_tip", "Update your location to use the weather view function (format: road, city, country)");
         this.box_inp = this.app.carrot.show_input(s_title,s_tip, this.s_weather_pin);
         this.box_inp.set_act_done(act_done_box_edit_weather_address);
     }
@@ -726,8 +726,8 @@ public class Setting : MonoBehaviour
 
     private void act_show_box_edit_name_user()
     {
-        string s_title = PlayerPrefs.GetString("setting_your_name", "Your name");
-        string s_tip = PlayerPrefs.GetString("setting_your_name_tip", "Enter your name for the character to name and use in several alternative app functions with the keyword {ten_user}");
+        string s_title =app.carrot.L("setting_your_name", "Your name");
+        string s_tip = app.carrot.L("setting_your_name_tip", "Enter your name for the character to name and use in several alternative app functions with the keyword {ten_user}");
         this.box_inp = this.app.carrot.show_input(s_title, s_tip, this.s_user_name);
         this.box_inp.set_act_done(act_done_name_user_input);
     }
@@ -742,8 +742,8 @@ public class Setting : MonoBehaviour
 
     private void act_show_box_edit_name_npc()
     {
-        string s_title = PlayerPrefs.GetString("character_name", "Character name");
-        string s_tip = PlayerPrefs.GetString("character_name_tip", "You can rename the character here");
+        string s_title = app.carrot.L("character_name", "Character name");
+        string s_tip = app.carrot.L("character_name_tip", "You can rename the character here");
         this.box_inp = this.app.carrot.show_input(s_title, s_tip, this.app.get_character().get_name_character());
         this.box_inp.set_act_done(act_done_name_npc_input);
     }
@@ -871,7 +871,7 @@ public class Setting : MonoBehaviour
             this.btn_edit_chat_bubble.set_icon(this.sp_icon_on);
         }
         this.app.carrot.play_sound_click();
-        this.show_msg_status(PlayerPrefs.GetString("setting_bubble_icon", "Bubble chat icon"),this.is_bubble_icon);
+        this.show_msg_status(app.carrot.L("setting_bubble_icon", "Bubble chat icon"),this.is_bubble_icon);
     }
 
     private void act_whatch_ads_rewarded_data()
@@ -885,7 +885,7 @@ public class Setting : MonoBehaviour
         if (this.is_ads_rewarded_data)
         {
             this.app.carrot.Show_msg("Watch ads to receive rewards", "Get Success Rewards!", Carrot.Msg_Icon.Success);
-            this.GetComponent<Command_storage>().download_command_shop();
+            this.app.command_storage.download_command_shop();
             this.is_ads_rewarded_data = false;
         }
     }
@@ -910,7 +910,7 @@ public class Setting : MonoBehaviour
     public void show_shop()
     {
         Carrot.Carrot_Box box_shop=this.app.carrot.Create_Box("box_shop");
-        box_shop.set_title(PlayerPrefs.GetString("shop","Shop"));
+        box_shop.set_title(app.carrot.L("shop","Shop"));
         box_shop.set_icon(this.sp_icon_shop);
 
         Carrot.Carrot_Box_Item item_shop_ads = box_shop.create_item("shop_ads");
@@ -1053,8 +1053,8 @@ public class Setting : MonoBehaviour
 
     private void act_show_box_edit_key_api_gpt()
     {
-        string s_title = PlayerPrefs.GetString("key_api_gpt", "API key");
-        string s_tip = PlayerPrefs.GetString("key_api_gpt_tip", "Your OpenAI GPT API key");
+        string s_title = app.carrot.L("key_api_gpt", "API key");
+        string s_tip = app.carrot.L("key_api_gpt_tip", "Your OpenAI GPT API key");
         this.box_inp = this.app.carrot.show_input(s_title, s_tip,PlayerPrefs.GetString("key_api_ai_gpt",""));
         this.box_inp.set_act_done(act_done_key_api_gpt);
     }
@@ -1090,7 +1090,7 @@ public class Setting : MonoBehaviour
         else
             this.btn_edit_gpt_active.set_icon(this.sp_icon_off);
 
-        this.show_msg_status(PlayerPrefs.GetString("ai_gpt", "Chat GPT"), this.app.open_AI.is_active);
+        this.show_msg_status(app.carrot.L("ai_gpt", "Chat GPT"), this.app.open_AI.is_active);
     }
 
     private void act_gemini_active()
@@ -1113,13 +1113,13 @@ public class Setting : MonoBehaviour
         else
             this.btn_edit_gemini_active.set_icon(this.sp_icon_off);
 
-        this.show_msg_status(PlayerPrefs.GetString("ai_gemini", "Gemini AI chatbot"), this.app.gemini_AI.is_active);
+        this.show_msg_status(app.carrot.L("ai_gemini", "Gemini AI chatbot"), this.app.gemini_AI.is_active);
     }
 
     private void act_show_box_edit_key_api_gemini()
     {
-        string s_title = PlayerPrefs.GetString("key_api_gemini", "API key");
-        string s_tip = PlayerPrefs.GetString("key_api_gemini_tip", "Your Gemini AI (Google) GPT API key");
+        string s_title = app.carrot.L("key_api_gemini", "API key");
+        string s_tip = app.carrot.L("key_api_gemini_tip", "Your Gemini AI (Google) GPT API key");
         this.box_inp = this.app.carrot.show_input(s_title, s_tip, PlayerPrefs.GetString("key_api_ai_gemini", ""));
         this.box_inp.set_act_done(act_done_key_api_gemini);
     }

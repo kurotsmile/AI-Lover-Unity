@@ -447,7 +447,7 @@ public class Command_storage : MonoBehaviour
         item_face.dropdown_val.ClearOptions();
         for (int i = 0; i <= this.c_length_face; i++)
         {
-            string s_name_face = PlayerPrefs.GetString("face", "Face") + " " + (i + 1);
+            string s_name_face = app.carrot.L("face", "Face") + " " + (i + 1);
             item_face.dropdown_val.options.Add(new Dropdown.OptionData(s_name_face));
         }
         if (data_chat["face"] != null) this.item_face.set_val(data_chat["face"].ToString());
@@ -543,7 +543,7 @@ public class Command_storage : MonoBehaviour
 
         this.item_user_sex = box_add_chat.create_item("item_user_sex");
         item_user_sex.set_icon(this.app.setting.sp_icon_sex_user);
-        item_user_sex.set_title(PlayerPrefs.GetString("setting_your_sex", "Your gender"));
+        item_user_sex.set_title(app.carrot.L("setting_your_sex", "Your gender"));
         item_user_sex.set_act(() => this.show_select_sex_chat(this.item_user_sex));
         if (this.is_cm_mode_nomal)
             this.item_user_sex.gameObject.SetActive(false);
