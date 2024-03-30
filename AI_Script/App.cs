@@ -141,7 +141,7 @@ public class App : MonoBehaviour
         this.carrot.act_after_delete_all_data = this.delete_all_data;
         this.carrot.act_after_close_all_box += this.close_all_box;
 
-        this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().check_show_emp_by_resolution();
+        this.GetComponent<Carrot_DeviceOrientationChange>().Check_show_emp_by_resolution();
         this.act_change_Scene_Rotation();
 
         this.view.On_start();
@@ -190,12 +190,12 @@ public class App : MonoBehaviour
         Debug.Log("Load:" + s_data_lang);
         this.check_manager_character();
         this.command.clear_log_chat();
-        this.GetComponent<Carrot_lang_show>().load_lang_emp();
+        this.GetComponent<Carrot_lang_show>().load_lang_emp(carrot.lang);
         this.panel_main.SetActive(true);
         this.load_weather();
         this.get_character().gameObject.SetActive(true);
         this.sel_menu_func_app(0);
-        this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice", "en"));
+        this.command_voice.set_DetectionLanguage(carrot.L("key_voice", "en"));
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
         this.command.send_chat("hi_" + hour);
@@ -352,7 +352,7 @@ public class App : MonoBehaviour
         this.panel_inp_func.SetActive(false);
         this.panel_inp_command_test.SetActive(false);
         if (this.player_music.sound_music.isPlaying) this.player_music.panel_player_mini.SetActive(true);
-        if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.panel_menu_right.SetActive(false);
+        if (this.GetComponent<Carrot_DeviceOrientationChange>().Get_status_portrait()) this.panel_menu_right.SetActive(false);
         this.command.On_reset_timer_msg_tip();
     }
 
@@ -517,9 +517,9 @@ public class App : MonoBehaviour
     public void show_tip_weather()
     {
         if (this.s_weather_temp_max == this.s_weather_temp_min)
-            this.txt_weather_tip.text = string.Format(PlayerPrefs.GetString("weather_tip", "Average temperature {0}, lowest from {1}"), s_weather_temp_feels_like + "°C", s_weather_temp_min + "°C");
+            this.txt_weather_tip.text = string.Format(carrot.L("weather_tip", "Average temperature {0}, lowest from {1}"), s_weather_temp_feels_like + "°C", s_weather_temp_min + "°C");
         else
-            this.txt_weather_tip.text = string.Format(PlayerPrefs.GetString("weather_tip_2", "Average temperature {0}, lowest from {1} to {2}"), s_weather_temp_feels_like + "°C", s_weather_temp_min + "°C", s_weather_temp_max + "°C");
+            this.txt_weather_tip.text = string.Format(carrot.L("weather_tip_2", "Average temperature {0}, lowest from {1} to {2}"), s_weather_temp_feels_like + "°C", s_weather_temp_min + "°C", s_weather_temp_max + "°C");
     }
 
     private static System.DateTime UnixTimeStampToDateTime(long unixTimeStamp)
@@ -583,7 +583,7 @@ public class App : MonoBehaviour
         if (this.sel_func == 3)
         {
             this.get_character().Reload_ui_character();
-            if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait())
+            if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().Get_status_portrait())
                 this.panel_menu_right_act.SetActive(false);
             else
                 this.panel_menu_right_act.SetActive(true);
@@ -592,7 +592,7 @@ public class App : MonoBehaviour
         if (this.sel_func == 4)
         {
             this.view.On_load();
-            if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait())
+            if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().Get_status_portrait())
                 this.panel_menu_right_act.SetActive(false);
             else
                 this.panel_menu_right_act.SetActive(true);
@@ -649,7 +649,7 @@ public class App : MonoBehaviour
         this.Load("");
         this.command.clear_log_chat();
         this.command_voice.set_DetectionLanguage(PlayerPrefs.GetString("key_voice"));
-        this.GetComponent<Carrot_lang_show>().load_lang_emp();
+        this.GetComponent<Carrot_lang_show>().load_lang_emp(carrot.lang);
     }
 
     [ContextMenu("Delete all data app")]
@@ -695,7 +695,7 @@ public class App : MonoBehaviour
         }
         else if (list_contact.Count > 1)
         {
-            this.box_list = this.carrot.Create_Box(PlayerPrefs.GetString("acc_info", "Account information"), this.icon_contacts);
+            this.box_list = this.carrot.Create_Box(carrot.L("acc_info", "Account information"), this.icon_contacts);
             for (int i = 0; i < list_contact.Count; i++)
             {
                 IDictionary data_contacts = (IDictionary)list_contact[i];
@@ -776,7 +776,7 @@ public class App : MonoBehaviour
 
     public void check_Scene_Rotation()
     {
-        if (this.GetComponent<Carrot_DeviceOrientationChange>().get_status_portrait())
+        if (this.GetComponent<Carrot_DeviceOrientationChange>().Get_status_portrait())
         {
             this.tr_scene_main.SetParent(this.area_scene_main_portait);
             this.tr_scene_menu_right.SetParent(this.area_scene_menu_right_portait);
@@ -824,60 +824,60 @@ public class App : MonoBehaviour
     {
         if (id_product == this.carrot.shop.get_id_by_index(2))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop_ads", "Remove ads"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop_ads", "Remove ads"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.act_inapp_removeAds();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(7))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop_all_mp3", "Allows downloading all mp3 music files"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop_all_mp3", "Allows downloading all mp3 music files"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.act_inapp_unlock_downloadmp3();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(6))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop_fahsion", "Open all outfits"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop_fahsion", "Open all outfits"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.get_character().Check_buy_success_character();
             this.act_inapp_unlock_all_character();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(4))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop_data", "Use chat data offline"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop_data", "Use chat data offline"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             PlayerPrefs.SetInt("is_buy_4", 1);
            this.command_storage.download_command_shop();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(0))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop_all_func", "Activate all functions"), PlayerPrefs.GetString("shop_buy_success", "Purchase successful! the function you purchased has been activated. Please restart the application to use it"));
+            this.carrot.Show_msg(carrot.L("shop_all_func", "Activate all functions"), carrot.L("shop_buy_success", "Purchase successful! the function you purchased has been activated. Please restart the application to use it"));
             this.act_inapp_unlock_all_func();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(1))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop", "Shop"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.player_music.act_download_mp3_form_shop();
             this.player_music.playlist.On_pay_success();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(3))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop", "Shop"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             PlayerPrefs.SetInt("is_buy_3", 1);
             this.get_character().Check_buy_success_character();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(5))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop", "Shop"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));;
             PlayerPrefs.SetInt("is_buy_5", 1);
             this.get_character().Check_buy_success_character();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(this.icon.index_buy_category_icon))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop", "Shop"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.icon.Act_buy_category_success();
         }
 

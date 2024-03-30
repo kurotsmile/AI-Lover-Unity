@@ -55,7 +55,7 @@ public class Environment : MonoBehaviour
         this.s_color_bk = PlayerPrefs.GetString("s_color_bk",ColorUtility.ToHtmlStringRGBA(color_default));
         this.index_type_rotate_character = PlayerPrefs.GetInt("type_rotate_character", 0);
 
-        this.set_color_bk(this.app.carrot.theme.get_color_by_string(this.s_color_bk));
+        this.set_color_bk(this.app.carrot.theme.Get_color_by_string(this.s_color_bk));
 
         this.s_id_floor = PlayerPrefs.GetString("s_id_floor", "");
         if (this.s_id_floor != "") this.sel_bk_floor(this.s_id_floor);
@@ -168,7 +168,7 @@ public class Environment : MonoBehaviour
         if (this.s_data_json_bk_offline != "")
             this.Act_load_list_bk(this.s_data_json_bk_offline);
         else
-            this.app.carrot.show_msg(s_error);
+            this.app.carrot.Show_msg(s_error);
     }
 
     private void Act_load_list_bk(string s_data)
@@ -178,7 +178,7 @@ public class Environment : MonoBehaviour
         this.app.carrot.hide_loading();
         if (this.box_list != null) this.box_list.close();
         this.box_list = this.app.carrot.show_grid(this.icon_list_background);
-        this.box_list.set_title(PlayerPrefs.GetString("background_list", "List of background images"));
+        this.box_list.set_title(app.carrot.L("background_list", "List of background images"));
 
         Carrot.Carrot_Box_Btn_Item btn_freshen = this.box_list.create_btn_menu_header(this.app.carrot.sp_icon_restore);
         btn_freshen.set_act(() => show_list_background_image());
@@ -221,26 +221,26 @@ public class Environment : MonoBehaviour
 
     public void delete_background_image()
     {
-        GameObject.Find("app").GetComponent<App>().carrot.get_tool().delete_file("background");
+        app.carrot.get_tool().delete_file("background");
         this.Load_file_background();
     }
 
     public void show_list_photo_camera()
     {
-        this.app.carrot.camera_pro.show_list_img(done_camera);
+        this.app.carrot.camera_pro.Show_list_img(done_camera);
     }
 
     public void show_camera()
     {
-        this.app.carrot.camera_pro.show_camera(done_camera);
+        this.app.carrot.camera_pro.Show_camera(done_camera);
     }
 
     private void done_camera(Texture2D pic)
     {
-        this.img_background_app.sprite = GameObject.Find("app").GetComponent<App>().carrot.get_tool().Texture2DtoSprite(pic);
-        GameObject.Find("app").GetComponent<App>().carrot.get_tool().save_file("background", pic.EncodeToPNG());
+        this.img_background_app.sprite =app.carrot.get_tool().Texture2DtoSprite(pic);
+        app.carrot.get_tool().save_file("background", pic.EncodeToPNG());
         this.Load_file_background();
-        GameObject.Find("app").GetComponent<App>().carrot.close();
+        app.carrot.close();
     }
 
     public void change_scene_rotation(bool is_portrait)
@@ -302,7 +302,7 @@ public class Environment : MonoBehaviour
         if (this.s_data_json_floor_offline != "")
             this.Act_load_list_floor(this.s_data_json_floor_offline);
         else
-            this.app.carrot.show_msg(s_error);
+            this.app.carrot.Show_msg(s_error);
     }
 
     private void Act_load_list_floor(string s_data)
@@ -313,7 +313,7 @@ public class Environment : MonoBehaviour
         {
             if (this.box_list != null) this.box_list.close();
             this.box_list = this.app.carrot.show_grid();
-            this.box_list.set_title(PlayerPrefs.GetString("bk_floor", "List Floor"));
+            this.box_list.set_title(app.carrot.L("bk_floor", "List Floor"));
             this.box_list.set_icon(this.icon_floor);
 
             for (int i = 0; i < fc.fire_document.Length; i++)
@@ -339,7 +339,7 @@ public class Environment : MonoBehaviour
 
     public void btn_show_list_color_bk()
     {
-        this.app.carrot.theme.show_list_color(act_sel_color_bk);
+        this.app.carrot.theme.Show_box_list_item_color(act_sel_color_bk);
     }
 
     private void act_sel_color_bk(Color32 color_set)
@@ -351,7 +351,7 @@ public class Environment : MonoBehaviour
 
     public void btn_show_mix_color_bk()
     {
-        this.app.carrot.theme.show_mix_color(this.app.carrot.theme.get_color_by_string(this.s_color_bk), act_sel_color_bk);
+        this.app.carrot.theme.Show_mix_color(act_sel_color_bk,this.s_color_bk);
     }
 
     private void set_color_bk(Color32 color_set)

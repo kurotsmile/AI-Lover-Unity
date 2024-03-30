@@ -49,7 +49,7 @@ public class Command_Dev : MonoBehaviour
         this.type = Command_Dev_Type.pending;
         this.app.carrot.show_loading();
 
-        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.Get_key_lang());
         q.Add_where("status", Query_OP.EQUAL, "pending");
 
         if (this.order == OrderBy_Type.date_desc)
@@ -87,8 +87,8 @@ public class Command_Dev : MonoBehaviour
 
     public void delete(string s_id_chat,GameObject obj_item_chat=null)
     {
-        this.app.carrot.server.Delete_Doc("chat-" + this.app.carrot.lang.get_key_lang(), s_id_chat);
-        this.app.carrot.show_msg("Chat", "Delete Success", Msg_Icon.Success);
+        this.app.carrot.server.Delete_Doc("chat-" + this.app.carrot.lang.Get_key_lang(), s_id_chat);
+        this.app.carrot.Show_msg("Chat", "Delete Success", Msg_Icon.Success);
         if (obj_item_chat != null)
         {
             Destroy(obj_item_chat);
@@ -102,7 +102,7 @@ public class Command_Dev : MonoBehaviour
         this.type = Command_Dev_Type.same_key;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
-        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.Get_key_lang());
         q.Add_where("key",Query_OP.EQUAL, s_key_chat);
         q.Set_limit(20);
         this.app.carrot.server.Get_doc(q.ToJson(), Act_show_chat_key_same_done, Act_show_chat_key_same_fail);
@@ -130,7 +130,7 @@ public class Command_Dev : MonoBehaviour
     private void Act_show_chat_key_same_fail(string s_error)
     {
         this.app.carrot.hide_loading();
-        this.app.carrot.show_msg("Error", s_error, Msg_Icon.Error);
+        this.app.carrot.Show_msg("Error", s_error, Msg_Icon.Error);
     }
 
     public void set_all_box_active(bool is_act)
@@ -158,10 +158,10 @@ public class Command_Dev : MonoBehaviour
         this.type = Command_Dev_Type.by_user;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
-        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.Get_key_lang());
         q.Add_where("user.id",Query_OP.EQUAL,this.app.carrot.user.get_id_user_login());
         q.Set_limit(20);
-        this.app.carrot.server.Get_doc("chat-" + this.app.carrot.lang.get_key_lang(), Act_show_chat_pass_by_user_done, Act_show_chat_pass_by_user_fail);
+        this.app.carrot.server.Get_doc("chat-" + this.app.carrot.lang.Get_key_lang(), Act_show_chat_pass_by_user_done, Act_show_chat_pass_by_user_fail);
     }
 
     private void Act_show_chat_pass_by_user_done(string s_data)
@@ -177,20 +177,20 @@ public class Command_Dev : MonoBehaviour
                 list_chat.Add(chat_data);
             }
             Carrot_Box box = this.box_list(list_chat);
-            box.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
+            box.set_title(app.carrot.L("command_pass", "Published chat"));
             box.set_icon(this.sp_icon_chat_passed);
         }
         else
         {
             this.app.carrot.hide_loading();
-            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+            this.app.carrot.Show_msg(app.carrot.L("brain_list", "List command"), app.carrot.L("list_none", "List is empty, no items found!"));
         }
     }
 
     private void Act_show_chat_pass_by_user_fail(string s_error)
     {
         this.app.carrot.hide_loading();
-        this.app.carrot.show_msg("Error", s_error, Msg_Icon.Error);
+        this.app.carrot.Show_msg("Error", s_error, Msg_Icon.Error);
     }
 
     public void show_chat_by_father(string s_id_fathe)
@@ -198,7 +198,7 @@ public class Command_Dev : MonoBehaviour
         this.type = Command_Dev_Type.by_father;
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
-        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.Get_key_lang());
         q.Set_limit(20);
         q.Add_where("pater",Query_OP.EQUAL, s_id_fathe);
         if (this.order == OrderBy_Type.date_desc)
@@ -226,27 +226,27 @@ public class Command_Dev : MonoBehaviour
                 list_chat.Add(chat_data);
             }
             Carrot_Box box = this.box_list(list_chat);
-            box.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
+            box.set_title(app.carrot.L("command_pass", "Published chat"));
             box.set_icon(this.sp_icon_chat_passed);
         }
         else
         {
             this.app.carrot.hide_loading();
-            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+            this.app.carrot.Show_msg(app.carrot.L("brain_list", "List command"),app.carrot.L("list_none", "List is empty, no items found!"));
         }
     }
 
     private void Act_show_chat_by_father_fail(string s_error)
     {
         this.app.carrot.hide_loading();
-        this.app.carrot.show_msg("Error", s_error, Msg_Icon.Error);
+        this.app.carrot.Show_msg("Error", s_error, Msg_Icon.Error);
     }
 
     public Carrot_Box box_list(IList<IDictionary> list_data)
     {
         if (list_data.Count == 0)
         {
-            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+            this.app.carrot.Show_msg(app.carrot.L("brain_list", "List command"),app.carrot.L("list_none", "List is empty, no items found!"));
             return null;
         }
 
@@ -398,7 +398,7 @@ public class Command_Dev : MonoBehaviour
 
         Carrot_Box_Item item_add = box_sub_menu.create_item();
         item_add.set_icon(this.app.command_storage.sp_icon_patert);
-        item_add.set_title(PlayerPrefs.GetString("brain_add", "Create a new command"));
+        item_add.set_title(app.carrot.L("brain_add", "Create a new command"));
         item_add.set_tip("Create a conversation with content that continues this conversation");
         item_add.set_act(() => this.app.command_storage.show_add_command_with_pater(data["msg"].ToString(), data["id"].ToString()));
 
@@ -546,7 +546,7 @@ public class Command_Dev : MonoBehaviour
         this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
 
-        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.Get_key_lang());
         q.Add_where("user.name", Query_OP.EQUAL, s_user_name);
         q.Set_limit(20);
 
@@ -581,14 +581,14 @@ public class Command_Dev : MonoBehaviour
         else
         {
             this.app.carrot.hide_loading();
-            this.app.carrot.show_msg(PlayerPrefs.GetString("brain_list", "List command"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+            this.app.carrot.Show_msg(app.carrot.L("brain_list", "List command"),app.carrot.L("list_none", "List is empty, no items found!"));
         }
     }
 
     private void Act_show_chat_by_user_id_fail(string s_error)
     {
         this.app.carrot.hide_loading();
-        this.app.carrot.show_msg("Error", s_error, Msg_Icon.Error);
+        this.app.carrot.Show_msg("Error", s_error, Msg_Icon.Error);
     }
 
     #region Command Test 

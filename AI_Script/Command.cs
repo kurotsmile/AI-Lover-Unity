@@ -168,7 +168,7 @@ public class Command : MonoBehaviour
 
     private void play_chat(string s_key)
     {
-        StructuredQuery q = new("chat-" + this.app.carrot.lang.get_key_lang());
+        StructuredQuery q = new("chat-" + this.app.carrot.lang.Get_key_lang());
         q.Add_where("key", Query_OP.EQUAL, s_key);
         q.Add_where("sex_user", Query_OP.EQUAL, this.app.setting.get_user_sex());
         q.Add_where("sex_character", Query_OP.EQUAL, this.app.setting.get_character_sex());
@@ -256,7 +256,7 @@ public class Command : MonoBehaviour
         if (this.item_command_loading != null) Destroy(this.item_command_loading);
         this.data_chat_cur = null;
         this.Hide_all_obj_msg();
-        this.show_effect_txt_msg(PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"));
+        this.show_effect_txt_msg(app.carrot.L("no_chat", "No related answers yet, please teach me!"));
     }
 
     public void send_command_by_text(string s_text)
@@ -608,7 +608,7 @@ public class Command : MonoBehaviour
         {
             if (this.app.carrot.is_online())
             {
-                StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.get_key_lang()));
+                StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.Get_key_lang()));
             }
             else
             {
@@ -621,7 +621,7 @@ public class Command : MonoBehaviour
         }
         else
         {
-            StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.get_key_lang()));
+            StartCoroutine(get_audio_chat_form_txt(s_chat, this.app.carrot.lang.Get_key_lang()));
         }
     }
 
@@ -704,7 +704,7 @@ public class Command : MonoBehaviour
 
     public void show_box_link_share_chat(string s_link_share)
     {
-        this.app.carrot.show_share(s_link_share, PlayerPrefs.GetString("share_chat_tip", "You can share and show this dialogue to others if they also have the app installed"));
+        this.app.carrot.show_share(s_link_share, app.carrot.L("share_chat_tip", "You can share and show this dialogue to others if they also have the app installed"));
     }
 
     public string get_s_command_chat_last()
@@ -735,7 +735,7 @@ public class Command : MonoBehaviour
     {
         IDictionary data_chat_info = this.app.command_storage.get_cm_by_id(s_id);
         if (data_chat_cur == null)
-            this.app.carrot.server.Get_doc_by_path("chat-" + this.app.carrot.lang.get_key_lang(), s_id, Act_show_info_chat_by_id_done, Act_show_info_chat_by_id_fail);
+            this.app.carrot.server.Get_doc_by_path("chat-" + this.app.carrot.lang.Get_key_lang(), s_id, Act_show_info_chat_by_id_done, Act_show_info_chat_by_id_fail);
         else
             this.box_info_chat(data_chat_info);
     }
@@ -747,25 +747,25 @@ public class Command : MonoBehaviour
         if (data_info!=null)
             this.box_info_chat(data_info);
         else
-            this.app.carrot.show_msg("Chat Info", PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
+            this.app.carrot.Show_msg("Chat Info", app.carrot.L("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
     }
 
     private void Act_show_info_chat_by_id_fail(string s_error)
     {
-        this.app.carrot.show_msg("Chat Info", "The data retrieval process encountered a problem!", Carrot.Msg_Icon.Error);
+        this.app.carrot.Show_msg("Chat Info", "The data retrieval process encountered a problem!", Carrot.Msg_Icon.Error);
     }
 
     public void box_info_chat(IDictionary data_chat)
     {
         if (data_chat == null)
         {
-            this.app.carrot.show_msg(PlayerPrefs.GetString("command_pass", "Published chat"), "There is no data for this chat!");
+            this.app.carrot.Show_msg(app.carrot.L("command_pass", "Published chat"), "There is no data for this chat!");
             return;
         }
 
         if (this.box_list != null) this.box_list.close();
         this.box_list = this.app.carrot.Create_Box("info_chat");
-        this.box_list.set_title(PlayerPrefs.GetString("command_pass", "Published chat"));
+        this.box_list.set_title(app.carrot.L("command_pass", "Published chat"));
         this.box_list.set_icon(this.icon_info_chat);
 
         foreach (var key in data_chat.Keys)
@@ -784,7 +784,7 @@ public class Command : MonoBehaviour
                                 string user_id = data_user["id"].ToString();
                                 string user_lang = data_user["lang"].ToString();
                                 Carrot.Carrot_Box_Item item_user = this.box_list.create_item("item_" + key.ToString());
-                                item_user.set_title(PlayerPrefs.GetString("chat_creator", "Creator"));
+                                item_user.set_title(app.carrot.L("chat_creator", "Creator"));
                                 item_user.set_icon(this.icon_info_chat);
                                 item_user.set_tip(data_user["name"].ToString());
 
@@ -813,33 +813,33 @@ public class Command : MonoBehaviour
 
                         if (s_key == "sex_user")
                         {
-                            s_field_title = PlayerPrefs.GetString("user_sex", "User Sex");
-                            if (s_data_val == "0") s_field_val = PlayerPrefs.GetString("user_sex_boy", "Male");
-                            else s_field_val = PlayerPrefs.GetString("user_sex_girl", "Female");
+                            s_field_title = app.carrot.L("user_sex", "User Sex");
+                            if (s_data_val == "0") s_field_val = app.carrot.L("user_sex_boy", "Male");
+                            else s_field_val =app.carrot.L("user_sex_girl", "Female");
                             item_field.set_icon(this.app.setting.sp_icon_sex_user);
                         }
                         else if (s_key == "sex_character")
                         {
-                            s_field_title = PlayerPrefs.GetString("setting_char_sex", "Character Sex");
-                            if (s_data_val == "0") s_field_val = PlayerPrefs.GetString("user_sex_boy", "Male");
-                            else s_field_val = PlayerPrefs.GetString("user_sex_girl", "Female");
+                            s_field_title = app.carrot.L("setting_char_sex", "Character Sex");
+                            if (s_data_val == "0") s_field_val = app.carrot.L("user_sex_boy", "Male");
+                            else s_field_val = app.carrot.L("user_sex_girl", "Female");
                             item_field.set_icon(this.app.setting.sp_icon_sex_character);
                         }
                         else if (s_key == "face")
                         {
-                            s_field_title = PlayerPrefs.GetString("face", "Face");
-                            s_field_val = PlayerPrefs.GetString("face", "Face") + " " + s_data_val;
+                            s_field_title =app.carrot.L("face", "Face");
+                            s_field_val =app.carrot.L("face", "Face") + " " + s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_face);
                         }
                         else if (s_key == "action")
                         {
-                            s_field_title = PlayerPrefs.GetString("act", "Action");
-                            s_field_val = PlayerPrefs.GetString("act", "Action") + " " + s_data_val;
+                            s_field_title =app.carrot.L("act", "Action");
+                            s_field_val = app.carrot.L("act", "Action") + " " + s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_action);
                         }
                         else if (s_key == "msg")
                         {
-                            s_field_title = PlayerPrefs.GetString("cm_msg", "Feedback message");
+                            s_field_title = app.carrot.L("cm_msg", "Feedback message");
                             s_field_val = s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_msg);
 
@@ -850,13 +850,13 @@ public class Command : MonoBehaviour
                         }
                         else if (s_key == "key")
                         {
-                            s_field_title = PlayerPrefs.GetString("cm_keyword", "Keywords");
+                            s_field_title = app.carrot.L("cm_keyword", "Keywords");
                             s_field_val = s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_key);
                         }
                         else if (s_key == "color")
                         {
-                            s_field_title = PlayerPrefs.GetString("bk_color", "Color");
+                            s_field_title = app.carrot.L("bk_color", "Color");
                             s_field_val = s_data_val;
                             item_field.set_icon(this.app.setting.sp_icon_select_color);
                             if (s_field_val.ToLower() != "#ffffff")
@@ -867,7 +867,7 @@ public class Command : MonoBehaviour
                         }
                         else if (s_key == "icon")
                         {
-                            s_field_title = PlayerPrefs.GetString("setting_bubble_icon", "Icons");
+                            s_field_title = app.carrot.L("setting_bubble_icon", "Icons");
                             s_field_val = s_data_val;
                             item_field.set_icon(this.app.setting.sp_icon_select_color);
                             if (s_data_val != "")
@@ -878,7 +878,7 @@ public class Command : MonoBehaviour
                         }
                         else if (s_key == "func")
                         {
-                            s_field_title = PlayerPrefs.GetString("cm_func_app", "Program control");
+                            s_field_title = app.carrot.L("cm_func_app", "Program control");
                             item_field.set_icon(this.app.command_storage.sp_icon_func);
                             try
                             {
@@ -894,7 +894,7 @@ public class Command : MonoBehaviour
                         else if (s_key == "reports")
                         {
                             IList list_report = (IList)data_chat["reports"];
-                            s_field_title = PlayerPrefs.GetString("report_title", "Report");
+                            s_field_title = app.carrot.L("report_title", "Report");
                             s_field_val = list_report.Count + " Report";
                             item_field.set_icon(this.sp_icon_info_report_chat);
                             item_field.set_act(() => this.app.report.show_list_report(list_report));
@@ -924,13 +924,13 @@ public class Command : MonoBehaviour
             if (s_status == "passed")
             {
                 string s_id_chat = data_chat["id"].ToString();
-                string s_link_share = this.app.carrot.mainhost + "/?p=chat&id=" + s_id_chat + "&lang_chat=" + this.app.carrot.lang.get_key_lang();
+                string s_link_share = this.app.carrot.mainhost + "/?p=chat&id=" + s_id_chat + "&lang_chat=" + this.app.carrot.lang.Get_key_lang();
                 Carrot_Box_Btn_Panel panel_btn = this.box_list.create_panel_btn();
                 Carrot_Button_Item btn_share = panel_btn.create_btn("item_share");
                 btn_share.set_bk_color(this.app.carrot.color_highlight);
                 btn_share.set_icon_white(this.app.carrot.sp_icon_share);
                 btn_share.set_label_color(Color.white);
-                btn_share.set_label(PlayerPrefs.GetString("share", "Share"));
+                btn_share.set_label(app.carrot.L("share", "Share"));
                 btn_share.set_act_click(() => this.share_chat(s_link_share));
             }
         }
@@ -960,7 +960,7 @@ public class Command : MonoBehaviour
     {
         string s_txt = this.data_chat_cur["msg"].ToString();
         s_txt = UnityWebRequest.EscapeURL(s_txt);
-        string s_tr = "https://translate.google.com/?sl=" + this.app.carrot.lang.get_key_lang() + "&tl=en&text=" + s_txt + "&op=translate";
+        string s_tr = "https://translate.google.com/?sl=" + this.app.carrot.lang.Get_key_lang() + "&tl=en&text=" + s_txt + "&op=translate";
         Application.OpenURL(s_tr);
     }
 
@@ -1028,7 +1028,7 @@ public class Command : MonoBehaviour
 
     private void Act_play_chat_by_ID_fail(string s_error)
     {
-        this.app.carrot.show_msg("Chat Info", PlayerPrefs.GetString("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
+        this.app.carrot.Show_msg("Chat Info", app.carrot.L("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
     }
 
     public void Set_ready_msg_tip()
