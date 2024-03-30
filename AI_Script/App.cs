@@ -883,13 +883,13 @@ public class App : MonoBehaviour
 
         if (id_product == this.carrot.shop.get_id_by_index(this.action.index_product_buy_act))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop", "Shop"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.action.check_buy_success_action();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(this.action.index_product_buy_all_act))
         {
-            this.carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop", "Shop"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.act_inapp_unlock_all_animation();
         }
     }
