@@ -363,7 +363,7 @@ public class character_actions : MonoBehaviour
         this.app.command_storage.obj_button_prev_command_test.SetActive(false);
         this.app.command_storage.obj_button_prev_command_replay.SetActive(false);
         this.app.command_storage.hide_box_add();
-        if (this.GetComponent<Carrot.Carrot_DeviceOrientationChange>().get_status_portrait()) this.app.panel_menu_right.SetActive(false);
+        if (this.GetComponent<Carrot_DeviceOrientationChange>().Get_status_portrait()) this.app.panel_menu_right.SetActive(false);
     }
 
     public IList get_list_all_name_animations()

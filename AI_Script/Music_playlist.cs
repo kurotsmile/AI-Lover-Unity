@@ -75,7 +75,7 @@ public class Music_playlist : MonoBehaviour
         this.length++;
         PlayerPrefs.SetInt("music_length", this.length);
         this.Check_show_btn_playlist();
-        this.app.carrot.show_msg(PlayerPrefs.GetString("music_list", "Music List"), PlayerPrefs.GetString("add_music_list_success", "Added to your favorites list, you can listen to this song again without a network connection"));
+        this.app.carrot.Show_msg(app.carrot.L("music_list", "Music List"), app.carrot.L("add_music_list_success", "Added to your favorites list, you can listen to this song again without a network connection"));
     }
 
     public void show_playlist()
@@ -88,7 +88,7 @@ public class Music_playlist : MonoBehaviour
         }
         else
         {
-            this.app.carrot.show_msg(PlayerPrefs.GetString("music_list", "Music Playlist"), PlayerPrefs.GetString("list_none", "List is empty, no items found!"));
+            this.app.carrot.Show_msg(app.carrot.L("music_list", "Music Playlist"), app.carrot.L("list_none", "List is empty, no items found!"));
         }
     }
 
@@ -100,7 +100,7 @@ public class Music_playlist : MonoBehaviour
             string s_data = PlayerPrefs.GetString("music_" + i);
             if (s_data != "")
             {
-                IDictionary data_music = (IDictionary)Carrot.Json.Deserialize(s_data);
+                IDictionary data_music = (IDictionary)Json.Deserialize(s_data);
                 data_music["type"] = "offline";
                 data_music["index_del"] = i;
                 list_music_offline.Add(data_music);
@@ -142,7 +142,7 @@ public class Music_playlist : MonoBehaviour
             }
             else
             {
-                this.get_data_list_playlist(this.app.carrot.lang.get_key_lang(), this.show_list_music_online);
+                this.get_data_list_playlist(this.app.carrot.lang.Get_key_lang(), this.show_list_music_online);
             }
         }
         else
@@ -153,7 +153,7 @@ public class Music_playlist : MonoBehaviour
 
     public void btn_show_seach_music()
     {
-        this.box_search_inp=this.app.carrot.show_search(Act_search_music, PlayerPrefs.GetString("search_song_tip", "Enter the name of the song you want to listen to"));
+        this.box_search_inp=this.app.carrot.show_search(Act_search_music,app.carrot.L("search_song_tip", "Enter the name of the song you want to listen to"));
     }
 
     private void Act_search_music(string key_search)
@@ -175,7 +175,7 @@ public class Music_playlist : MonoBehaviour
             if (list_song != null)
                 this.Box_list_song(list_song);
             else
-                this.app.carrot.show_msg(PlayerPrefs.GetString("search_results", "Search Results"), PlayerPrefs.GetString("no_song_found","No songs found!"), Carrot.Msg_Icon.Alert);
+                this.app.carrot.Show_msg(app.carrot.L("search_results", "Search Results"), app.carrot.L("no_song_found","No songs found!"), Msg_Icon.Alert);
         }
     }
 
@@ -223,25 +223,25 @@ public class Music_playlist : MonoBehaviour
 
             if (this.type == Playlist_Type.music_search_result)
             {
-                this.box_list.set_title(PlayerPrefs.GetString("search_results", "Search Results"));
+                this.box_list.set_title(app.carrot.L("search_results", "Search Results"));
                 this.box_list.set_icon(this.app.carrot.icon_carrot_search);
             }
 
             if (this.type == Playlist_Type.offline)
             {
-                this.box_list.set_title(PlayerPrefs.GetString("music_list", "Music Playlist"));
+                this.box_list.set_title(app.carrot.L("music_list", "Music Playlist"));
                 this.box_list.set_icon(this.icon);
             }
 
             if (this.type == Playlist_Type.online)
             {
-                this.box_list.set_title(PlayerPrefs.GetString("song_history", "List Music History"));
+                this.box_list.set_title(app.carrot.L("song_history", "List Music History"));
                 this.box_list.set_icon(this.icon_music_online);
             }
 
             if (this.type == Playlist_Type.radio)
             {
-                this.box_list.set_title(PlayerPrefs.GetString("radio", "Radio"));
+                this.box_list.set_title(app.carrot.L("radio", "Radio"));
                 this.box_list.set_icon(this.icon_radio);
             }
 
@@ -317,7 +317,7 @@ public class Music_playlist : MonoBehaviour
         else
         {
             if (this.box_search_inp != null) this.box_search_inp.close();
-            this.app.carrot.show_msg(PlayerPrefs.GetString("search_results", "Search Results"), "No songs found!", Carrot.Msg_Icon.Alert);
+            this.app.carrot.Show_msg(app.carrot.L("search_results", "Search Results"), "No songs found!", Carrot.Msg_Icon.Alert);
         }
     }
 
@@ -349,7 +349,7 @@ public class Music_playlist : MonoBehaviour
             Carrot.Carrot_Box_Btn_Item btn_share = item_song.create_item();
             btn_share.set_icon(this.app.carrot.sp_icon_share);
             btn_share.set_color(this.app.carrot.color_highlight);
-            btn_share.set_act(() => this.app.carrot.show_share(link_song_share, PlayerPrefs.GetString("share_song", "Share this song so everyone can hear it!")));
+            btn_share.set_act(() => this.app.carrot.show_share(link_song_share, app.carrot.L("share_song", "Share this song so everyone can hear it!")));
 
             if (PlayerPrefs.GetInt("is_buy_song_" + s_id_song, 0) == 1)
             {
@@ -443,7 +443,7 @@ public class Music_playlist : MonoBehaviour
         if (this.s_data_json_radio_offline != "") 
             this.Act_load_list_radio(this.s_data_json_radio_offline);
         else
-            this.app.carrot.show_msg("Radio", s_error);
+            this.app.carrot.Show_msg("Radio", s_error);
     }
 
     private void Act_load_list_radio(string s_data)
@@ -469,7 +469,7 @@ public class Music_playlist : MonoBehaviour
         }
         else
         {
-            this.app.carrot.show_msg("Radio", "Lits None");
+            this.app.carrot.Show_msg("Radio", "Lits None");
         }
     }
 

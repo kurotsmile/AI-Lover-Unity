@@ -309,7 +309,7 @@ public class Icon : MonoBehaviour
         }
         else
         {
-            this.app.carrot.show_msg("None");
+            this.app.carrot.Show_msg("None");
         }
     }
 }

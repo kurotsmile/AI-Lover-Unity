@@ -64,7 +64,7 @@ public class GeminiAPI : MonoBehaviour
                 chat_ai["sex_character"] = this.app.setting.get_character_sex();
                 chat_ai["date_create"] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
                 chat_ai["link"] = "";
-                chat_ai["lang"] = this.app.carrot.lang.get_key_lang();
+                chat_ai["lang"] = this.app.carrot.lang.Get_key_lang();
                 chat_ai["icon"] = "";
                 chat_ai["pater"] = "";
                 chat_ai["mp3"] = "";
