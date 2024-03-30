@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public struct Ai_Chat_Report_Data
@@ -35,7 +34,7 @@ public class Report : MonoBehaviour
 
         this.box_report = this.GetComponent<App>().carrot.Create_Box("box_report");
         box_report.set_icon(this.icon_report);
-        box_report.set_title(PlayerPrefs.GetString("report_title", "Report"));
+        box_report.set_title(app.carrot.L("report_title", "Report"));
 
         Carrot.Carrot_Box_Item item_msg = box_report.create_item();
         item_msg.set_type(Carrot.Box_Item_Type.box_value_txt);
@@ -64,21 +63,21 @@ public class Report : MonoBehaviour
         btn_done.set_icon(this.GetComponent<App>().carrot.icon_carrot_done);
         btn_done.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
         btn_done.set_label_color(Color.white);
-        btn_done.txt_val.text = PlayerPrefs.GetString("done", "Done");
+        btn_done.txt_val.text = app.carrot.L("done", "Done");
         btn_done.set_act_click(() => done());
 
         Carrot.Carrot_Button_Item btn_cancel = box_panel_btn.create_btn("btn_cancel");
         btn_cancel.set_icon(this.GetComponent<App>().carrot.icon_carrot_cancel);
         btn_cancel.set_bk_color(this.GetComponent<App>().carrot.color_highlight);
         btn_cancel.set_label_color(Color.white);
-        btn_cancel.txt_val.text = PlayerPrefs.GetString("cancel", "Cancel");
+        btn_cancel.txt_val.text =app.carrot.L("cancel", "Cancel");
         btn_cancel.set_act_click(() => box_report.close());
     }
 
     public void done()
     {
         this.app.carrot.show_loading();
-        this.app.carrot.server.Get_doc_by_path("chat-" + this.app.carrot.lang.get_key_lang(), this.id_chat, Get_data_chat_done, Get_data_chat_fail);
+        this.app.carrot.server.Get_doc_by_path("chat-" + this.app.carrot.lang.Get_key_lang(), this.id_chat, Get_data_chat_done, Get_data_chat_fail);
     }
 
     private void Get_data_chat_done(string s_data)
@@ -113,25 +112,25 @@ public class Report : MonoBehaviour
         data_chat["reports"] = reports;
         IDictionary chat_data = (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(data_chat));
         string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
-        this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.get_key_lang(),this.id_chat, s_json, Submit_Report_done, Submit_Report_fail);
+        this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.Get_key_lang(),this.id_chat, s_json, Submit_Report_done, Submit_Report_fail);
     }
 
     private void Submit_Report_done(string s_data)
     {
-        this.GetComponent<App>().carrot.show_msg(PlayerPrefs.GetString("report_title", "Report"), PlayerPrefs.GetString("report_success"));
+        this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), app.carrot.L("report_success"));
         if (this.box_report != null) this.box_report.close();
     }
 
     private void Submit_Report_fail(string s_error)
     {
-        this.app.carrot.show_msg(PlayerPrefs.GetString("report_title", "Report"), s_error, Msg_Icon.Error);
+        this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), s_error, Msg_Icon.Error);
         if (this.box_report != null) this.box_report.close();
     }
 
     private void Get_data_chat_fail(string s_error)
     {
         this.app.carrot.hide_loading();
-        this.app.carrot.show_msg(PlayerPrefs.GetString("report_title", "Report"), string.Format("Document {0} does not exist!",this.id_chat), Msg_Icon.Error);
+        this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), string.Format("Document {0} does not exist!",this.id_chat), Msg_Icon.Error);
         if (this.box_report != null) this.box_report.close();
     }
 
@@ -139,7 +138,7 @@ public class Report : MonoBehaviour
     {
         Carrot_Box box_list_report = this.app.carrot.Create_Box("report_list");
         box_list_report.set_icon(this.app.command.sp_icon_info_report_chat);
-        box_list_report.set_title(PlayerPrefs.GetString("report_title", "Report"));
+        box_list_report.set_title(app.carrot.L("report_title", "Report"));
 
         for (int i = 0; i < list_report.Count; i++)
         {

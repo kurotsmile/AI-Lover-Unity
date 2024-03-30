@@ -358,7 +358,7 @@ public class Player_music : MonoBehaviour
                 this.button_download_mp3.SetActive(false);
                 this.button_share_song.SetActive(false);
                 this.img_repeat_full.gameObject.SetActive(false);
-                this.txt_name_song_full.text = PlayerPrefs.GetString("no_song_play_title", "No song");
+                this.txt_name_song_full.text = app.carrot.L("no_song_play_title", "No song");
             }
         }
         else
@@ -498,11 +498,11 @@ public class Player_music : MonoBehaviour
         }
         else
         {
-            if(GameObject.Find("app").GetComponent<App>().carrot.store_public==Carrot.Store.Google_Play) Application.OpenURL("https://play.google.com/store/apps/details?id=com.CarrotApp.musicforlife");
-            if(GameObject.Find("app").GetComponent<App>().carrot.store_public==Carrot.Store.Amazon_app_store) Application.OpenURL("https://www.amazon.com/gp/mas/dl/android?p=com.CarrotApp.musicforlife");
-            if(GameObject.Find("app").GetComponent<App>().carrot.store_public==Carrot.Store.Microsoft_Store) Application.OpenURL("https://www.microsoft.com/store/productId/9PMH34Z5TWZ2");
-            if(GameObject.Find("app").GetComponent<App>().carrot.store_public==Carrot.Store.Carrot_store) Application.OpenURL("http://carrotstore.com/music");
-            if(GameObject.Find("app").GetComponent<App>().carrot.store_public==Carrot.Store.Samsung_Galaxy_Store) Application.OpenURL("https://galaxystore.samsung.com/detail/com.CarrotApp.musicforlife");
+            if(app.carrot.store_public==Carrot.Store.Google_Play) Application.OpenURL("https://play.google.com/store/apps/details?id=com.CarrotApp.musicforlife");
+            if(app.carrot.store_public==Carrot.Store.Amazon_app_store) Application.OpenURL("https://www.amazon.com/gp/mas/dl/android?p=com.CarrotApp.musicforlife");
+            if(app.carrot.store_public==Carrot.Store.Microsoft_Store) Application.OpenURL("https://www.microsoft.com/store/productId/9PMH34Z5TWZ2");
+            if(app.carrot.store_public==Carrot.Store.Carrot_store) Application.OpenURL("http://carrotstore.com/music");
+            if(app.carrot.store_public==Carrot.Store.Samsung_Galaxy_Store) Application.OpenURL("https://galaxystore.samsung.com/detail/com.CarrotApp.musicforlife");
         }
     }
 
@@ -571,12 +571,12 @@ public class Player_music : MonoBehaviour
 
     private void Act_play_song_by_id_fail(string s_error)
     {
-        this.app.carrot.show_msg(PlayerPrefs.GetString("search_results", "Search Results"), "No songs found!", Carrot.Msg_Icon.Alert);
+        this.app.carrot.Show_msg(app.carrot.L("search_results", "Search Results"), "No songs found!", Carrot.Msg_Icon.Alert);
     }
 
     public void play_new_song()  
     {
-        get_new_song(this.app.carrot.lang.get_key_lang());
+        get_new_song(this.app.carrot.lang.Get_key_lang());
     }
 
     private void get_new_song(string s_lang=null)
@@ -592,7 +592,7 @@ public class Player_music : MonoBehaviour
 
     public void show_lyrics()
     {
-        this.box_list=this.app.carrot.Create_Box(PlayerPrefs.GetString("song_lyrics", "Song Lyrics"), this.button_lyrics.GetComponent<Image>().sprite);
+        this.box_list=this.app.carrot.Create_Box(app.carrot.L("song_lyrics", "Song Lyrics"), this.button_lyrics.GetComponent<Image>().sprite);
         GameObject item_lyrics_obj = Instantiate(this.prefab_item_lyrics);
         item_lyrics_obj.transform.SetParent(this.box_list.area_all_item);
         item_lyrics_obj.transform.localScale = new Vector3(1f, 1f, 1f);
@@ -636,7 +636,7 @@ public class Player_music : MonoBehaviour
 
     public void btn_share_music()
     {
-        this.app.carrot.show_share(this.link_store, PlayerPrefs.GetString("share_song","Share this song so everyone can hear it"));
+        this.app.carrot.show_share(this.link_store, app.carrot.L("share_song","Share this song so everyone can hear it"));
     }
 
     public string get_id_song_current()

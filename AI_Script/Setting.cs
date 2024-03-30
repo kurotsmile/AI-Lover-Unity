@@ -201,7 +201,7 @@ public class Setting : MonoBehaviour
         item_color_select.set_tip("The color of the selected item and the highlighted values");
         item_color_select.set_lang_data("setting_color", "setting_color_tip");
         item_color_select.load_lang_data();
-        item_color_select.set_act(() => this.app.carrot.theme.show_list_color(this.act_select_color));
+        item_color_select.set_act(() => this.app.carrot.theme.Show_box_list_item_color(this.act_select_color));
         item_color_select.transform.SetSiblingIndex(4);
 
         Carrot.Carrot_Box_Btn_Item btn_color_list = item_color_select.create_item();
@@ -212,7 +212,7 @@ public class Setting : MonoBehaviour
         Carrot.Carrot_Box_Btn_Item btn_color_mix = item_color_select.create_item();
         btn_color_mix.set_icon(this.sp_icon_mix_color);
         btn_color_mix.set_color(this.app.carrot.color_highlight);
-        btn_color_mix.set_act(() => this.app.carrot.theme.show_mix_color(this.color_select, this.act_select_color));
+        btn_color_mix.set_act(() => this.app.carrot.theme.Show_mix_color(this.act_select_color,ColorUtility.ToHtmlStringRGBA(this.color_select)));
         group_sys.add_item(item_color_select);
 
         Carrot.Carrot_Box_Item_group group_user = box_setting.add_item_group("user_group");
@@ -813,12 +813,12 @@ public class Setting : MonoBehaviour
 
     public void act_change_status_voice()
     {
-        string s_title = PlayerPrefs.GetString("setting_sound", "Chat audio");
+        string s_title =app.carrot.L("setting_sound", "Chat audio");
         if (this.is_sound_voice)
         {
             this.is_sound_voice = false;
             PlayerPrefs.SetInt("is_sound_voice",0);
-            this.app.carrot.show_msg(s_title,PlayerPrefs.GetString("setting_off", "Turn off"));
+            this.app.carrot.Show_msg(s_title,app.carrot.L("setting_off", "Turn off"));
             if(this.btn_edit_sound!=null) this.btn_edit_sound.set_icon(this.sp_icon_off);
             this.img_sound_voice_home.sprite = this.sp_icon_voice_off;
         }
@@ -826,7 +826,7 @@ public class Setting : MonoBehaviour
         {
             this.is_sound_voice = true;
             PlayerPrefs.SetInt("is_sound_voice",1);
-            this.app.carrot.show_msg(s_title, PlayerPrefs.GetString("setting_on", "Turn on"));
+            this.app.carrot.Show_msg(s_title, app.carrot.L("setting_on", "Turn on"));
             if (this.btn_edit_sound != null) this.btn_edit_sound.set_icon(this.sp_icon_on);
             this.img_sound_voice_home.sprite = this.sp_icon_voice_on;
         }
@@ -834,7 +834,7 @@ public class Setting : MonoBehaviour
 
     private void act_show_edit_voice_speed()
     {
-        string s_title = PlayerPrefs.GetString("voice_speed", "Pronunciation speed");
+        string s_title = app.carrot.L("voice_speed", "Pronunciation speed");
         this.box_inp = this.app.carrot.show_input(s_title, this.voice_speech.ToString() + "/s", this.voice_speech.ToString(),Carrot.Window_Input_value_Type.slider);
         this.box_inp.set_icon(this.sp_icon_voice_speed);
         this.box_inp.inp_slider.wholeNumbers = false;
@@ -884,7 +884,7 @@ public class Setting : MonoBehaviour
     {
         if (this.is_ads_rewarded_data)
         {
-            this.app.carrot.show_msg("Watch ads to receive rewards", "Get Success Rewards!", Carrot.Msg_Icon.Success);
+            this.app.carrot.Show_msg("Watch ads to receive rewards", "Get Success Rewards!", Carrot.Msg_Icon.Success);
             this.GetComponent<Command_storage>().download_command_shop();
             this.is_ads_rewarded_data = false;
         }
@@ -902,7 +902,7 @@ public class Setting : MonoBehaviour
     {
         if (this.item_weather_pin != null)
         {
-            this.app.carrot.show_msg(this.item_weather_pin.txt_name.text, "Address confirmed:"+s_name);
+            this.app.carrot.Show_msg(this.item_weather_pin.txt_name.text, "Address confirmed:"+s_name);
             this.item_weather_pin.set_val(s_name);
         }
     }
@@ -1032,7 +1032,7 @@ public class Setting : MonoBehaviour
     public void act_open_help_voice_type()
     {
         this.app.carrot.play_sound_click();
-        Application.OpenURL("https://support.google.com/accessibility/answer/11221616?hl="+this.app.carrot.lang.get_key_lang());
+        Application.OpenURL("https://support.google.com/accessibility/answer/11221616?hl="+this.app.carrot.lang.Get_key_lang());
     }
 
     private void act_change_voice_type(int index)
@@ -1158,16 +1158,16 @@ public class Setting : MonoBehaviour
     private void show_msg_status(string s_title,bool is_active)
     {
         if (is_active)
-            this.app.carrot.show_msg(s_title, PlayerPrefs.GetString("setting_on", "Turn on"));
+            this.app.carrot.Show_msg(s_title, app.carrot.L("setting_on", "Turn on"));
         else
-            this.app.carrot.show_msg(s_title, PlayerPrefs.GetString("setting_off", "Turn off"));
+            this.app.carrot.Show_msg(s_title,app.carrot.L("setting_off", "Turn off"));
     }
 
     public void show_list_ai_prioritize()
     {
         this.app.carrot.play_sound_click();
         this.box_list= this.app.carrot.Create_Box("ai_prioritize");
-        this.box_list.set_title(PlayerPrefs.GetString("ai_prioritize", "AI Prioritize"));
+        this.box_list.set_title(app.carrot.L("ai_prioritize", "AI Prioritize"));
         this.box_list.set_icon(this.sp_icon_prioritize);
 
         string[] s_name_p=new string[4];

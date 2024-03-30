@@ -62,7 +62,7 @@ public class Voice_Command : MonoBehaviour
         }
         else
         {
-            SpeechToText.Instance.StartRecording(PlayerPrefs.GetString("voice_command_ready", "Say something :-)"));
+            SpeechToText.Instance.StartRecording(app.carrot.L("voice_command_ready", "Say something :-)"));
         }
     }
 
@@ -100,7 +100,7 @@ public class Voice_Command : MonoBehaviour
     {
         this.inp_mic = inp;
         this.app.textToSpeech.StopSpeak();
-        SpeechToText.Instance.StartRecording(PlayerPrefs.GetString("voice_command_ready", "Say something :-)"));
+        SpeechToText.Instance.StartRecording(app.carrot.L("voice_command_ready", "Say something :-)"));
     }
 
     public void change_mode()
@@ -110,17 +110,17 @@ public class Voice_Command : MonoBehaviour
         if (this.app.command.mode == Command_Type_Mode.chat)
         {
             this.app.command.mode = Command_Type_Mode.live;
-            s_status_live = PlayerPrefs.GetString("setting_on", "On");
+            s_status_live = app.carrot.L("setting_on", "On");
             this.app.live.on_live();
         }
         else
         {
             this.app.command.mode = Command_Type_Mode.chat;
-            s_status_live = PlayerPrefs.GetString("setting_off", "Off");
+            s_status_live = app.carrot.L("setting_off", "Off");
             this.app.live.off_live();
         }
 
-        this.app.carrot.show_msg(PlayerPrefs.GetString("chat_narrative", "Chat narration"), s_status_live, Carrot.Msg_Icon.Alert);
+        this.app.carrot.Show_msg(app.carrot.L("chat_narrative", "Chat narration"), s_status_live, Carrot.Msg_Icon.Alert);
         this.check_icon_input_command();
     }
 
