@@ -270,7 +270,7 @@ public class Environment : MonoBehaviour
             else
                 this.cam.transform.localPosition = new Vector3(1f, 3f, 14f);
 
-            this.cam.fieldOfView = PlayerPrefs.GetFloat("bk_zoom_view", 5f);;
+            this.cam.fieldOfView = PlayerPrefs.GetFloat("bk_zoom_view", 20f);;
         }
         this.slider_zoom.value = this.cam.fieldOfView;
     }
