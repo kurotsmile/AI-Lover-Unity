@@ -33783,6 +33783,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  call_full_when_on_start: 1
 --- !u!114 &1522014045571366627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33812,7 +33813,21 @@ MonoBehaviour:
         m_CallState: 2
   OnOrientationChange:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2755477471257207454}
+        m_TargetAssemblyTypeName: App, Assembly-CSharp
+        m_MethodName: act_change_Scene_Rotation
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  resolution: {x: 0, y: 0}
+  orientation: 0
   emp_portrait:
   - {fileID: 4773127604941714200}
   - {fileID: 2755477471481125030}
