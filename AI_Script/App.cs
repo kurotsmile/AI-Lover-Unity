@@ -171,7 +171,7 @@ public class App : MonoBehaviour
     {
         if (PlayerPrefs.GetString("lang", "") == "")
         {
-            this.carrot.show_list_lang(this.Load);
+            this.carrot.Show_list_lang(this.Load);
             this.get_character().gameObject.SetActive(false);
         }
         else
@@ -628,7 +628,7 @@ public class App : MonoBehaviour
 
     public void btn_show_list_lang()
     {
-        this.carrot.show_list_lang(act_after_load_lang);
+        this.carrot.Show_list_lang(act_after_load_lang);
     }
 
     private void act_after_load_lang(string s_data)
