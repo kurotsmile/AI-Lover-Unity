@@ -7,7 +7,7 @@ public class Icon : MonoBehaviour
 {
     [Header("Main Obj")]
     public App app;
-    public int index_buy_category_icon;
+    public int index_buy_category_icon=19;
 
     [Header("Icon Obj")]
     public Sprite sp_icon_icons;
