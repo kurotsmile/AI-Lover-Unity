@@ -723,7 +723,7 @@ public class App : MonoBehaviour
 
     public void hide_banner_ads()
     {
-        this.carrot.ads.Destroy_Banner_Ad();
+        //this.carrot.ads.Destroy_Banner_Ad();
     }
     public string s_rep_key(string s_chat)
     {

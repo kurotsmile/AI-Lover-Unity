@@ -696,7 +696,7 @@ public class Setting : MonoBehaviour
     {
         string s_title =app.carrot.L("setting_weather_pin", "Address to see the weather");
         string s_tip = app.carrot.L("setting_weather_pin_tip", "Update your location to use the weather view function (format: road, city, country)");
-        this.box_inp = this.app.carrot.show_input(s_title,s_tip, this.s_weather_pin);
+        this.box_inp = this.app.carrot.Show_input(s_title,s_tip, this.s_weather_pin);
         this.box_inp.set_act_done(act_done_box_edit_weather_address);
     }
 
@@ -728,7 +728,7 @@ public class Setting : MonoBehaviour
     {
         string s_title =app.carrot.L("setting_your_name", "Your name");
         string s_tip = app.carrot.L("setting_your_name_tip", "Enter your name for the character to name and use in several alternative app functions with the keyword {ten_user}");
-        this.box_inp = this.app.carrot.show_input(s_title, s_tip, this.s_user_name);
+        this.box_inp = this.app.carrot.Show_input(s_title, s_tip, this.s_user_name);
         this.box_inp.set_act_done(act_done_name_user_input);
     }
 
@@ -744,7 +744,7 @@ public class Setting : MonoBehaviour
     {
         string s_title = app.carrot.L("character_name", "Character name");
         string s_tip = app.carrot.L("character_name_tip", "You can rename the character here");
-        this.box_inp = this.app.carrot.show_input(s_title, s_tip, this.app.get_character().get_name_character());
+        this.box_inp = this.app.carrot.Show_input(s_title, s_tip, this.app.get_character().get_name_character());
         this.box_inp.set_act_done(act_done_name_npc_input);
     }
 
@@ -835,7 +835,7 @@ public class Setting : MonoBehaviour
     private void act_show_edit_voice_speed()
     {
         string s_title = app.carrot.L("voice_speed", "Pronunciation speed");
-        this.box_inp = this.app.carrot.show_input(s_title, this.voice_speech.ToString() + "/s", this.voice_speech.ToString(),Carrot.Window_Input_value_Type.slider);
+        this.box_inp = this.app.carrot.Show_input(s_title, this.voice_speech.ToString() + "/s", this.voice_speech.ToString(),Carrot.Window_Input_value_Type.slider);
         this.box_inp.set_icon(this.sp_icon_voice_speed);
         this.box_inp.inp_slider.wholeNumbers = false;
         this.box_inp.inp_slider.minValue = 0.8f;
@@ -1055,7 +1055,7 @@ public class Setting : MonoBehaviour
     {
         string s_title = app.carrot.L("key_api_gpt", "API key");
         string s_tip = app.carrot.L("key_api_gpt_tip", "Your OpenAI GPT API key");
-        this.box_inp = this.app.carrot.show_input(s_title, s_tip,PlayerPrefs.GetString("key_api_ai_gpt",""));
+        this.box_inp = this.app.carrot.Show_input(s_title, s_tip,PlayerPrefs.GetString("key_api_ai_gpt",""));
         this.box_inp.set_act_done(act_done_key_api_gpt);
     }
 
@@ -1120,7 +1120,7 @@ public class Setting : MonoBehaviour
     {
         string s_title = app.carrot.L("key_api_gemini", "API key");
         string s_tip = app.carrot.L("key_api_gemini_tip", "Your Gemini AI (Google) GPT API key");
-        this.box_inp = this.app.carrot.show_input(s_title, s_tip, PlayerPrefs.GetString("key_api_ai_gemini", ""));
+        this.box_inp = this.app.carrot.Show_input(s_title, s_tip, PlayerPrefs.GetString("key_api_ai_gemini", ""));
         this.box_inp.set_act_done(act_done_key_api_gemini);
     }
 

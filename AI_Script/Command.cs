@@ -938,7 +938,7 @@ public class Command : MonoBehaviour
 
     private void act_open_copy_msg(string s_msg)
     {
-        this.app.carrot.show_input("Copy", "You can copy the content here", s_msg);
+        this.app.carrot.Show_input("Copy", "You can copy the content here", s_msg);
     }
 
     public void btn_new_chat_with_fater()

@@ -528,7 +528,7 @@ public class Command_Dev : MonoBehaviour
 
     private void show_chat_by_user()
     {
-        this.box_inp_text= this.app.carrot.show_input("Show List Chat By User", "Enter Id Username user to view");
+        this.box_inp_text= this.app.carrot.Show_input("Show List Chat By User", "Enter Id Username user to view");
         this.box_inp_text.set_act_done(this.done_show_list_by_user);
     }
 
