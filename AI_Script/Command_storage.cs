@@ -1306,7 +1306,7 @@ public class Command_storage : MonoBehaviour
         }
 
         if (this.box_add_chat != null) this.box_add_chat.close();
-        if (this.app.carrot.model_app == ModelApp.Publish) this.app.carrot.ads.show_ads_Interstitial();
+        if (this.app.carrot.model_app == ModelApp.Publish) this.app.ads.On_show_interstitial();
     }
 
     private void Act_done_submit_command_done(string s_data)

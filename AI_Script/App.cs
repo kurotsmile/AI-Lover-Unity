@@ -27,6 +27,7 @@ public class App : MonoBehaviour
     public GeminiAPI gemini_AI;
     public Utility_Tool tool;
     public character_actions action;
+    public Carrot_ads_manage ads;
 
     [Header("App obj")]
     public bool is_radio_func = true;
@@ -137,7 +138,7 @@ public class App : MonoBehaviour
         this.carrot.Load_Carrot(this.check_app_exit);
         this.carrot.shop.onCarrotPaySuccess += this.onBuySuccessCarrotPay;
         this.carrot.shop.onCarrotRestoreSuccess += this.onRestoreSuccessCarrotPay;
-        this.carrot.ads.onRewardedSuccess += this.setting.act_ads_rewarded_success;
+        //this.carrot.ads.onRewardedSuccess += this.setting.act_ads_rewarded_success;
         this.carrot.act_after_delete_all_data = this.delete_all_data;
         this.carrot.act_after_close_all_box += this.close_all_box;
 

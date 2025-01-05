@@ -493,7 +493,7 @@ public class Setting : MonoBehaviour
         item_removeads.set_lang_data("remove_ads", "remove_ads_tip");
         item_removeads.load_lang_data();
         Carrot.Carrot_Box_Btn_Item btn_by_ads = item_removeads.create_item();
-        if (this.app.carrot.ads.get_status_ads())
+        if (this.app.ads.get_status_ads())
             btn_by_ads.set_icon(this.sp_icon_buy);
         else
             btn_by_ads.set_icon(this.app.carrot.icon_carrot_done);
@@ -876,7 +876,7 @@ public class Setting : MonoBehaviour
 
     private void act_whatch_ads_rewarded_data()
     {
-        this.app.carrot.ads.show_ads_Rewarded();
+        this.app.ads.On_show_rewarded();
         this.is_ads_rewarded_data = true;
     }
 
