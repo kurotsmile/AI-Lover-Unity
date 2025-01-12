@@ -1,5 +1,6 @@
 ﻿using Carrot;
 using Crosstales;
+using Crosstales.Common.Util;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -64,13 +65,31 @@ public class Command : MonoBehaviour
     private float timer_msg_tip = 0;
     private bool is_tts = false;
     private bool is_ready_msg_tip = false;
-
+    IList all_item=null;
     public void load()
     {
         this.obj_btn_play_all_log.SetActive(false);
         this.obj_btn_clear_all_log.SetActive(false);
         this.app.textToSpeech.onStartCallBack = this.act_start_speech;
         this.app.textToSpeech.onDoneCallback = this.act_done_speech;
+
+        string name_file_chat="chat-"+this.app.carrot.lang.Get_key_lang()+".json";
+        if(this.app.carrot.get_tool().check_file_exist(name_file_chat)){
+            string s_data=this.app.carrot.get_tool().get_file_path(name_file_chat);
+            string s_text=FileHelper.ReadAllText(s_data);
+            load_all_item_chat(s_text);
+        }else{
+            this.app.carrot.Get_Data("https://raw.githubusercontent.com/kurotsmile/Database-Store-Json/refs/heads/main/"+name_file_chat,(s_data)=>{
+                this.load_all_item_chat(s_data);
+                this.app.carrot.get_tool().save_file(name_file_chat,s_data);
+            });
+        }
+    }
+
+    private void load_all_item_chat(string s_data){
+        IDictionary data=(IDictionary)Json.Deserialize(s_data);
+        all_item=data["all_item"] as IList;
+        Debug.Log("Load "+all_item.Count+" Chat cmd");
     }
 
     public void send_command()
@@ -103,6 +122,35 @@ public class Command : MonoBehaviour
                 this.Add_item_log_chat(s_key);
                 this.Add_item_log_loading();
                 if (this.app.player_music.playlist.Check_query_key(s_key)) return;
+            }
+
+            if(all_item!=null){
+                for(int i=0;i<this.all_item.Count;i++){
+                    IDictionary item_c=this.all_item[i] as IDictionary;
+                    if(item_c["key"].ToString().ToLower()==s_key){
+                        Debug.Log("Co");
+                        this.act_chat(item_c);
+                        return;
+                    }
+                }
+
+                for(int i=0;i<this.all_item.Count;i++){
+                    IDictionary item_c=this.all_item[i] as IDictionary;
+                    if(item_c["key"].ToString().ToLower().Contains(s_key)){
+                        Debug.Log("Co Contains");
+                        this.act_chat(item_c);
+                        return;
+                    }
+                }
+
+                for(int i=0;i<this.all_item.Count;i++){
+                    IDictionary item_c=this.all_item[i] as IDictionary;
+                    if(s_key.Contains(item_c["key"].ToString().ToLower())){
+                        Debug.Log("Co Contains");
+                        this.act_chat(item_c);
+                        return;
+                    }
+                }
             }
 
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
