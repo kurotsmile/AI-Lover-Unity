@@ -512,7 +512,7 @@ public class Setting : MonoBehaviour
         other_group.add_item(item_rate);
 
         other_group.add_item(box_setting.area_all_item.GetChild(28).GetComponent<Carrot.Carrot_Box_Item>());
-        other_group.add_item(box_setting.area_all_item.GetChild(29).GetComponent<Carrot.Carrot_Box_Item>());
+//        other_group.add_item(box_setting.area_all_item.GetChild(29).GetComponent<Carrot.Carrot_Box_Item>());
 
         group_sys.add_item(box_setting.area_all_item.GetChild(1).GetComponent<Carrot.Carrot_Box_Item>());
         group_sys.add_item(box_setting.area_all_item.GetChild(5).GetComponent<Carrot.Carrot_Box_Item>());
@@ -876,7 +876,7 @@ public class Setting : MonoBehaviour
 
     private void act_whatch_ads_rewarded_data()
     {
-        this.app.ads.On_show_rewarded();
+        this.app.ads.ShowRewardedVideo();
         this.is_ads_rewarded_data = true;
     }
 

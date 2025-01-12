@@ -501,7 +501,7 @@ public class Command : MonoBehaviour
         {
             this.add_item_pc_chat(s_msg_chat, this.app.get_character().icon_sex, data_chat);
         }
-        this.app.ads.On_show_interstitial();
+        this.app.ads.show_ads_Interstitial();
     }
 
     public void act_cm_face(string s_face)

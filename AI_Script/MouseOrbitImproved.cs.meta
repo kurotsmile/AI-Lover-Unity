@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: f6b986f6b2ba94f409c0bfc977e94c79
+timeCreated: 1512750102
+licenseType: Store
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -9,3 +11,10 @@ MonoImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 123185
+  packageName: Rin
+  packageVersion: 2.0
+  assetPath: Assets/AI-Lover-Unity/AI_Script/MouseOrbitImproved.cs
+  uploadId: 583930

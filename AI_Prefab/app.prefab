@@ -8200,6 +8200,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -14274,6 +14277,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -15424,6 +15430,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 1bfc02d99498dc3448d6f24a627dcf97, type: 3}
+  m_Resource: {fileID: 8300000, guid: 1bfc02d99498dc3448d6f24a627dcf97, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -15903,6 +15910,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -21760,6 +21770,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -25040,6 +25051,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -30124,6 +30136,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -33314,6 +33329,7 @@ GameObject:
   - component: {fileID: 2130662158616155322}
   - component: {fileID: 2065144560488948737}
   - component: {fileID: 1793282830951987721}
+  - component: {fileID: 5162338886866966751}
   m_Layer: 0
   m_Name: app
   m_TagString: Untagged
@@ -33369,6 +33385,7 @@ MonoBehaviour:
   gemini_AI: {fileID: 2130662158616155322}
   tool: {fileID: 2065144560488948737}
   action: {fileID: 1793282830951987721}
+  ads: {fileID: 5162338886866966751}
   is_radio_func: 1
   img_bt_sel_lang: {fileID: 2755477472231957537}
   color_nomal:
@@ -34310,6 +34327,24 @@ MonoBehaviour:
   - IdleG_wing
   - UMATOBI00
   - 002_SIM01_Final
+--- !u!114 &5162338886866966751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755477472099462738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90a2c0946a8c5eb4b9684601f03c85ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count_step_show_interstitial: 5
+  emplement_Ads: []
+  app_key: 
+  id_banner: 
+  id_video: 
+  id_rewarded: 
 --- !u!1 &2755477472104608252
 GameObject:
   m_ObjectHideFlags: 0
@@ -35982,6 +36017,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 3a4d47516748f554180dea6319a5d825, type: 3}
+  m_Resource: {fileID: 8300000, guid: 3a4d47516748f554180dea6319a5d825, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -39144,9 +39180,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2838922376157572747}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 11
   m_Type: 1
-  m_Shape: 0
   m_Color: {r: 1, g: 0.9372549, b: 0.90588236, a: 1}
   m_Intensity: 1
   m_Range: 10
@@ -39196,8 +39231,12 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1 &3009326018494993402
 GameObject:
   m_ObjectHideFlags: 0
