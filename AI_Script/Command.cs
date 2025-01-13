@@ -2,6 +2,8 @@
 using Crosstales;
 using Crosstales.Common.Util;
 using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -65,7 +67,7 @@ public class Command : MonoBehaviour
     private float timer_msg_tip = 0;
     private bool is_tts = false;
     private bool is_ready_msg_tip = false;
-    IList all_item=null;
+    IList all_item = null;
     public void load()
     {
         this.obj_btn_play_all_log.SetActive(false);
@@ -73,23 +75,28 @@ public class Command : MonoBehaviour
         this.app.textToSpeech.onStartCallBack = this.act_start_speech;
         this.app.textToSpeech.onDoneCallback = this.act_done_speech;
 
-        string name_file_chat="chat-"+this.app.carrot.lang.Get_key_lang()+".json";
-        if(this.app.carrot.get_tool().check_file_exist(name_file_chat)){
-            string s_data=this.app.carrot.get_tool().get_file_path(name_file_chat);
-            string s_text=FileHelper.ReadAllText(s_data);
+        string name_file_chat = "chat-" + this.app.carrot.lang.Get_key_lang() + ".json";
+        if (this.app.carrot.get_tool().check_file_exist(name_file_chat))
+        {
+            string s_data = this.app.carrot.get_tool().get_file_path(name_file_chat);
+            string s_text = FileHelper.ReadAllText(s_data);
             load_all_item_chat(s_text);
-        }else{
-            this.app.carrot.Get_Data("https://raw.githubusercontent.com/kurotsmile/Database-Store-Json/refs/heads/main/"+name_file_chat,(s_data)=>{
+        }
+        else
+        {
+            this.app.carrot.Get_Data("https://raw.githubusercontent.com/kurotsmile/Database-Store-Json/refs/heads/main/" + name_file_chat, (s_data) =>
+            {
                 this.load_all_item_chat(s_data);
-                this.app.carrot.get_tool().save_file(name_file_chat,s_data);
+                this.app.carrot.get_tool().save_file(name_file_chat, s_data);
             });
         }
     }
 
-    private void load_all_item_chat(string s_data){
-        IDictionary data=(IDictionary)Json.Deserialize(s_data);
-        all_item=data["all_item"] as IList;
-        Debug.Log("Load "+all_item.Count+" Chat cmd");
+    private void load_all_item_chat(string s_data)
+    {
+        IDictionary data = (IDictionary)Json.Deserialize(s_data);
+        all_item = data["all_item"] as IList;
+        Debug.Log("Load " + all_item.Count + " Chat cmd");
     }
 
     public void send_command()
@@ -104,7 +111,7 @@ public class Command : MonoBehaviour
     public void send_chat_no_father(string s_key, bool is_log_show = false)
     {
         this.id_cur_chat = "";
-        this.send_chat(s_key,is_log_show);
+        this.send_chat(s_key, is_log_show);
     }
 
     public void send_chat(string s_key, bool is_log_show = false)
@@ -124,33 +131,10 @@ public class Command : MonoBehaviour
                 if (this.app.player_music.playlist.Check_query_key(s_key)) return;
             }
 
-            if(all_item!=null){
-                for(int i=0;i<this.all_item.Count;i++){
-                    IDictionary item_c=this.all_item[i] as IDictionary;
-                    if(item_c["key"].ToString().ToLower()==s_key){
-                        Debug.Log("Co");
-                        this.act_chat(item_c);
-                        return;
-                    }
-                }
-
-                for(int i=0;i<this.all_item.Count;i++){
-                    IDictionary item_c=this.all_item[i] as IDictionary;
-                    if(item_c["key"].ToString().ToLower().Contains(s_key)){
-                        Debug.Log("Co Contains");
-                        this.act_chat(item_c);
-                        return;
-                    }
-                }
-
-                for(int i=0;i<this.all_item.Count;i++){
-                    IDictionary item_c=this.all_item[i] as IDictionary;
-                    if(s_key.Contains(item_c["key"].ToString().ToLower())){
-                        Debug.Log("Co Contains");
-                        this.act_chat(item_c);
-                        return;
-                    }
-                }
+            IDictionary db_chat=this.Check_cmd_data(s_key);
+            if(db_chat!=null){
+                this.act_chat(db_chat);
+                return;
             }
 
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
@@ -214,6 +198,60 @@ public class Command : MonoBehaviour
         }
     }
 
+
+    private IDictionary Check_cmd_data(string s_key)
+    {
+        Debug.Log("Check_cmd_data");
+        if (all_item != null)
+        {
+            IList list_cmd=Json.Deserialize("[]") as IList;
+            for (int i = 0; i < this.all_item.Count; i++)
+            {
+                IDictionary item_c = this.all_item[i] as IDictionary;
+                if (item_c["key"].ToString().ToLower() == s_key&&
+                    item_c["sex_user"].ToString().ToLower()==this.app.setting.get_user_sex()&&
+                    item_c["sex_character"].ToString().ToLower()==this.app.setting.get_character_sex()&&
+                    item_c["pater"].ToString()==this.id_cur_chat) 
+                list_cmd.Add(item_c);
+            }
+
+            if(list_cmd.Count==0){
+                for (int i = 0; i < this.all_item.Count; i++)
+                {
+                    IDictionary item_c = this.all_item[i] as IDictionary;
+                    if (item_c["key"].ToString().ToLower().Contains(s_key)&&
+                        item_c["sex_user"].ToString().ToLower()==this.app.setting.get_user_sex()&&
+                        item_c["sex_character"].ToString().ToLower()==this.app.setting.get_character_sex()&&
+                        item_c["pater"].ToString()==this.id_cur_chat)
+                    list_cmd.Add(item_c);
+                }
+            }
+
+            if(list_cmd.Count==0){
+                for (int i = 0; i < this.all_item.Count; i++)
+                {
+                    IDictionary item_c = this.all_item[i] as IDictionary;
+                    if (s_key.Contains(item_c["key"].ToString().ToLower())&&
+                        item_c["sex_user"].ToString().ToLower()==this.app.setting.get_user_sex()&&
+                        item_c["sex_character"].ToString().ToLower()==this.app.setting.get_character_sex()&&
+                        item_c["pater"].ToString()==this.id_cur_chat)
+                    list_cmd.Add(item_c);
+                }
+            }
+
+            if(list_cmd.Count!=0){
+                if(list_cmd.Count==0){
+                    return list_cmd[0] as IDictionary;
+                }
+                else{
+                    int r_index=Random.Range(0,list_cmd.Count);
+                    return list_cmd[r_index] as IDictionary;
+                }
+            }
+        }
+        return null;
+    }
+
     private void play_chat(string s_key)
     {
         StructuredQuery q = new("chat-" + this.app.carrot.lang.Get_key_lang());
@@ -250,7 +288,7 @@ public class Command : MonoBehaviour
 
         if (!fc.is_null)
         {
-            for(int i = 0; i < fc.fire_document.Length; i++)
+            for (int i = 0; i < fc.fire_document.Length; i++)
             {
                 this.app.command_storage.add_command_offline(fc.fire_document[i].Get_IDictionary());
             }
@@ -340,6 +378,7 @@ public class Command : MonoBehaviour
 
         if (data_chat_cur != null)
         {
+            Debug.Log(Json.Serialize(data_chat_cur));
             c_chat.btn_extension.GetComponent<Button>().onClick.RemoveAllListeners();
             string s_id = data_chat_cur["id"].ToString();
             string s_msg = data_chat_cur["msg"].ToString();
@@ -484,7 +523,7 @@ public class Command : MonoBehaviour
         if (data_chat["face"] != null) this.act_cm_face(data_chat["face"].ToString());
         if (data_chat["color"] != null) this.set_color_by_string(data_chat["color"].ToString());
 
-        if (data_chat["ai"]!=null)
+        if (data_chat["ai"] != null)
         {
             this.id_cur_chat = "";
         }
@@ -530,7 +569,7 @@ public class Command : MonoBehaviour
             if (data_chat["icon"].ToString() != "")
             {
                 string s_id_icon = data_chat["icon"].ToString();
-                if(s_id_icon!= "undefined")
+                if (s_id_icon != "undefined")
                 {
                     Sprite sp_icon_chat = this.app.carrot.get_tool().get_sprite_to_playerPrefs(s_id_icon);
                     if (sp_icon_chat != null)
@@ -617,10 +656,10 @@ public class Command : MonoBehaviour
         else
         {
             this.timer_msg_tip += Time.deltaTime;
-            if (this.timer_msg_tip >30f)
+            if (this.timer_msg_tip > 30f)
             {
                 this.timer_msg_tip = 0;
-                if (this.app.player_music.sound_music.isPlaying==false&&this.app.panel_chat_msg.activeInHierarchy==true&&this.is_show_text==false&&this.is_tts==false&&this.is_ready_msg_tip==true)
+                if (this.app.player_music.sound_music.isPlaying == false && this.app.panel_chat_msg.activeInHierarchy == true && this.is_show_text == false && this.is_tts == false && this.is_ready_msg_tip == true)
                 {
                     this.send_chat_no_father("tip");
                 }
@@ -729,7 +768,7 @@ public class Command : MonoBehaviour
     {
         Fire_Document fd = new(s_data);
         IDictionary icon_data = fd.Get_IDictionary();
-        this.app.carrot.get_img_and_save_playerPrefs(icon_data["icon"].ToString(), null,fd.Get_id(), act_play_effect_icon_chat);
+        this.app.carrot.get_img_and_save_playerPrefs(icon_data["icon"].ToString(), null, fd.Get_id(), act_play_effect_icon_chat);
     }
 
     private void act_play_effect_icon_chat(Texture2D tex_icon)
@@ -792,7 +831,7 @@ public class Command : MonoBehaviour
     {
         Fire_Document doc = new(s_data);
         IDictionary data_info = doc.Get_IDictionary();
-        if (data_info!=null)
+        if (data_info != null)
             this.box_info_chat(data_info);
         else
             this.app.carrot.Show_msg("Chat Info", app.carrot.L("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
@@ -863,7 +902,7 @@ public class Command : MonoBehaviour
                         {
                             s_field_title = app.carrot.L("user_sex", "User Sex");
                             if (s_data_val == "0") s_field_val = app.carrot.L("user_sex_boy", "Male");
-                            else s_field_val =app.carrot.L("user_sex_girl", "Female");
+                            else s_field_val = app.carrot.L("user_sex_girl", "Female");
                             item_field.set_icon(this.app.setting.sp_icon_sex_user);
                         }
                         else if (s_key == "sex_character")
@@ -875,13 +914,13 @@ public class Command : MonoBehaviour
                         }
                         else if (s_key == "face")
                         {
-                            s_field_title =app.carrot.L("face", "Face");
-                            s_field_val =app.carrot.L("face", "Face") + " " + s_data_val;
+                            s_field_title = app.carrot.L("face", "Face");
+                            s_field_val = app.carrot.L("face", "Face") + " " + s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_face);
                         }
                         else if (s_key == "action")
                         {
-                            s_field_title =app.carrot.L("act", "Action");
+                            s_field_title = app.carrot.L("act", "Action");
                             s_field_val = app.carrot.L("act", "Action") + " " + s_data_val;
                             item_field.set_icon(this.app.command_storage.sp_icon_action);
                         }
@@ -1062,7 +1101,7 @@ public class Command : MonoBehaviour
         this.is_tts = false;
     }
 
-    public void Play_chat_by_ID(string s_id,string s_lang)
+    public void Play_chat_by_ID(string s_id, string s_lang)
     {
         this.app.carrot.server.Get_doc_by_path("chat-" + s_lang, s_id, Act_play_chat_by_ID_done, Act_play_chat_by_ID_fail);
     }
