@@ -45,6 +45,7 @@ public class Voice_Command : MonoBehaviour
             {
                 listener.onFinalResults.AddListener(OnFinalResult);
                 listener.onPartialResults.AddListener(OnPartialResult);
+                listener.onEndOfSpeech.AddListener(OnEndOfSpeech);
                 SpeechRecognizer.RequestAccess();
                 SpeechRecognizer.SetDetectionLanguage(this.app.carrot.lang.Val("key_voice","en-US"));
             }
@@ -70,12 +71,13 @@ public class Voice_Command : MonoBehaviour
     {
         this.inp_mic = null;
         this.app.textToSpeech.StopSpeak();
-        this.img_mic_inp_home.color = this.app.carrot.color_highlight;
+        
         if (this.app.carrot.os_app == Carrot.OS.Window)
         {
 #if !UNITY_ANDROID
             dictationRecognizer.Start();
 #endif
+            this.img_mic_inp_home.color = this.app.carrot.color_highlight;
         }
         else
         {
@@ -86,10 +88,12 @@ public class Voice_Command : MonoBehaviour
 #elif UNITY_ANDROID && !UNITY_EDITOR
                         SpeechRecognizer.StopIfRecording();
 #endif
+                this.img_mic_inp_home.color =Color.white;
             }
             else
             {
                 SpeechRecognizer.StartRecording(true);
+                this.img_mic_inp_home.color = this.app.carrot.color_highlight;
             }
         }
     }
@@ -104,6 +108,7 @@ public class Voice_Command : MonoBehaviour
                 SpeechRecognizer.StopIfRecording();
     #endif
         }
+        this.img_mic_inp_home.color =Color.white;
     }
 
     public void set_DetectionLanguage(string s_key_lang)
@@ -179,4 +184,8 @@ public class Voice_Command : MonoBehaviour
         this.check_icon_input_command();
     }
 
+    public void OnEndOfSpeech()
+    {
+        this.img_mic_inp_home.color = Color.white;
+    }
 }
