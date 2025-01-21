@@ -1,7 +1,7 @@
-﻿using Carrot;
+﻿using System.Collections;
+using Carrot;
 using Crosstales;
 using Crosstales.Common.Util;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -134,20 +134,6 @@ public class Command : MonoBehaviour
                 if (this.app.player_music.playlist.Check_query_key(s_key)) return;
             }
 
-            IDictionary db_chat=this.Check_cmd_data(s_key);
-            if(db_chat!=null){
-                this.act_chat(db_chat);
-                Debug.Log("Co -----------------------> child");
-                return;
-            }else{
-                this.id_cur_chat="";
-                IDictionary db_chat_again=this.Check_cmd_data(s_key);
-                if(db_chat_again!=null){
-                    this.act_chat(db_chat_again);
-                    Debug.Log("Co -----------------------> No Child");
-                    return;
-                }
-            }
 
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
             if (chat_offline != null)
@@ -158,6 +144,21 @@ public class Command : MonoBehaviour
             }
             else
             {
+                IDictionary db_chat=this.Check_cmd_data(s_key);
+                if(db_chat!=null){
+                    this.act_chat(db_chat);
+                    Debug.Log("Co -------> child");
+                    return;
+                }else{
+                    this.id_cur_chat="";
+                    IDictionary db_chat_again=this.Check_cmd_data(s_key);
+                    if(db_chat_again!=null){
+                        this.act_chat(db_chat_again);
+                        Debug.Log("Co ------> No Child");
+                        return;
+                    }
+                }
+
                 Debug.Log("chat online (Id father:" + this.id_cur_chat + ")");
                 if (this.app.carrot.is_online())
                 {
@@ -485,7 +486,8 @@ public class Command : MonoBehaviour
         this.data_chat_cur = data_chat;
         this.app.panel_main.SetActive(true);
         this.app.textToSpeech.StopSpeak();
-
+        this.app.get_character().get_npc().transform.eulerAngles=Vector3.zero;
+        this.app.get_character().get_npc().transform.localPosition=Vector3.zero;
         if (data_chat["id"] != null)
         {
             this.id_cur_chat = data_chat["id"].ToString();
@@ -589,6 +591,7 @@ public class Command : MonoBehaviour
         {
             this.add_item_pc_chat(s_msg_chat, this.app.get_character().icon_sex, data_chat);
         }
+
         this.app.ads.show_ads_Interstitial();
     }
 
