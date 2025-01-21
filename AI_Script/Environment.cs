@@ -24,6 +24,7 @@ public class Environment : MonoBehaviour
 
     [Header("Background Image App")]
     public Sprite icon_list_background;
+    public Sprite sp_bk_default=null;
     public Image img_background_app;
     public Image img_background_app_thumb;
     public Slider slider_color_bk;
@@ -111,9 +112,16 @@ public class Environment : MonoBehaviour
         }
         else
         {
-            this.img_background_app_thumb.sprite = this.icon_list_background;
-            this.img_background_app.gameObject.SetActive(false);
-            this.btn_delete_bk.SetActive(false);
+            if(sp_bk_default==null){
+                this.img_background_app_thumb.sprite = this.icon_list_background;
+                this.img_background_app.gameObject.SetActive(false);
+                this.btn_delete_bk.SetActive(false);
+            }else{
+                this.img_background_app_thumb.sprite = this.sp_bk_default;
+                this.img_background_app.gameObject.SetActive(true);
+                this.img_background_app.sprite = this.sp_bk_default;
+                this.btn_delete_bk.SetActive(true);
+            }
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using TextSpeech;
+﻿using KKSpeech;
+using TextSpeech;
 using UnityEngine;
 using UnityEngine.UI;
 #if !UNITY_ANDROID
@@ -7,22 +8,23 @@ using UnityEngine.Windows.Speech;
 
 public class Voice_Command : MonoBehaviour
 {
-	[Header("Obj main")]
-	public App app;
+    [Header("Obj main")]
+    public App app;
+    public SpeechRecognizerListener listener;
 
     [Header("Voice Obj")]
-	public Image img_mic_inp_home;
+    public Image img_mic_inp_home;
     public Image img_mic_fun_brain;
     public Sprite icon_mic_chat;
     public Sprite icon_mic_live;
     private InputField inp_mic = null;
 
-    #if !UNITY_ANDROID
+#if !UNITY_ANDROID
     private DictationRecognizer dictationRecognizer;
-    #endif
+#endif
 
     void Start()
-	{
+    {
         if (this.app.carrot.os_app == Carrot.OS.Window)
         {
 #if !UNITY_ANDROID
@@ -39,8 +41,13 @@ public class Voice_Command : MonoBehaviour
         }
         else
         {
-            SpeechToText.Instance.Setting("en-US");
-            SpeechToText.Instance.onResultCallback = OnFinalResult;
+            if (SpeechRecognizer.ExistsOnDevice())
+            {
+                listener.onFinalResults.AddListener(OnFinalResult);
+                listener.onPartialResults.AddListener(OnPartialResult);
+                SpeechRecognizer.RequestAccess();
+                SpeechRecognizer.SetDetectionLanguage(this.app.carrot.lang.Val("key_voice","en-US"));
+            }
             this.check_icon_input_command();
         }
     }
@@ -66,39 +73,57 @@ public class Voice_Command : MonoBehaviour
         this.img_mic_inp_home.color = this.app.carrot.color_highlight;
         if (this.app.carrot.os_app == Carrot.OS.Window)
         {
-            #if !UNITY_ANDROID
+#if !UNITY_ANDROID
             dictationRecognizer.Start();
-            #endif
+#endif
         }
         else
         {
-            SpeechToText.Instance.StartRecording(app.carrot.L("voice_command_ready", "Say something :-)"));
+            if (SpeechRecognizer.IsRecording())
+            {
+#if UNITY_IOS && !UNITY_EDITOR
+                        SpeechRecognizer.StopIfRecording();
+#elif UNITY_ANDROID && !UNITY_EDITOR
+                        SpeechRecognizer.StopIfRecording();
+#endif
+            }
+            else
+            {
+                SpeechRecognizer.StartRecording(true);
+            }
         }
     }
 
     public void btn_stop()
     {
-        SpeechToText.Instance.StopRecording();
+        if (SpeechRecognizer.IsRecording())
+        {
+    #if UNITY_IOS && !UNITY_EDITOR
+                SpeechRecognizer.StopIfRecording();
+    #elif UNITY_ANDROID && !UNITY_EDITOR
+                SpeechRecognizer.StopIfRecording();
+    #endif
+        }
     }
 
     public void set_DetectionLanguage(string s_key_lang)
     {
-        SpeechToText.Instance.Setting(s_key_lang);
-        TextToSpeech.Instance.Setting(s_key_lang,this.app.setting.get_voice_speed(), 1);
+        SpeechRecognizer.SetDetectionLanguage(this.app.carrot.lang.Val("key_voice","en-US"));
+        //TextToSpeech.Instance.Setting(s_key_lang, this.app.setting.get_voice_speed(), 1);
     }
 
-    void OnFinalResult(string _data)
-	{
+    public void OnFinalResult(string _data)
+    {
         this.img_mic_inp_home.color = Color.white;
 
         if (this.inp_mic == null)
             this.app.command.send_chat(_data, true);
         else
             this.inp_mic.text = _data;
-	}
+    }
 
-	public void OnPartialResult(string _data)
-	{
+    public void OnPartialResult(string _data)
+    {
         this.img_mic_inp_home.color = Color.white;
         if (this.inp_mic == null)
             this.app.command.send_chat(_data, true);
@@ -110,7 +135,7 @@ public class Voice_Command : MonoBehaviour
     {
         this.inp_mic = inp;
         this.app.textToSpeech.StopSpeak();
-        SpeechToText.Instance.StartRecording(app.carrot.L("voice_command_ready", "Say something :-)"));
+        SpeechRecognizer.StartRecording(true);
     }
 
     public void change_mode()
@@ -153,4 +178,5 @@ public class Voice_Command : MonoBehaviour
         this.app.command.mode = Command_Type_Mode.chat;
         this.check_icon_input_command();
     }
+
 }

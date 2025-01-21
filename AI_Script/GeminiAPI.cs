@@ -19,10 +19,10 @@ public class GeminiAPI : MonoBehaviour
     public void on_load()
     {
         this.key_api = PlayerPrefs.GetString("key_api_ai_gemini", this.key_api_default);
-        if (PlayerPrefs.GetInt("is_active_gemini",0)==0)
-            this.is_active= true;
+        if (PlayerPrefs.GetInt("is_active_gemini", 0) == 0)
+            this.is_active = true;
         else
-            this.is_active= false;
+            this.is_active = false;
     }
 
     IEnumerator PostRequest(string userMessage)
@@ -30,10 +30,10 @@ public class GeminiAPI : MonoBehaviour
         Debug.Log("Get chat Gemini(" + userMessage + ")");
         if (this.key_api.Trim() == "") this.key_api = this.key_api_default;
 
-        string requestData = "{\"contents\":[{\"parts\":[{\"text\":\""+ userMessage + "\"}]}]}";
+        string requestData = "{\"contents\":[{\"parts\":[{\"text\":\"" + userMessage + "\"}]}]}";
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(requestData);
 
-        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(apiEndpoint+ "?key=" + this.key_api, "POST"))
+        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(apiEndpoint + "?key=" + this.key_api, "POST"))
         {
             www.uploadHandler = new UploadHandlerRaw(postData);
             www.SetRequestHeader("Content-Type", "application/json");
@@ -79,40 +79,50 @@ public class GeminiAPI : MonoBehaviour
             else
             {
                 Debug.Log($"Error: {www.error}");
-                if (this.app.setting.get_index_prioritize() == 0)
-                {
-                    this.app.command.show_msg_no_chat();
-                }
-                else if (this.app.setting.get_index_prioritize() == 1)
-                {
-                    if (this.app.open_AI.is_active)
-                        this.app.open_AI.send_chat(userMessage);
-                    else
-                        this.app.command.show_msg_no_chat();
-                }
-                else if (this.app.setting.get_index_prioritize() == 2)
-                {
-                    this.app.command.show_msg_no_chat();
-                }
-                else if (this.app.setting.get_index_prioritize() == 3)
-                {
-                    if (this.app.open_AI.is_active)
-                        this.app.open_AI.send_chat(userMessage);
-                    else
-                        this.app.command.show_msg_no_chat();
-                }
-
+                this.Check_next_ai(www.error);
             }
+        }
+    }
+
+    private void Check_next_ai(string userMessage)
+    {
+        if (this.app.setting.get_index_prioritize() == 0)
+        {
+            this.app.command.show_msg_no_chat();
+        }
+        else if (this.app.setting.get_index_prioritize() == 1)
+        {
+            if (this.app.open_AI.is_active)
+                this.app.open_AI.send_chat(userMessage);
+            else
+                this.app.command.show_msg_no_chat();
+        }
+        else if (this.app.setting.get_index_prioritize() == 2)
+        {
+            this.app.command.show_msg_no_chat();
+        }
+        else if (this.app.setting.get_index_prioritize() == 3)
+        {
+            if (this.app.open_AI.is_active)
+                this.app.open_AI.send_chat(userMessage);
+            else
+                this.app.command.show_msg_no_chat();
         }
     }
 
     public void send_chat(string s_key)
     {
         IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, "");
-        if (chat_offline != null)
+        if (chat_offline != null){
             this.app.command.act_chat(chat_offline);
-        else
-            StartCoroutine(PostRequest(s_key));
+        }
+        else{
+            if(this.key_api.Length!=0)
+                StartCoroutine(PostRequest(s_key));
+            else
+                Check_next_ai("No key Gemini");
+        }
+            
     }
 
     public void set_key_api(string s_key)

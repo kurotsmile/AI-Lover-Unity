@@ -137,11 +137,13 @@ public class App : MonoBehaviour
         this.command_storage.check_load_command_storage();
 
         this.carrot.Load_Carrot(this.check_app_exit);
+        this.ads.On_Load();
         this.carrot.shop.onCarrotPaySuccess += this.onBuySuccessCarrotPay;
         this.carrot.shop.onCarrotRestoreSuccess += this.onRestoreSuccessCarrotPay;
         this.carrot.game.act_click_watch_ads_in_music_bk=this.ads.ShowRewardedVideo;
         this.carrot.act_after_delete_all_data = this.delete_all_data;
         this.carrot.act_after_close_all_box += this.close_all_box;
+        this.carrot.act_buy_ads_success=this.ads.RemoveAds;
 
         this.GetComponent<Carrot_DeviceOrientationChange>().Check_show_emp_by_resolution();
         this.act_change_Scene_Rotation();
@@ -200,8 +202,10 @@ public class App : MonoBehaviour
         this.command_voice.set_DetectionLanguage(carrot.L("key_voice", "en"));
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
-        this.command.send_chat("hi_" + hour);
         this.command.Set_ready_msg_tip();
+        this.command.load_all_data_chat(()=>{
+            this.command.send_chat("hi_" + hour);
+        });
         this.player_music.playlist.On_load();
         if (!this.is_radio_func) this.button_randio.SetActive(false);
     }

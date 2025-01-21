@@ -31,7 +31,7 @@ public class OpenAIChatbot : MonoBehaviour
         if (this.key_api.Trim() == "") this.key_api = this.get_key_api_random();
         Debug.Log("Get chat GPT (" + userMessage + ")");
 
-        string requestData = "{\"model\": \"gpt-3.5-turbo\",\"messages\":[{\"role\": \"user\",\"content\": \""+userMessage+"\"}]}";
+        string requestData = "{\"model\": \"gpt-3.5-turbo\",\"messages\":[{\"role\": \"user\",\"content\": \"" + userMessage + "\"}]}";
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(requestData);
 
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(openaiEndpoint, "POST"))
@@ -60,7 +60,7 @@ public class OpenAIChatbot : MonoBehaviour
                     chat_ai["action"] = UnityEngine.Random.Range(0, this.app.action.list_anim_act_defalt.Length).ToString();
 
                     Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                    chat_ai["color"]= "#" + ColorUtility.ToHtmlStringRGBA(color_icon);
+                    chat_ai["color"] = "#" + ColorUtility.ToHtmlStringRGBA(color_icon);
 
                     chat_ai["sex_user"] = this.app.setting.get_user_sex();
                     chat_ai["sex_character"] = this.app.setting.get_character_sex();
@@ -70,7 +70,7 @@ public class OpenAIChatbot : MonoBehaviour
                     chat_ai["icon"] = "";
                     chat_ai["pater"] = "";
                     chat_ai["mp3"] = "";
-                    chat_ai["user"] =null;
+                    chat_ai["user"] = null;
 
                     chat_ai["usage"] = null;
                     chat_ai["choices"] = null;
@@ -89,39 +89,50 @@ public class OpenAIChatbot : MonoBehaviour
             else
             {
                 Debug.Log($"Error: {www.error}");
-                if (this.app.setting.get_index_prioritize() == 0)
-                {
-                    if (this.app.gemini_AI.is_active)
-                        this.app.gemini_AI.send_chat(userMessage);
-                    else
-                        this.app.command.show_msg_no_chat();
-                }else if (this.app.setting.get_index_prioritize() == 1)
-                {
-                    this.app.command.show_msg_no_chat();
-                }
-                else if (this.app.setting.get_index_prioritize() == 2)
-                {
-                    if (this.app.gemini_AI.is_active)
-                        this.app.gemini_AI.send_chat(userMessage);
-                    else
-                        this.app.command.show_msg_no_chat();
-                }
-                else if(this.app.setting.get_index_prioritize()==3)
-                {
-                    this.app.command.show_msg_no_chat();
-                }
-
+                this.Check_next_ai(www.error);
             }
+        }
+    }
+
+    private void Check_next_ai(string userMessage)
+    {
+        if (this.app.setting.get_index_prioritize() == 0)
+        {
+            if (this.app.gemini_AI.is_active)
+                this.app.gemini_AI.send_chat(userMessage);
+            else
+                this.app.command.show_msg_no_chat();
+        }
+        else if (this.app.setting.get_index_prioritize() == 1)
+        {
+            this.app.command.show_msg_no_chat();
+        }
+        else if (this.app.setting.get_index_prioritize() == 2)
+        {
+            if (this.app.gemini_AI.is_active)
+                this.app.gemini_AI.send_chat(userMessage);
+            else
+                this.app.command.show_msg_no_chat();
+        }
+        else if (this.app.setting.get_index_prioritize() == 3)
+        {
+            this.app.command.show_msg_no_chat();
         }
     }
 
     public void send_chat(string s_key)
     {
-        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key,"");
-        if (chat_offline != null)
+        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, "");
+        if (chat_offline != null){
             this.app.command.act_chat(chat_offline);
-        else
-            StartCoroutine(PostRequest(s_key));
+        }
+        else{
+            if(this.key_api.Length!=0)
+                StartCoroutine(PostRequest(s_key));
+            else
+                this.Check_next_ai("No key chat GPT");
+        }
+            
     }
 
     private string get_key_api_random()

@@ -2,9 +2,8 @@
 using Crosstales;
 using Crosstales.Common.Util;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
@@ -74,13 +73,16 @@ public class Command : MonoBehaviour
         this.obj_btn_clear_all_log.SetActive(false);
         this.app.textToSpeech.onStartCallBack = this.act_start_speech;
         this.app.textToSpeech.onDoneCallback = this.act_done_speech;
+    }
 
+    public void load_all_data_chat(UnityAction act_done){
         string name_file_chat = "chat-" + this.app.carrot.lang.Get_key_lang() + ".json";
         if (this.app.carrot.get_tool().check_file_exist(name_file_chat))
         {
             string s_data = this.app.carrot.get_tool().get_file_path(name_file_chat);
             string s_text = FileHelper.ReadAllText(s_data);
             load_all_item_chat(s_text);
+            act_done.Invoke();
         }
         else
         {
@@ -88,6 +90,7 @@ public class Command : MonoBehaviour
             {
                 this.load_all_item_chat(s_data);
                 this.app.carrot.get_tool().save_file(name_file_chat, s_data);
+                act_done.Invoke();
             });
         }
     }
@@ -134,7 +137,16 @@ public class Command : MonoBehaviour
             IDictionary db_chat=this.Check_cmd_data(s_key);
             if(db_chat!=null){
                 this.act_chat(db_chat);
+                Debug.Log("Co -----------------------> child");
                 return;
+            }else{
+                this.id_cur_chat="";
+                IDictionary db_chat_again=this.Check_cmd_data(s_key);
+                if(db_chat_again!=null){
+                    this.act_chat(db_chat_again);
+                    Debug.Log("Co -----------------------> No Child");
+                    return;
+                }
             }
 
             IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
@@ -197,8 +209,6 @@ public class Command : MonoBehaviour
             this.send_live(s_key);
         }
     }
-
-
     private IDictionary Check_cmd_data(string s_key)
     {
         Debug.Log("Check_cmd_data");
@@ -208,7 +218,7 @@ public class Command : MonoBehaviour
             for (int i = 0; i < this.all_item.Count; i++)
             {
                 IDictionary item_c = this.all_item[i] as IDictionary;
-                if (item_c["key"].ToString().ToLower() == s_key&&
+                if (item_c["key"].ToString().Trim().ToLower() == s_key.Trim()&&
                     item_c["sex_user"].ToString().ToLower()==this.app.setting.get_user_sex()&&
                     item_c["sex_character"].ToString().ToLower()==this.app.setting.get_character_sex()&&
                     item_c["pater"].ToString()==this.id_cur_chat) 
@@ -219,19 +229,7 @@ public class Command : MonoBehaviour
                 for (int i = 0; i < this.all_item.Count; i++)
                 {
                     IDictionary item_c = this.all_item[i] as IDictionary;
-                    if (item_c["key"].ToString().ToLower().Contains(s_key)&&
-                        item_c["sex_user"].ToString().ToLower()==this.app.setting.get_user_sex()&&
-                        item_c["sex_character"].ToString().ToLower()==this.app.setting.get_character_sex()&&
-                        item_c["pater"].ToString()==this.id_cur_chat)
-                    list_cmd.Add(item_c);
-                }
-            }
-
-            if(list_cmd.Count==0){
-                for (int i = 0; i < this.all_item.Count; i++)
-                {
-                    IDictionary item_c = this.all_item[i] as IDictionary;
-                    if (s_key.Contains(item_c["key"].ToString().ToLower())&&
+                    if (item_c["key"].ToString().Trim().ToLower().Contains(s_key.Trim())&&
                         item_c["sex_user"].ToString().ToLower()==this.app.setting.get_user_sex()&&
                         item_c["sex_character"].ToString().ToLower()==this.app.setting.get_character_sex()&&
                         item_c["pater"].ToString()==this.id_cur_chat)
@@ -240,13 +238,16 @@ public class Command : MonoBehaviour
             }
 
             if(list_cmd.Count!=0){
+                IDictionary data_c;
                 if(list_cmd.Count==0){
-                    return list_cmd[0] as IDictionary;
+                    data_c= list_cmd[0] as IDictionary;
                 }
                 else{
                     int r_index=Random.Range(0,list_cmd.Count);
-                    return list_cmd[r_index] as IDictionary;
+                    data_c=list_cmd[r_index] as IDictionary;
                 }
+                if(data_c["id_import"]!=null) data_c["id"]=data_c["id_import"];
+                return data_c;
             }
         }
         return null;
