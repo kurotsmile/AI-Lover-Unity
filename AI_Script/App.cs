@@ -1,5 +1,4 @@
 ﻿using Carrot;
-using Crosstales.Common.Util;
 using System;
 using System.Collections;
 using TextSpeech;
@@ -29,6 +28,7 @@ public class App : MonoBehaviour
     public Utility_Tool tool;
     public character_actions action;
     public IronSourceAds ads;
+    public Carrot_File file;
 
     [Header("App obj")]
     public bool is_radio_func = true;
@@ -138,6 +138,11 @@ public class App : MonoBehaviour
 
         this.carrot.Load_Carrot(this.check_app_exit);
         this.ads.On_Load();
+        if(this.carrot.os_app==OS.Android)
+            this.file.type=Carrot_File_Type.SimpleFileBrowser;
+        else
+            this.file.type=Carrot_File_Type.StandaloneFileBrowser;
+
         this.carrot.shop.onCarrotPaySuccess += this.onBuySuccessCarrotPay;
         this.carrot.shop.onCarrotRestoreSuccess += this.onRestoreSuccessCarrotPay;
         this.carrot.game.act_click_watch_ads_in_music_bk=this.ads.ShowRewardedVideo;

@@ -897,7 +897,7 @@ public class Command_storage : MonoBehaviour
         return list_cm;
     }
 
-    private List<IDictionary> get_list_buy_cm()
+    public List<IDictionary> get_list_buy_cm()
     {
         List<IDictionary> list_cm = new List<IDictionary>();
         for (int i = this.length; i >= 0; i--)

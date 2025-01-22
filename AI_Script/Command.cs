@@ -1144,4 +1144,28 @@ public class Command : MonoBehaviour
         }
     }
     #endregion
+
+    public void Btn_export_data(){
+        this.app.carrot.play_sound_click();
+        this.app.file.Set_filter(Carrot_File_Data.JsonData);
+        this.app.file.Save_file(paths=>{
+            string s_path=paths[0];
+            IDictionary data_export=Json.Deserialize("{}") as IDictionary;
+            data_export["all_item"]=this.all_item;
+            data_export["cmd_offline"]=this.app.command_storage.get_list_buy_cm();
+            FileHelper.WriteAllText(s_path,Json.Serialize(data_export));
+            this.app.carrot.Show_msg("Export Success\n at:"+s_path);
+        });
+    }
+
+    public void Btn_import_data(){
+        this.app.carrot.play_sound_click();
+        this.app.file.Set_filter(Carrot_File_Data.JsonData);
+        this.app.file.Open_file(paths=>{
+            string s_path=paths[0];
+            string s_data=FileHelper.ReadAllText(s_path);
+            this.all_item=Json.Deserialize(s_data) as IList;
+            this.app.carrot.Show_msg("Import Success!");
+        });
+    }
 }
