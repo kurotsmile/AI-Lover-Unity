@@ -12,7 +12,6 @@ public enum Command_Type_Act
     add_command,
     edit_command,
     edit_pass,
-    edit_live,
     edit_pending_to_pass,
     edit_command_from_log
 }
@@ -55,6 +54,7 @@ public class Command_storage : MonoBehaviour
 
     [Header("Panel Add Command")]
     public Sprite icon_list_command;
+    public Sprite icon_list_cmd_sys;
     public string[] list_parameter_tag_name;
     public string[] list_parameter_tag_val;
 
@@ -259,13 +259,6 @@ public class Command_storage : MonoBehaviour
         this.show_edit_by_data(data_chat);
     }
 
-    public void show_edit_live(IDictionary data_chat)
-    {
-        this.reset_all_s_data();
-        this.type_act = Command_Type_Act.edit_live;
-        this.show_edit_by_data(data_chat);
-    }
-
     private void show_edit_by_data(IDictionary data_chat)
     {
         if (data_chat["id"] != null) this.s_id = data_chat["id"].ToString();
@@ -288,7 +281,6 @@ public class Command_storage : MonoBehaviour
 
         if (this.type_act == Command_Type_Act.add_command) box_add_chat.set_title(app.carrot.L("brain_add", "Add the command"));
         if (this.type_act == Command_Type_Act.edit_command) box_add_chat.set_title(app.carrot.L("brain_update", "Update command"));
-        if (this.type_act == Command_Type_Act.edit_live) box_add_chat.set_title(app.carrot.L("brain_update", "Update command"));
         if (this.type_act == Command_Type_Act.edit_pass) box_add_chat.set_title("Update Pass Command (Dev)");
         if (this.type_act == Command_Type_Act.edit_pending_to_pass) box_add_chat.set_title("Update Pending To Pass Command (Dev)");
 
@@ -303,11 +295,8 @@ public class Command_storage : MonoBehaviour
 
         if (this.app.carrot.os_app != OS.Window)
         {
-            if (this.type_act != Command_Type_Act.edit_live)
-            {
-                Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_bug);
-                btn_list_key_block.set_act(() => this.show_list_block_key_chat());
-            }
+            Carrot.Carrot_Box_Btn_Item btn_list_key_block = this.box_add_chat.create_btn_menu_header(this.app.carrot.icon_carrot_bug);
+            btn_list_key_block.set_act(() => this.show_list_block_key_chat());
         }
 
         if (data_chat["pater"] != null)
@@ -357,7 +346,7 @@ public class Command_storage : MonoBehaviour
             if (this.app.carrot.os_app != OS.Window)
             {
                 Carrot_Box_Btn_Item btn_key_mic = this.item_keyword.create_item();
-                btn_key_mic.set_icon(this.app.command_voice.icon_mic_chat);
+                btn_key_mic.set_icon(this.app.command_voice.icon_voice);
                 btn_key_mic.set_color(this.app.carrot.color_highlight);
                 btn_key_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_keyword.inp_val));
             }
@@ -389,7 +378,7 @@ public class Command_storage : MonoBehaviour
         if (this.app.carrot.os_app != OS.Window)
         {
             Carrot_Box_Btn_Item btn_msg_mic = this.item_msg.create_item();
-            btn_msg_mic.set_icon(this.app.command_voice.icon_mic_chat);
+            btn_msg_mic.set_icon(this.app.command_voice.icon_voice);
             btn_msg_mic.set_color(this.app.carrot.color_highlight);
             btn_msg_mic.set_act(() => this.app.command_voice.start_inp_mic(this.item_msg.inp_val));
         }
@@ -861,6 +850,13 @@ public class Command_storage : MonoBehaviour
             box.set_icon(this.icon_list_command);
             box.set_title(app.carrot.L("brain_list", "List command"));
         }
+        else if (s_type == "3")
+        {
+            box = this.app.command_dev.box_list(this.app.command.Get_list_random_cmd());
+            if (box == null) return;
+            box.set_icon(this.icon_list_cmd_sys);
+            box.set_title(app.carrot.L("brain_list_chat_sys", "System chat list"));
+        }
         else
         {
             box = this.app.command_dev.box_list(this.get_list_buy_cm());
@@ -1296,13 +1292,6 @@ public class Command_storage : MonoBehaviour
                 this.item_command_edit_temp.set_tip(c.msg);
             }
             this.app.carrot.hide_loading();
-        }
-
-        if (this.type_act == Command_Type_Act.edit_live)
-        {
-            this.app.carrot.hide_loading();
-            IDictionary data_live = this.get_data_chat_editor();
-            this.app.live.update_data_item_chat_live(data_live);
         }
 
         if (this.box_add_chat != null) this.box_add_chat.close();

@@ -633,7 +633,7 @@ public class Setting : MonoBehaviour
         ai_robot_group.add_item(item_ai_prioritize);
 
         Carrot_Box_Item item_recognition_voice = this.box_setting.create_item("item_recognition_voice");
-        item_recognition_voice.set_icon(this.app.command_voice.icon_mic_chat);
+        item_recognition_voice.set_icon(this.app.command_voice.icon_voice);
         item_recognition_voice.set_title("Voice recognition");
         item_recognition_voice.set_tip("Set up voice recognition and speech-to-text input");
         item_recognition_voice.set_lang_data("voice_command_setting", "voice_command_setting_tip");

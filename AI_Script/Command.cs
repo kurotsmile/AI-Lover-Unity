@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Carrot;
 using Crosstales;
 using Crosstales.Common.Util;
@@ -7,7 +9,6 @@ using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public enum Command_Type_Mode { chat, live }
 
 public class Command : MonoBehaviour
 {
@@ -15,7 +16,6 @@ public class Command : MonoBehaviour
     public App app;
 
     [Header("Obj chat")]
-    public Command_Type_Mode mode = Command_Type_Mode.chat;
     public InputField inp_command;
     public GameObject prefab_item_command_chat;
     public GameObject prefab_item_command_pc;
@@ -23,7 +23,6 @@ public class Command : MonoBehaviour
     public GameObject prefab_effect_icon_chat;
 
     public GameObject obj_btn_clear_all_log;
-    public GameObject obj_btn_play_all_log;
     public Transform area_body_log_command;
     public ScrollRect ScrollRect_log_command;
     public AudioSource sound_command;
@@ -51,12 +50,10 @@ public class Command : MonoBehaviour
 
     private float count_timer_show_text = 0;
     private float count_timer_hide_text = 0;
-    private float count_timer_live_chat = 0;
     private int index_text = 0;
     private string s_chat_temp;
     private bool is_hide_text = false;
     private bool is_show_text = false;
-    private bool is_live = false;
 
     private Carrot.Carrot_Box box_list;
     private string s_command_chat_last;
@@ -69,13 +66,13 @@ public class Command : MonoBehaviour
     IList all_item = null;
     public void load()
     {
-        this.obj_btn_play_all_log.SetActive(false);
         this.obj_btn_clear_all_log.SetActive(false);
         this.app.textToSpeech.onStartCallBack = this.act_start_speech;
         this.app.textToSpeech.onDoneCallback = this.act_done_speech;
     }
 
-    public void load_all_data_chat(UnityAction act_done){
+    public void load_all_data_chat(UnityAction act_done)
+    {
         string name_file_chat = "chat-" + this.app.carrot.lang.Get_key_lang() + ".json";
         if (this.app.carrot.get_tool().check_file_exist(name_file_chat))
         {
@@ -121,93 +118,89 @@ public class Command : MonoBehaviour
     {
         s_key = s_key.Trim().ToLower();
 
-        this.is_live = false;
         this.s_command_chat_last = s_key;
         this.On_reset_timer_msg_tip();
 
-        if (this.mode == Command_Type_Mode.chat)
+        if (is_log_show)
         {
-            if (is_log_show)
-            {
-                this.Add_item_log_chat(s_key);
-                this.Add_item_log_loading();
-                if (this.app.player_music.playlist.Check_query_key(s_key)) return;
-            }
+            this.Add_item_log_chat(s_key);
+            this.Add_item_log_loading();
+            if (this.app.player_music.playlist.Check_query_key(s_key)) return;
+        }
 
 
-            IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
-            if (chat_offline != null)
-            {
-                Debug.Log("chat offline (Id father:" + this.id_cur_chat + ")");
-                this.id_cur_chat = chat_offline["id"].ToString();
-                this.act_chat(chat_offline);
-            }
-            else
-            {
-                IDictionary db_chat=this.Check_cmd_data(s_key);
-                if(db_chat!=null){
-                    this.act_chat(db_chat);
-                    Debug.Log("Co -------> child");
-                    return;
-                }else{
-                    this.id_cur_chat="";
-                    IDictionary db_chat_again=this.Check_cmd_data(s_key);
-                    if(db_chat_again!=null){
-                        this.act_chat(db_chat_again);
-                        Debug.Log("Co ------> No Child");
-                        return;
-                    }
-                }
-
-                Debug.Log("chat online (Id father:" + this.id_cur_chat + ")");
-                if (this.app.carrot.is_online())
-                {
-                    if (this.app.setting.get_index_prioritize() == 0)
-                    {
-                        this.play_chat(s_key);
-                    }
-                    else if (this.app.setting.get_index_prioritize() == 1)
-                    {
-                        this.play_chat(s_key);
-                    }
-                    else if (this.app.setting.get_index_prioritize() == 2)
-                    {
-                        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
-                        {
-                            this.show_msg_no_chat();
-                        }
-                        else
-                        {
-                            if (this.app.open_AI.is_active)
-                                this.app.open_AI.send_chat(s_key);
-                            else
-                                this.app.gemini_AI.send_chat(s_key);
-                        }
-                    }
-                    else if (this.app.setting.get_index_prioritize() == 3)
-                    {
-                        if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
-                        {
-                            this.show_msg_no_chat();
-                        }
-                        else
-                        {
-                            if (this.app.gemini_AI.is_active)
-                                this.app.gemini_AI.send_chat(s_key);
-                            else
-                                this.app.open_AI.send_chat(s_key);
-                        }
-                    }
-                }
-                else
-                {
-                    this.show_msg_no_chat();
-                }
-            }
+        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
+        if (chat_offline != null)
+        {
+            Debug.Log("chat offline (Id father:" + this.id_cur_chat + ")");
+            this.id_cur_chat = chat_offline["id"].ToString();
+            this.act_chat(chat_offline);
         }
         else
         {
-            this.send_live(s_key);
+            IDictionary db_chat = this.Check_cmd_data(s_key);
+            if (db_chat != null)
+            {
+                this.act_chat(db_chat);
+                Debug.Log("Co -------> child");
+                return;
+            }
+            else
+            {
+                this.id_cur_chat = "";
+                IDictionary db_chat_again = this.Check_cmd_data(s_key);
+                if (db_chat_again != null)
+                {
+                    this.act_chat(db_chat_again);
+                    Debug.Log("Co ------> No Child");
+                    return;
+                }
+            }
+
+            Debug.Log("chat online (Id father:" + this.id_cur_chat + ")");
+            if (this.app.carrot.is_online())
+            {
+                if (this.app.setting.get_index_prioritize() == 0)
+                {
+                    this.play_chat(s_key);
+                }
+                else if (this.app.setting.get_index_prioritize() == 1)
+                {
+                    this.play_chat(s_key);
+                }
+                else if (this.app.setting.get_index_prioritize() == 2)
+                {
+                    if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
+                    {
+                        this.show_msg_no_chat();
+                    }
+                    else
+                    {
+                        if (this.app.open_AI.is_active)
+                            this.app.open_AI.send_chat(s_key);
+                        else
+                            this.app.gemini_AI.send_chat(s_key);
+                    }
+                }
+                else if (this.app.setting.get_index_prioritize() == 3)
+                {
+                    if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
+                    {
+                        this.show_msg_no_chat();
+                    }
+                    else
+                    {
+                        if (this.app.gemini_AI.is_active)
+                            this.app.gemini_AI.send_chat(s_key);
+                        else
+                            this.app.open_AI.send_chat(s_key);
+                    }
+                }
+            }
+            else
+            {
+                this.show_msg_no_chat();
+            }
         }
     }
     private IDictionary Check_cmd_data(string s_key)
@@ -215,39 +208,43 @@ public class Command : MonoBehaviour
         Debug.Log("Check_cmd_data");
         if (all_item != null)
         {
-            IList list_cmd=Json.Deserialize("[]") as IList;
+            IList list_cmd = Json.Deserialize("[]") as IList;
             for (int i = 0; i < this.all_item.Count; i++)
             {
                 IDictionary item_c = this.all_item[i] as IDictionary;
-                if (item_c["key"].ToString().Trim().ToLower() == s_key.Trim()&&
-                    item_c["sex_user"].ToString().ToLower()==this.app.setting.get_user_sex()&&
-                    item_c["sex_character"].ToString().ToLower()==this.app.setting.get_character_sex()&&
-                    item_c["pater"].ToString()==this.id_cur_chat) 
-                list_cmd.Add(item_c);
+                if (item_c["key"].ToString().Trim().ToLower() == s_key.Trim() &&
+                    item_c["sex_user"].ToString().ToLower() == this.app.setting.get_user_sex() &&
+                    item_c["sex_character"].ToString().ToLower() == this.app.setting.get_character_sex() &&
+                    item_c["pater"].ToString() == this.id_cur_chat)
+                    list_cmd.Add(item_c);
             }
 
-            if(list_cmd.Count==0){
+            if (list_cmd.Count == 0)
+            {
                 for (int i = 0; i < this.all_item.Count; i++)
                 {
                     IDictionary item_c = this.all_item[i] as IDictionary;
-                    if (item_c["key"].ToString().Trim().ToLower().Contains(s_key.Trim())&&
-                        item_c["sex_user"].ToString().ToLower()==this.app.setting.get_user_sex()&&
-                        item_c["sex_character"].ToString().ToLower()==this.app.setting.get_character_sex()&&
-                        item_c["pater"].ToString()==this.id_cur_chat)
-                    list_cmd.Add(item_c);
+                    if (item_c["key"].ToString().Trim().ToLower().Contains(s_key.Trim()) &&
+                        item_c["sex_user"].ToString().ToLower() == this.app.setting.get_user_sex() &&
+                        item_c["sex_character"].ToString().ToLower() == this.app.setting.get_character_sex() &&
+                        item_c["pater"].ToString() == this.id_cur_chat)
+                        list_cmd.Add(item_c);
                 }
             }
 
-            if(list_cmd.Count!=0){
+            if (list_cmd.Count != 0)
+            {
                 IDictionary data_c;
-                if(list_cmd.Count==0){
-                    data_c= list_cmd[0] as IDictionary;
+                if (list_cmd.Count == 0)
+                {
+                    data_c = list_cmd[0] as IDictionary;
                 }
-                else{
-                    int r_index=Random.Range(0,list_cmd.Count);
-                    data_c=list_cmd[r_index] as IDictionary;
+                else
+                {
+                    int r_index = Random.Range(0, list_cmd.Count);
+                    data_c = list_cmd[r_index] as IDictionary;
                 }
-                if(data_c["id_import"]!=null) data_c["id"]=data_c["id_import"];
+                if (data_c["id_import"] != null) data_c["id"] = data_c["id_import"];
                 return data_c;
             }
         }
@@ -437,12 +434,6 @@ public class Command : MonoBehaviour
                     comand_chat.btn_add_app.SetActive(false);
                     comand_chat.set_act_click(() => this.app.player_music.act_play_data(i_data));
                 }
-                else if (s_status == "live")
-                {
-                    comand_chat.set_icon_btn(this.app.carrot.user.icon_user_edit);
-                    comand_chat.set_act_click(() => this.act_chat(i_data, false));
-                    comand_chat.set_act_add(() => this.app.live.show_edit_item_chat_live(comand_chat));
-                }
                 else
                 {
                     comand_chat.set_act_add(() => this.app.command_storage.show_add_command_with_pater(i_data["msg"].ToString(), i_data["id"].ToString()));
@@ -477,17 +468,13 @@ public class Command : MonoBehaviour
         this.obj_btn_report_chat.SetActive(false);
         this.obj_btn_add_chat_whith_father.SetActive(false);
         this.obj_btn_clear_all_log.SetActive(false);
-        if (this.app.live.get_status_active())
-            this.obj_btn_play_all_log.SetActive(true);
-        else
-            this.obj_btn_play_all_log.SetActive(false);
         this.obj_btn_more.SetActive(true);
 
         this.data_chat_cur = data_chat;
         this.app.panel_main.SetActive(true);
         this.app.textToSpeech.StopSpeak();
-        this.app.get_character().get_npc().transform.eulerAngles=Vector3.zero;
-        this.app.get_character().get_npc().transform.localPosition=Vector3.zero;
+        this.app.get_character().get_npc().transform.eulerAngles = Vector3.zero;
+        this.app.get_character().get_npc().transform.localPosition = Vector3.zero;
         if (data_chat["id"] != null)
         {
             this.id_cur_chat = data_chat["id"].ToString();
@@ -639,34 +626,19 @@ public class Command : MonoBehaviour
                 this.panel_show_msg_chat.SetActive(false);
                 this.panel_show_log_chat.SetActive(true);
                 this.On_reset_timer_msg_tip();
-                if (this.area_body_log_command.childCount > 0)
-                {
-                    this.obj_btn_clear_all_log.SetActive(true);
-                    if (this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
-                }
+                if (this.area_body_log_command.childCount > 0) this.obj_btn_clear_all_log.SetActive(true);
                 if (this.app.player_music.sound_music.isPlaying == false) this.Action_waitting();
             }
         }
 
-        if (this.is_live)
+
+        this.timer_msg_tip += Time.deltaTime;
+        if (this.timer_msg_tip > 30f)
         {
-            this.count_timer_live_chat = this.count_timer_live_chat + Time.deltaTime;
-            if (this.count_timer_live_chat > 5f)
+            this.timer_msg_tip = 0;
+            if (this.app.player_music.sound_music.isPlaying == false && this.app.panel_chat_msg.activeInHierarchy == true && this.is_show_text == false && this.is_tts == false && this.is_ready_msg_tip == true)
             {
-                this.count_timer_live_chat = 0;
-                this.app.live.next();
-            }
-        }
-        else
-        {
-            this.timer_msg_tip += Time.deltaTime;
-            if (this.timer_msg_tip > 30f)
-            {
-                this.timer_msg_tip = 0;
-                if (this.app.player_music.sound_music.isPlaying == false && this.app.panel_chat_msg.activeInHierarchy == true && this.is_show_text == false && this.is_tts == false && this.is_ready_msg_tip == true)
-                {
-                    this.send_chat_no_father("tip");
-                }
+                this.send_chat_no_father("tip");
             }
         }
     }
@@ -1055,30 +1027,12 @@ public class Command : MonoBehaviour
         Application.OpenURL(s_tr);
     }
 
-    private void send_live(string s_key)
-    {
-        IList icons = this.app.icon.Get_list_icon_name();
-        this.data_chat_cur = (IDictionary)Json.Deserialize("{}");
-        this.data_chat_cur["id"] = "chat" + this.app.carrot.generateID();
-        this.data_chat_cur["msg"] = s_key;
-        this.data_chat_cur["action"] = Random.Range(0, 40).ToString();
-        this.data_chat_cur["face"] = Random.Range(0, 18).ToString();
-        this.data_chat_cur["color"] = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f).CTToHexRGBA();
-        this.data_chat_cur["status"] = "live";
-        if (icons != null)
-        {
-            int index_icons = Random.Range(0, icons.Count);
-            this.data_chat_cur["icon"] = icons[index_icons];
-        }
-        this.act_chat(this.data_chat_cur);
-    }
 
     public void btn_clear_all_chat_log()
     {
         this.app.carrot.play_sound_click();
         this.clear_log_chat();
         this.obj_btn_clear_all_log.SetActive(false);
-        this.obj_btn_play_all_log.SetActive(false);
     }
 
     public void show_chat_log()
@@ -1087,7 +1041,6 @@ public class Command : MonoBehaviour
         this.app.command.panel_show_msg_chat.SetActive(false);
         this.app.command.panel_show_log_chat.SetActive(true);
         this.obj_btn_clear_all_log.SetActive(true);
-        if (this.app.live.get_status_active()) this.obj_btn_play_all_log.SetActive(true);
     }
 
     public void btn_show_sub_menu()
@@ -1127,45 +1080,47 @@ public class Command : MonoBehaviour
         this.is_ready_msg_tip = true;
     }
 
-    #region Live Chat
-    public void btn_play_all_live_chat()
+    public void Btn_export_data()
     {
         this.app.carrot.play_sound_click();
-
-        if (this.is_live == false)
-        {
-            this.is_live = true;
-            this.app.live.play();
-        }
-        else
-        {
-            this.is_live = false;
-            this.app.live.stop();
-        }
-    }
-    #endregion
-
-    public void Btn_export_data(){
-        this.app.carrot.play_sound_click();
         this.app.file.Set_filter(Carrot_File_Data.JsonData);
-        this.app.file.Save_file(paths=>{
-            string s_path=paths[0];
-            IDictionary data_export=Json.Deserialize("{}") as IDictionary;
-            data_export["all_item"]=this.all_item;
-            data_export["cmd_offline"]=this.app.command_storage.get_list_buy_cm();
-            FileHelper.WriteAllText(s_path,Json.Serialize(data_export));
-            this.app.carrot.Show_msg("Export Success\n at:"+s_path);
+        this.app.file.Save_file(paths =>
+        {
+            string s_path = paths[0];
+            IDictionary data_export = Json.Deserialize("{}") as IDictionary;
+            data_export["all_item"] = this.all_item;
+            data_export["cmd_offline"] = this.app.command_storage.get_list_buy_cm();
+            FileHelper.WriteAllText(s_path, Json.Serialize(data_export));
+            this.app.carrot.Show_msg("Export Success\n at:" + s_path);
         });
     }
 
-    public void Btn_import_data(){
+    public void Btn_import_data()
+    {
         this.app.carrot.play_sound_click();
         this.app.file.Set_filter(Carrot_File_Data.JsonData);
-        this.app.file.Open_file(paths=>{
-            string s_path=paths[0];
-            string s_data=FileHelper.ReadAllText(s_path);
-            this.all_item=Json.Deserialize(s_data) as IList;
+        this.app.file.Open_file(paths =>
+        {
+            string s_path = paths[0];
+            string s_data = FileHelper.ReadAllText(s_path);
+            this.all_item = Json.Deserialize(s_data) as IList;
             this.app.carrot.Show_msg("Import Success!");
         });
+    }
+
+    public void Btn_show_list_command()
+    {
+        this.app.command_storage.show_list_cm("3");
+    }
+
+    public List<IDictionary> Get_list_random_cmd()
+    {
+
+        return GetRandomUniqueItems<IDictionary>(all_item, 20);
+    }
+    
+    private List<T> GetRandomUniqueItems<T>(IList list, int count)
+    {
+        return list.Cast<T>().OrderBy(x => UnityEngine.Random.value).Take(count).ToList();
     }
 }

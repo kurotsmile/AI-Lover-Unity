@@ -15,9 +15,10 @@ public class Voice_Command : MonoBehaviour
     [Header("Voice Obj")]
     public Image img_mic_inp_home;
     public Image img_mic_fun_brain;
-    public Sprite icon_mic_chat;
-    public Sprite icon_mic_live;
     private InputField inp_mic = null;
+
+    [Header("Assets")]
+    public Sprite icon_voice;
 
 #if !UNITY_ANDROID
     private DictationRecognizer dictationRecognizer;
@@ -49,7 +50,6 @@ public class Voice_Command : MonoBehaviour
                 SpeechRecognizer.RequestAccess();
                 SpeechRecognizer.SetDetectionLanguage(this.app.carrot.lang.Val("key_voice","en-US"));
             }
-            this.check_icon_input_command();
         }
     }
 
@@ -141,47 +141,6 @@ public class Voice_Command : MonoBehaviour
         this.inp_mic = inp;
         this.app.textToSpeech.StopSpeak();
         SpeechRecognizer.StartRecording(true);
-    }
-
-    public void change_mode()
-    {
-        this.app.carrot.play_sound_click();
-        string s_status_live;
-        if (this.app.command.mode == Command_Type_Mode.chat)
-        {
-            this.app.command.mode = Command_Type_Mode.live;
-            s_status_live = app.carrot.L("setting_on", "On");
-            this.app.live.on_live();
-        }
-        else
-        {
-            this.app.command.mode = Command_Type_Mode.chat;
-            s_status_live = app.carrot.L("setting_off", "Off");
-            this.app.live.off_live();
-        }
-
-        this.app.carrot.Show_msg(app.carrot.L("chat_narrative", "Chat narration"), s_status_live, Carrot.Msg_Icon.Alert);
-        this.check_icon_input_command();
-    }
-
-    private void check_icon_input_command()
-    {
-        if (this.app.command.mode == Command_Type_Mode.chat)
-        {
-            this.img_mic_inp_home.sprite = this.icon_mic_chat;
-            this.img_mic_fun_brain.sprite = this.icon_mic_live;
-        }
-        else
-        {
-            this.img_mic_inp_home.sprite = this.icon_mic_live;
-            this.img_mic_fun_brain.sprite = this.icon_mic_chat;
-        }
-    }
-
-    public void on_input_mode_chat()
-    {
-        this.app.command.mode = Command_Type_Mode.chat;
-        this.check_icon_input_command();
     }
 
     public void OnEndOfSpeech()
