@@ -48,6 +48,7 @@ public class Music_playlist : MonoBehaviour
     {
         if (this.app.carrot.is_offline()) this.s_data_json_radio_offline = PlayerPrefs.GetString("s_data_json_radio_offline");
         this.s_data_key_query_music = PlayerPrefs.GetString("key_query_music","");
+        if (this.s_data_key_query_music == "") this.s_data_key_query_music = this.app.carrot.L("key_query_music","");
         this.length = PlayerPrefs.GetInt("music_length");
         this.Check_show_btn_playlist();
     }

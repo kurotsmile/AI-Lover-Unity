@@ -74,7 +74,7 @@ public class GeminiAPI : MonoBehaviour
                 chat_ai["ai"] = "Gemini";
 
                 this.app.command.act_chat(chat_ai);
-                this.app.command_storage.add_command_offline(chat_ai);
+                //this.app.command_storage.add_command_offline(chat_ai);
             }
             else
             {
@@ -112,17 +112,10 @@ public class GeminiAPI : MonoBehaviour
 
     public void send_chat(string s_key)
     {
-        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, "");
-        if (chat_offline != null){
-            this.app.command.act_chat(chat_offline);
-        }
-        else{
-            if(this.key_api.Length!=0)
-                StartCoroutine(PostRequest(s_key));
-            else
-                Check_next_ai("No key Gemini");
-        }
-            
+        if (this.key_api.Length != 0)
+            StartCoroutine(PostRequest(s_key));
+        else
+            Check_next_ai("No key Gemini");
     }
 
     public void set_key_api(string s_key)

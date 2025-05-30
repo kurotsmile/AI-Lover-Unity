@@ -849,13 +849,6 @@ public class App : MonoBehaviour
             this.act_inapp_unlock_all_character();
         }
 
-        if (id_product == this.carrot.shop.get_id_by_index(4))
-        {
-            this.carrot.Show_msg(carrot.L("shop_data", "Use chat data offline"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
-            PlayerPrefs.SetInt("is_buy_4", 1);
-           this.command_storage.download_command_shop();
-        }
-
         if (id_product == this.carrot.shop.get_id_by_index(0))
         {
             this.carrot.Show_msg(carrot.L("shop_all_func", "Activate all functions"), carrot.L("shop_buy_success", "Purchase successful! the function you purchased has been activated. Please restart the application to use it"));

@@ -1,6 +1,7 @@
 using Carrot;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 public enum Command_Dev_Type {storage,pending,by_user, by_user_field, by_father,same_key}
 public class Command_Dev : MonoBehaviour
@@ -314,7 +315,7 @@ public class Command_Dev : MonoBehaviour
                     Carrot_Box_Btn_Item btn_father = item_chat.create_item();
                     btn_father.set_color(this.app.carrot.color_highlight);
                     btn_father.set_icon(this.app.command_storage.sp_icon_father);
-                    btn_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
+                    btn_father.set_act(() => this.app.command.Show_info_chat_by_id(s_id_chat_father));
                 }
             }
 
@@ -328,25 +329,15 @@ public class Command_Dev : MonoBehaviour
             btn_sub_menu.set_color(this.app.carrot.color_highlight);
             btn_sub_menu.set_act(() => this.sub_menu(c, item_chat.gameObject));
 
-            if (c["index_cm"] != null)
+            if (c["index_item"] != null)
             {
-                if (c["index_cm"].ToString() != "")
-                {
-                    int index_cm = int.Parse(c["index_cm"].ToString());
-                    item_chat.set_act(() => this.app.command_storage.show_edit_command(index_cm,item_chat));
-                }
-                else
-                {
-                    if(this.app.carrot.model_app==ModelApp.Develope) 
-                        item_chat.set_act(() => this.app.command_storage.show_edit_dev(c,item_chat));
-                    else
-                        item_chat.set_act(() => this.app.command.box_info_chat(c));
-                }
+                int index_item = int.Parse(c["index_item"].ToString());
+                item_chat.set_act(() => this.app.command_storage.show_edit_command_sys(index_item, item_chat));
             }
             else
             {
-                if(this.app.carrot.model_app==ModelApp.Develope) 
-                    item_chat.set_act(() => this.app.command_storage.show_edit_dev(c,item_chat));
+                if (this.app.carrot.model_app == ModelApp.Develope)
+                    item_chat.set_act(() => this.app.command_storage.show_edit_dev(c, item_chat));
                 else
                     item_chat.set_act(() => this.app.command.box_info_chat(c));
             }
@@ -449,7 +440,7 @@ public class Command_Dev : MonoBehaviour
                     item_father.set_icon(this.app.command_storage.sp_icon_father);
                     item_father.set_title("Dad chat");
                     item_father.set_tip("View this chat's parent chat information");
-                    item_father.set_act(() => this.app.command.show_info_chat_by_id(s_id_chat_father));
+                    item_father.set_act(() => this.app.command.Show_info_chat_by_id(s_id_chat_father));
                 }
             }
         }
@@ -473,11 +464,11 @@ public class Command_Dev : MonoBehaviour
         }
 
 
-        if (data["index_cm"] != null)
+        if (data["index_item"] != null)
         {
-            if (data["index_cm"].ToString() != "")
+            if (data["index_item"].ToString() != "")
             {
-                int index_cm = int.Parse(data["index_cm"].ToString());
+                int index_cm = int.Parse(data["index_item"].ToString());
 
                 if (this.app.carrot.model_app == ModelApp.Develope)
                 {
@@ -498,13 +489,13 @@ public class Command_Dev : MonoBehaviour
                 item_edit_offline.set_icon(this.app.carrot.user.icon_user_edit);
                 item_edit_offline.set_title("Edit (Offline)");
                 item_edit_offline.set_tip("Edit chat offline");
-                item_edit_offline.set_act(() => this.app.command_storage.show_edit_command(index_cm, null));
+                item_edit_offline.set_act(() => this.app.command_storage.show_edit_command_sys(index_cm, null));
 
                 Carrot_Box_Item item_del_offline = box_sub_menu.create_item();
                 item_del_offline.set_icon(this.app.command_storage.sp_icon_delete);
                 item_del_offline.set_title("Delete (Offline)");
                 item_del_offline.set_tip("Delete chat offline");
-                item_del_offline.set_act(() => this.app.command_storage.delete_cm(index_cm, obj_focus));
+                item_del_offline.set_act(() => this.app.command_storage.Delete_cm_sys(index_cm, obj_focus));
             }
         }
 

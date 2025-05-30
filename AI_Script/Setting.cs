@@ -880,15 +880,6 @@ public class Setting : MonoBehaviour
         this.is_ads_rewarded_data = true;
     }
 
-    public void act_ads_rewarded_success()
-    {
-        if (this.is_ads_rewarded_data)
-        {
-            this.app.carrot.Show_msg("Watch ads to receive rewards", "Get Success Rewards!", Carrot.Msg_Icon.Success);
-            this.app.command_storage.download_command_shop();
-            this.is_ads_rewarded_data = false;
-        }
-    }
 
     public bool check_buy_product(int index)
     {

@@ -48,6 +48,10 @@ public class Command : MonoBehaviour
     public GameObject obj_btn_more;
     public GameObject obj_btn_log;
 
+    [Header("Ui")]
+    public Text txt_cmd_pending_title;
+    public Text txt_cmd_sys_title;
+
     private float count_timer_show_text = 0;
     private float count_timer_hide_text = 0;
     private int index_text = 0;
@@ -64,6 +68,7 @@ public class Command : MonoBehaviour
     private bool is_tts = false;
     private bool is_ready_msg_tip = false;
     IList all_item = null;
+    private string file_name_data_chat = "";
     public void load()
     {
         this.obj_btn_clear_all_log.SetActive(false);
@@ -73,20 +78,20 @@ public class Command : MonoBehaviour
 
     public void load_all_data_chat(UnityAction act_done)
     {
-        string name_file_chat = "chat-" + this.app.carrot.lang.Get_key_lang() + ".json";
-        if (this.app.carrot.get_tool().check_file_exist(name_file_chat))
+        this.file_name_data_chat = "chat-" + this.app.carrot.lang.Get_key_lang() + ".json";
+        if (this.app.carrot.get_tool().check_file_exist(this.file_name_data_chat))
         {
-            string s_data = this.app.carrot.get_tool().get_file_path(name_file_chat);
+            string s_data = this.app.carrot.get_tool().get_file_path(this.file_name_data_chat);
             string s_text = FileHelper.ReadAllText(s_data);
             load_all_item_chat(s_text);
             act_done.Invoke();
         }
         else
         {
-            this.app.carrot.Get_Data("https://raw.githubusercontent.com/kurotsmile/Database-Store-Json/refs/heads/main/" + name_file_chat, (s_data) =>
+            this.app.carrot.Get_Data("https://raw.githubusercontent.com/kurotsmile/Database-Store-Json/refs/heads/main/" + this.file_name_data_chat, (s_data) =>
             {
                 this.load_all_item_chat(s_data);
-                this.app.carrot.get_tool().save_file(name_file_chat, s_data);
+                this.app.carrot.get_tool().save_file(this.file_name_data_chat, s_data);
                 act_done.Invoke();
             });
         }
@@ -97,6 +102,31 @@ public class Command : MonoBehaviour
         IDictionary data = (IDictionary)Json.Deserialize(s_data);
         all_item = data["all_item"] as IList;
         Debug.Log("Load " + all_item.Count + " Chat cmd");
+        for (int i = 0; i < all_item.Count; i++)
+        {
+            IDictionary item = all_item[i] as IDictionary;
+            if (item != null)
+            {
+                item["index_item"] = i;
+                List<object> keysToRemove = new List<object>();
+                foreach (DictionaryEntry entry in item)
+                {
+                    if (entry.Value == null || (entry.Value is string str && string.IsNullOrEmpty(str))) keysToRemove.Add(entry.Key);
+                }
+
+                foreach (object key in keysToRemove)
+                {
+                    item.Remove(key);
+                }
+            }
+        }
+        this.Update_UI_info();
+    }
+
+    public void Update_UI_info()
+    {
+        this.txt_cmd_pending_title.text = this.app.carrot.L("brain_list", "Command list") + " (" + this.GetPendingCmd().Count + ")";
+        this.txt_cmd_sys_title.text = this.app.carrot.L("cmd_sys_list", "System chat list") + " (" + this.all_item.Count + ")";
     }
 
     public void send_command()
@@ -128,79 +158,68 @@ public class Command : MonoBehaviour
             if (this.app.player_music.playlist.Check_query_key(s_key)) return;
         }
 
-
-        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, this.id_cur_chat);
-        if (chat_offline != null)
+        IDictionary db_chat = this.Check_cmd_data(s_key);
+        if (db_chat != null)
         {
-            Debug.Log("chat offline (Id father:" + this.id_cur_chat + ")");
-            this.id_cur_chat = chat_offline["id"].ToString();
-            this.act_chat(chat_offline);
+            this.act_chat(db_chat);
+            Debug.Log("Co -------> child");
+            return;
         }
         else
         {
-            IDictionary db_chat = this.Check_cmd_data(s_key);
-            if (db_chat != null)
+            this.id_cur_chat = "";
+            IDictionary db_chat_again = this.Check_cmd_data(s_key);
+            if (db_chat_again != null)
             {
-                this.act_chat(db_chat);
-                Debug.Log("Co -------> child");
+                this.act_chat(db_chat_again);
+                Debug.Log("Co ------> No Child");
                 return;
             }
-            else
-            {
-                this.id_cur_chat = "";
-                IDictionary db_chat_again = this.Check_cmd_data(s_key);
-                if (db_chat_again != null)
-                {
-                    this.act_chat(db_chat_again);
-                    Debug.Log("Co ------> No Child");
-                    return;
-                }
-            }
+        }
 
-            Debug.Log("chat online (Id father:" + this.id_cur_chat + ")");
-            if (this.app.carrot.is_online())
+        Debug.Log("chat online (Id father:" + this.id_cur_chat + ")");
+        if (this.app.carrot.is_online())
+        {
+            if (this.app.setting.get_index_prioritize() == 0)
             {
-                if (this.app.setting.get_index_prioritize() == 0)
+                this.play_chat(s_key);
+            }
+            else if (this.app.setting.get_index_prioritize() == 1)
+            {
+                this.play_chat(s_key);
+            }
+            else if (this.app.setting.get_index_prioritize() == 2)
+            {
+                if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
                 {
-                    this.play_chat(s_key);
+                    this.show_msg_no_chat();
                 }
-                else if (this.app.setting.get_index_prioritize() == 1)
+                else
                 {
-                    this.play_chat(s_key);
-                }
-                else if (this.app.setting.get_index_prioritize() == 2)
-                {
-                    if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
-                    {
-                        this.show_msg_no_chat();
-                    }
+                    if (this.app.open_AI.is_active)
+                        this.app.open_AI.send_chat(s_key);
                     else
-                    {
-                        if (this.app.open_AI.is_active)
-                            this.app.open_AI.send_chat(s_key);
-                        else
-                            this.app.gemini_AI.send_chat(s_key);
-                    }
-                }
-                else if (this.app.setting.get_index_prioritize() == 3)
-                {
-                    if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
-                    {
-                        this.show_msg_no_chat();
-                    }
-                    else
-                    {
-                        if (this.app.gemini_AI.is_active)
-                            this.app.gemini_AI.send_chat(s_key);
-                        else
-                            this.app.open_AI.send_chat(s_key);
-                    }
+                        this.app.gemini_AI.send_chat(s_key);
                 }
             }
-            else
+            else if (this.app.setting.get_index_prioritize() == 3)
             {
-                this.show_msg_no_chat();
+                if (this.app.gemini_AI.is_active == false && this.app.open_AI.is_active == false)
+                {
+                    this.show_msg_no_chat();
+                }
+                else
+                {
+                    if (this.app.gemini_AI.is_active)
+                        this.app.gemini_AI.send_chat(s_key);
+                    else
+                        this.app.open_AI.send_chat(s_key);
+                }
             }
+        }
+        else
+        {
+            this.show_msg_no_chat();
         }
     }
     private IDictionary Check_cmd_data(string s_key)
@@ -212,6 +231,8 @@ public class Command : MonoBehaviour
             for (int i = 0; i < this.all_item.Count; i++)
             {
                 IDictionary item_c = this.all_item[i] as IDictionary;
+                if (item_c["pater"] == null) item_c["pater"] = "";
+                if (item_c["key"] == null) item_c["key"] = "";
                 if (item_c["key"].ToString().Trim().ToLower() == s_key.Trim() &&
                     item_c["sex_user"].ToString().ToLower() == this.app.setting.get_user_sex() &&
                     item_c["sex_character"].ToString().ToLower() == this.app.setting.get_character_sex() &&
@@ -224,6 +245,9 @@ public class Command : MonoBehaviour
                 for (int i = 0; i < this.all_item.Count; i++)
                 {
                     IDictionary item_c = this.all_item[i] as IDictionary;
+
+                    if (item_c["pater"] == null) item_c["pater"] = "";
+                    if (item_c["key"] == null) item_c["key"] = "";
                     if (item_c["key"].ToString().Trim().ToLower().Contains(s_key.Trim()) &&
                         item_c["sex_user"].ToString().ToLower() == this.app.setting.get_user_sex() &&
                         item_c["sex_character"].ToString().ToLower() == this.app.setting.get_character_sex() &&
@@ -283,14 +307,6 @@ public class Command : MonoBehaviour
                 this.Send_to_all_ai(this.s_command_chat_last);
             else
                 this.act_chat(fc.Get_doc_random().Get_IDictionary());
-        }
-
-        if (!fc.is_null)
-        {
-            for (int i = 0; i < fc.fire_document.Length; i++)
-            {
-                this.app.command_storage.add_command_offline(fc.fire_document[i].Get_IDictionary());
-            }
         }
     }
 
@@ -794,13 +810,20 @@ public class Command : MonoBehaviour
         this.box_info_chat(this.data_chat_cur);
     }
 
-    public void show_info_chat_by_id(string s_id)
+    public void Show_info_chat_by_index(int index)
     {
-        IDictionary data_chat_info = this.app.command_storage.get_cm_by_id(s_id);
-        if (data_chat_cur == null)
-            this.app.carrot.server.Get_doc_by_path("chat-" + this.app.carrot.lang.Get_key_lang(), s_id, Act_show_info_chat_by_id_done, Act_show_info_chat_by_id_fail);
-        else
-            this.box_info_chat(data_chat_info);
+        this.box_info_chat(this.all_item[index] as IDictionary);
+    }
+
+    public void Show_info_chat_by_id(string s_id_chat)
+    {
+        IDictionary data_chat = this.GetCmdById(s_id_chat);
+        if (s_id_chat == null || s_id_chat.Trim() == "")
+        {
+            this.app.carrot.Show_msg("Chat Info", app.carrot.L("no_chat", "No related answers yet, please teach me!"), Carrot.Msg_Icon.Alert);
+            return;
+        }
+        this.box_info_chat(data_chat);
     }
 
     private void Act_show_info_chat_by_id_done(string s_data)
@@ -986,15 +1009,19 @@ public class Command : MonoBehaviour
             string s_status = data_chat["status"].ToString();
             if (s_status == "passed")
             {
-                string s_id_chat = data_chat["id"].ToString();
-                string s_link_share = this.app.carrot.mainhost + "/?p=chat&id=" + s_id_chat + "&lang_chat=" + this.app.carrot.lang.Get_key_lang();
+                string s_id_chat = "";
                 Carrot_Box_Btn_Panel panel_btn = this.box_list.create_panel_btn();
-                Carrot_Button_Item btn_share = panel_btn.create_btn("item_share");
-                btn_share.set_bk_color(this.app.carrot.color_highlight);
-                btn_share.set_icon_white(this.app.carrot.sp_icon_share);
-                btn_share.set_label_color(Color.white);
-                btn_share.set_label(app.carrot.L("share", "Share"));
-                btn_share.set_act_click(() => this.share_chat(s_link_share));
+                if (data_chat["id"] != null)
+                {
+                    s_id_chat = data_chat["id"].ToString();
+                    string s_link_share = this.app.carrot.mainhost + "/?p=chat&id=" + s_id_chat + "&lang_chat=" + this.app.carrot.lang.Get_key_lang();
+                    Carrot_Button_Item btn_share = panel_btn.create_btn("item_share");
+                    btn_share.set_bk_color(this.app.carrot.color_highlight);
+                    btn_share.set_icon_white(this.app.carrot.sp_icon_share);
+                    btn_share.set_label_color(Color.white);
+                    btn_share.set_label(app.carrot.L("share", "Share"));
+                    btn_share.set_act_click(() => this.share_chat(s_link_share));
+                }
             }
         }
     }
@@ -1089,7 +1116,7 @@ public class Command : MonoBehaviour
             string s_path = paths[0];
             IDictionary data_export = Json.Deserialize("{}") as IDictionary;
             data_export["all_item"] = this.all_item;
-            data_export["cmd_offline"] = this.app.command_storage.get_list_buy_cm();
+            //data_export["cmd_offline"] = this.app.command_storage.get_cm_offline();
             FileHelper.WriteAllText(s_path, Json.Serialize(data_export));
             this.app.carrot.Show_msg("Export Success\n at:" + s_path);
         });
@@ -1118,9 +1145,121 @@ public class Command : MonoBehaviour
 
         return GetRandomUniqueItems<IDictionary>(all_item, 20);
     }
-    
+
+    public List<IDictionary> Get_list_cmd_by_key(string s_key)
+    {
+
+        return GetFilteredKeyItems<IDictionary>(all_item, 20, s_key);
+    }
+
     private List<T> GetRandomUniqueItems<T>(IList list, int count)
     {
         return list.Cast<T>().OrderBy(x => UnityEngine.Random.value).Take(count).ToList();
+    }
+
+    public IDictionary Get_data_item_cmd_index(int index)
+    {
+        return this.all_item[index] as IDictionary;
+    }
+
+    private List<T> GetFilteredKeyItems<T>(IList list, int count, string keyword)
+    {
+        if (string.IsNullOrEmpty(keyword)) return new List<T>();
+
+        string lowerKeyword = keyword.ToLower();
+
+        var filteredList = list.Cast<IDictionary>()
+            .Where(item =>
+                item.Contains("key") &&
+                item["key"] != null &&
+                item["key"].ToString().ToLower().Contains(lowerKeyword)
+            )
+            .Cast<T>()
+            .Take(count)
+            .ToList();
+        return filteredList;
+    }
+
+    public List<IDictionary> GetPendingCmd()
+    {
+        var filteredList = this.all_item.Cast<IDictionary>()
+            .Where(item =>
+                item.Contains("status") &&
+                item["status"].ToString() == "pending"
+            )
+            .Cast<IDictionary>()
+            .ToList();
+        return filteredList;
+    }
+
+    public IDictionary GetCmdById(string id)
+    {
+        var item = this.all_item.Cast<IDictionary>()
+            .FirstOrDefault(cmd =>
+                cmd.Contains("id") &&
+                cmd["id"] != null &&
+                cmd["id"].ToString() == id
+            );
+
+        return item;
+    }
+
+    public void DeletePendingCmd()
+    {
+        var itemsToRemove = this.all_item.Cast<IDictionary>()
+            .Where(item =>
+                item.Contains("status") &&
+                item["status"] != null &&
+                item["status"].ToString() == "pending"
+            ).ToList();
+
+        foreach (var item in itemsToRemove)
+        {
+            this.all_item.Remove(item);
+        }
+        this.Update_data_file();
+    }
+
+    public void Set_data_item_cmd_index(int index, IDictionary data)
+    {
+        if (index < 0 || index >= this.all_item.Count) return;
+        this.all_item[index] = data;
+    }
+
+    public void Delete_cmd_by_index(int index)
+    {
+        if (index < 0 || index >= this.all_item.Count) return;
+        this.all_item.RemoveAt(index);
+        Debug.Log("Delete command at index: " + index);
+        this.Update_data_file();
+    }
+
+    private void Update_data_file()
+    {
+        string name_file_chat = "chat-" + this.app.carrot.lang.Get_key_lang() + ".json";
+        IDictionary s_data = Json.Deserialize("{}") as IDictionary;
+        s_data["all_item"] = this.all_item;
+        this.app.carrot.get_tool().save_file(name_file_chat, Json.Serialize(s_data));
+        this.Update_UI_info();
+    }
+
+    public void Add_cmd(IDictionary data_cmd)
+    {
+        this.all_item.Add(data_cmd);
+        this.Update_data_file();
+        this.Update_UI_info();
+    }
+
+    public void Btn_Update_cmd()
+    {
+        this.app.carrot.play_sound_click(); 
+        this.app.carrot.show_loading();
+        this.app.carrot.Get_Data("https://raw.githubusercontent.com/kurotsmile/Database-Store-Json/refs/heads/main/" + this.file_name_data_chat, (s_data) =>
+        {
+            this.app.carrot.hide_loading();
+            this.load_all_item_chat(s_data);
+            this.app.carrot.get_tool().save_file(this.file_name_data_chat, s_data);
+            this.app.carrot.Show_msg("Update Success", "The chat data has been successfully updated!");
+        });
     }
 }

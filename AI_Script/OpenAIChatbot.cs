@@ -78,7 +78,6 @@ public class OpenAIChatbot : MonoBehaviour
                     chat_ai["ai"] = "Gpt";
 
                     this.app.command.act_chat(chat_ai);
-                    this.app.command_storage.add_command_offline(chat_ai);
                 }
                 else
                 {
@@ -122,17 +121,10 @@ public class OpenAIChatbot : MonoBehaviour
 
     public void send_chat(string s_key)
     {
-        IDictionary chat_offline = this.app.command_storage.act_call_cm_offline(s_key, "");
-        if (chat_offline != null){
-            this.app.command.act_chat(chat_offline);
-        }
-        else{
-            if(this.key_api.Length!=0)
-                StartCoroutine(PostRequest(s_key));
-            else
-                this.Check_next_ai("No key chat GPT");
-        }
-            
+        if (this.key_api.Length != 0)
+            StartCoroutine(PostRequest(s_key));
+        else
+            this.Check_next_ai("No key chat GPT");
     }
 
     private string get_key_api_random()

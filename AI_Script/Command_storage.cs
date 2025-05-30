@@ -11,6 +11,7 @@ public enum Command_Type_Act
 {
     add_command,
     edit_command,
+    edit_command_sys,
     edit_pass,
     edit_pending_to_pass,
     edit_command_from_log
@@ -58,8 +59,6 @@ public class Command_storage : MonoBehaviour
     public string[] list_parameter_tag_name;
     public string[] list_parameter_tag_val;
 
-    private int length;
-
     private Carrot_Box_Item item_command_edit_temp;
     private int index_cm_update = -1;
     private bool is_cm_mode_nomal = true;
@@ -78,6 +77,7 @@ public class Command_storage : MonoBehaviour
     private string s_user_name = "";
     private string s_user_lang = "";
     private string s_user_avatar = "";
+    private string s_keyword_search = "";
 
     [Header("Asset Func App")]
     public string[] func_app_name;
@@ -144,6 +144,7 @@ public class Command_storage : MonoBehaviour
     private List<Carrot_Box_Item> list_item_key_query = null;
 
     private int c_length_face = 18;
+    private Carrot_Window_Input box_inp_search = null;
 
     private void reset_all_s_data()
     {
@@ -164,7 +165,6 @@ public class Command_storage : MonoBehaviour
 
     public void check_load_command_storage()
     {
-        this.length = PlayerPrefs.GetInt("cm_length", 0);
         if (PlayerPrefs.GetInt("is_cm_mode_nomal", 0) == 0) this.is_cm_mode_nomal = true; else this.is_cm_mode_nomal = false;
     }
 
@@ -214,6 +214,15 @@ public class Command_storage : MonoBehaviour
         this.item_command_edit_temp = item_edit;
         this.type_act = Command_Type_Act.edit_command;
         this.show_edit_by_index(index);
+    }
+
+    public void show_edit_command_sys(int index, Carrot_Box_Item item_edit)
+    {
+        this.reset_all_s_data();
+        this.item_command_edit_temp = item_edit;
+        this.index_cm_update = index;
+        this.type_act = Command_Type_Act.edit_command_sys;
+        this.show_edit_by_data(this.app.command.Get_data_item_cmd_index(index));
     }
 
     public void show_edit_command_from_log(IDictionary data, Item_command_chat item_edit_cm_log)
@@ -280,7 +289,7 @@ public class Command_storage : MonoBehaviour
         this.box_add_chat = app.carrot.Create_Box("box_command_editor");
 
         if (this.type_act == Command_Type_Act.add_command) box_add_chat.set_title(app.carrot.L("brain_add", "Add the command"));
-        if (this.type_act == Command_Type_Act.edit_command) box_add_chat.set_title(app.carrot.L("brain_update", "Update command"));
+        if (this.type_act == Command_Type_Act.edit_command||this.type_act==Command_Type_Act.edit_command_sys) box_add_chat.set_title(app.carrot.L("brain_update", "Update command"));
         if (this.type_act == Command_Type_Act.edit_pass) box_add_chat.set_title("Update Pass Command (Dev)");
         if (this.type_act == Command_Type_Act.edit_pending_to_pass) box_add_chat.set_title("Update Pending To Pass Command (Dev)");
 
@@ -323,7 +332,7 @@ public class Command_storage : MonoBehaviour
             Carrot.Carrot_Box_Btn_Item btn_info_patert = item_patert.create_item();
             btn_info_patert.set_icon(this.app.command.icon_info_chat);
             btn_info_patert.set_color(this.app.carrot.color_highlight);
-            btn_info_patert.set_act(() => this.app.command.show_info_chat_by_id(this.s_pater_id));
+            btn_info_patert.set_act(() => this.app.command.Show_info_chat_by_id(this.s_pater_id));
 
             Carrot.Carrot_Box_Btn_Item btn_del_patert = item_patert.create_item();
             btn_del_patert.set_icon(this.app.carrot.sp_icon_del_data);
@@ -616,10 +625,25 @@ public class Command_storage : MonoBehaviour
         obj_btn_done.set_label(app.carrot.L("done", "Done"));
         obj_btn_done.set_icon(this.sp_icon_add_chat);
 
+        if (this.type_act == Command_Type_Act.add_command)
+        {
+            Carrot_Button_Item obj_btn_add_sys = obj_panel_btn.create_btn("btn_done_sys");
+            obj_btn_add_sys.set_act_click(()=>
+            {
+                this.chat_data_temp= (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(this.get_data_chat()));
+                this.app.command.Add_cmd(this.chat_data_temp);
+                if (this.box_add_chat != null) this.box_add_chat.close();
+                if (this.app.carrot.model_app == ModelApp.Publish) this.app.ads.show_ads_Interstitial();
+            });
+            obj_btn_add_sys.set_bk_color(this.app.carrot.color_highlight);
+            obj_btn_add_sys.set_label_color(Color.white);
+            obj_btn_add_sys.set_label(app.carrot.L("done", "Done")+" (No Send)");
+            obj_btn_add_sys.set_icon(this.sp_icon_add_chat);
+        }
+
         obj_btn_test = obj_panel_btn.create_btn("btn_test");
         obj_btn_test.set_act_click(btn_test_command);
         obj_btn_test.set_bk_color(this.app.carrot.color_highlight);
-
         obj_btn_test.set_label_color(Color.white);
         obj_btn_test.set_label(app.carrot.L("cm_test", "Test"));
         obj_btn_test.set_icon(this.app.carrot.game.icon_play_music_game);
@@ -741,233 +765,92 @@ public class Command_storage : MonoBehaviour
         if (this.item_user_create != null) this.item_user_create.gameObject.SetActive(false);
     }
 
-    public void add_command_offline(IDictionary data_chat)
+    public void add_command_sys(IDictionary data_chat)
     {
         Debug.Log("add_command_offline:" + data_chat["id"].ToString());
-        if (this.get_cm_by_id(data_chat["id"].ToString()) == null)
-        {
-            string s = Carrot.Json.Serialize(data_chat);
-            this.add_command_offline(s);
-        }
+        this.app.command.Add_cmd(data_chat);
     }
 
-    public void add_command_offline(string s_data)
-    {
-        PlayerPrefs.SetString("command_offline_" + this.app.carrot.lang.Get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + this.length, s_data);
-        this.length++;
-        PlayerPrefs.SetInt("cm_length", this.length);
-    }
-
-    public IDictionary act_call_cm_offline(string cm_cmd, string id_pather = "")
-    {
-        IDictionary cm_offline = this.get_cm_offline(cm_cmd, id_pather);
-        if (cm_offline == null)
-        {
-            return this.get_cm_offline(cm_cmd,"");
-        }
-        else
-        {
-            return cm_offline;
-        }
-    }
-
-    public IDictionary get_cm_offline(string cm_cmd, string id_pather = "")
-    {
-        cm_cmd = cm_cmd.ToLower();
-        
-        List<IDictionary> list_chat = new List<IDictionary>();
-        for (int i = 0; i < this.length; i++)
-        {
-            string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.Get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
-            if (s_data != "")
-            {
-                IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
-                data_chat["index_cm"] = i;
-                if (id_pather == "")
-                {
-                    if (cm_cmd.Equals(data_chat["key"].ToString().ToLower())) list_chat.Add(data_chat);
-                }
-                else
-                {
-                    if (cm_cmd.Equals(data_chat["key"].ToString().ToLower()) && data_chat["pater"].ToString() == id_pather) list_chat.Add(data_chat);
-                }
-            }
-        }
-
-        Debug.Log("act_call_cm_offline found " + list_chat.Count+" pater:"+id_pather+" length:"+this.length+" lang:"+this.app.carrot.lang.Get_key_lang()+" user:"+this.app.setting.get_user_sex()+" char:"+this.app.setting.get_character_sex());
-
-        if (list_chat.Count > 0)
-        {
-            if (list_chat.Count == 1)
-            {
-                return list_chat[0];
-            }
-            else
-            {
-                int rand_index = UnityEngine.Random.Range(0, list_chat.Count);
-                return list_chat[rand_index];
-            }
-        }
-        return null;
-    }
-
-    public IDictionary get_cm_by_id(string id_chat)
-    {
-        for (int i = 0; i < this.length; i++)
-        {
-            string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.Get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
-            if (s_data != "")
-            {
-                IDictionary data_chat = (IDictionary)Carrot.Json.Deserialize(s_data);
-                if (data_chat["id"].ToString() == id_chat) return data_chat;
-            }
-        }
-        return null;
-    }
 
     [ContextMenu("Delete all command")]
     public void delete_all_cm()
     {
-        for (int i = 0; i < this.length; i++) this.act_delete_cm(i);
-        this.length = 0;
-        PlayerPrefs.SetInt("cm_length", 0);
         string s_title = app.carrot.L("brain_list", "List command");
         this.app.carrot.Show_msg(s_title, "Delete all command success!!!");
         this.check_load_command_storage();
         this.app.command_dev.close_all_box();
         this.app.command.clear_log_chat();
         this.app.command.obj_btn_clear_all_log.SetActive(false);
+        this.app.command.DeletePendingCmd();
     }
 
     public void show_list_cm(string s_type)
     {
         this.app.command_dev.set_type(Command_Dev_Type.storage);
         Carrot_Box box;
-        if (s_type == "0")
-        {
-            box = this.app.command_dev.box_list(this.get_list_all_cm());
-            if (box == null) return;
-            box.set_icon(this.icon_list_command);
-            box.set_title(app.carrot.L("brain_list", "List command"));
-        }
-        else if (s_type == "3")
+        if (s_type == "3")
         {
             box = this.app.command_dev.box_list(this.app.command.Get_list_random_cmd());
             if (box == null) return;
             box.set_icon(this.icon_list_cmd_sys);
             box.set_title(app.carrot.L("brain_list_chat_sys", "System chat list"));
         }
+        else if (s_type == "4")
+        {
+            box = this.app.command_dev.box_list(this.app.command.Get_list_cmd_by_key(this.s_keyword_search));
+            if (box == null) return;
+            box.set_icon(this.app.carrot.icon_carrot_search);
+            box.set_title(this.s_keyword_search);
+        }
         else
         {
-            box = this.app.command_dev.box_list(this.get_list_buy_cm());
+            box = this.app.command_dev.box_list(this.app.command.GetPendingCmd());
             if (box == null) return;
-            box.set_icon(this.sp_icon_command_purchased);
-            box.set_title(app.carrot.L("brain_list_buy", "Purchase command"));
+            box.set_icon(this.icon_list_command);
+            box.set_title(app.carrot.L("brain_list", "List command"));
         }
 
-        Carrot_Box_Btn_Item btn_command_teach = box.create_btn_menu_header(this.sp_icon_command_teach);
-        btn_command_teach.set_act(() => this.show_list_cm("0"));
-        if (s_type != "0") btn_command_teach.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
-
-        Carrot_Box_Btn_Item btn_command_purchased = box.create_btn_menu_header(this.sp_icon_command_purchased);
-        btn_command_purchased.set_act(() => this.show_list_cm("1"));
-        if (s_type != "1") btn_command_purchased.set_icon_color(this.GetComponent<App>().carrot.color_highlight);
-
-        Carrot_Box_Btn_Item btn_del_all = box.create_btn_menu_header(this.GetComponent<App>().carrot.sp_icon_del_data);
-        btn_del_all.set_act(() => this.delete_all_cm());
-        btn_del_all.set_icon_color(Color.red);
-    }
-
-    private List<IDictionary> get_list_all_cm()
-    {
-        List<IDictionary> list_cm = new List<IDictionary>();
-        for (int i = this.length; i >= 0; i--)
+        if (s_type == "3" || s_type == "4")
         {
-            string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.Get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
-            if (s_data == "") continue;
-
-            IDictionary data_chat = (IDictionary)Json.Deserialize(s_data);
-            data_chat["index_cm"] = i;
-            list_cm.Add(data_chat);
-        }
-        return list_cm;
-    }
-
-    public List<IDictionary> get_list_buy_cm()
-    {
-        List<IDictionary> list_cm = new List<IDictionary>();
-        for (int i = this.length; i >= 0; i--)
-        {
-            string s_data = PlayerPrefs.GetString("command_offline_" + this.app.carrot.lang.Get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + i);
-            if (s_data == "") continue;
-
-            IDictionary data_chat = (IDictionary)Json.Deserialize(s_data);
-            if (data_chat["status"] != null)
+            Carrot_Box_Btn_Item btn_search = box.create_btn_menu_header(this.app.carrot.icon_carrot_search);
+            btn_search.set_act(() =>
             {
-                if (data_chat["status"].ToString() == "buy")
+                if(box!=null)box.close();
+                this.box_inp_search = this.app.carrot.show_search((string s_search) =>
                 {
-                    data_chat["index_cm"] = i;
-                    list_cm.Add(data_chat);
-                }
-            }
+                    this.s_keyword_search = s_search;
+                    this.box_inp_search.close();
+                    this.show_list_cm("4");
+                });
+            });
+            
+            Carrot_Box_Btn_Item btn_reset = box.create_btn_menu_header(this.app.carrot.sp_icon_restore);
+            btn_reset.set_act(() =>
+            {
+                if(box!=null)box.close();
+                this.s_keyword_search = "";
+                if(this.box_inp_search!=null)this.box_inp_search.close();
+                this.show_list_cm("3");
+            });
         }
-        return list_cm;
+        else
+        {
+            Carrot_Box_Btn_Item btn_del_all = box.create_btn_menu_header(this.GetComponent<App>().carrot.sp_icon_del_data);
+            btn_del_all.set_act(() => this.delete_all_cm());
+            btn_del_all.set_icon_color(Color.red);
+        }
     }
 
-    public void delete_cm(int index, GameObject obj_item)
+    public void Delete_cm_sys(int index, GameObject obj_item)
     {
-        this.act_delete_cm(index);
+        this.app.command.Delete_cmd_by_index(index);
         if (obj_item != null)
         {
             Destroy(obj_item.gameObject);
             this.app.command_dev.close_box_last();
         }
     }
-
-    private void act_delete_cm(int index)
-    {
-        PlayerPrefs.DeleteKey("command_offline_" + this.app.carrot.lang.Get_key_lang() + "_" + this.app.setting.get_user_sex() + "_" + this.app.setting.get_character_sex() + "_" + index);
-    }
-
-    public void download_command_offline()
-    {
-        if (this.app.setting.check_buy_product(4))
-            download_command_shop();
-        else
-            this.app.buy_product(4);
-    }
-
-    public void download_command_shop()
-    {
-        this.app.carrot.show_loading();
-        StructuredQuery q = new("chat-" + this.app.carrot.lang.Get_key_lang());
-        q.Add_where("sex_user", Query_OP.EQUAL, this.app.setting.get_user_sex());
-        q.Add_where("sex_character", Query_OP.EQUAL, this.app.setting.get_character_sex());
-        this.app.carrot.server.Get_doc(q.ToJson(), Act_download_command_shop_done, Act_download_command_shop_fail);
-    }
-
-    private void Act_download_command_shop_done(string s_data)
-    {
-        this.app.carrot.hide_loading();
-        Fire_Collection fc = new(s_data);
-        if (!fc.is_null)
-        {
-            for(int i=0;i<fc.fire_document.Length;i++)
-            {
-                IDictionary c = fc.fire_document[i].Get_IDictionary();
-                c["status"] = "buy";
-                this.app.command_storage.add_command_offline(c);
-            };
-            this.app.carrot.Show_msg(app.carrot.L("brain_download", "Download commands"), app.carrot.L("shop_buy_success", "Purchase successful! the function you purchased has been activated. Please restart the application to use it"), Carrot.Msg_Icon.Success);
-        }
-    }
-
-    private void Act_download_command_shop_fail(string s_error)
-    {
-        this.app.carrot.hide_loading();
-        this.app.carrot.Show_msg(s_error);
-    }
-
+    
     public void hide_box_add()
     {
         if (this.box_add_chat != null) this.box_add_chat.gameObject.SetActive(false);
@@ -1252,7 +1135,7 @@ public class Command_storage : MonoBehaviour
             else
             {
                 this.chat_data_temp= (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(c));
-                this.add_command_offline(this.chat_data_temp);
+                this.add_command_sys(this.chat_data_temp);
             }
         }
 
@@ -1278,7 +1161,6 @@ public class Command_storage : MonoBehaviour
             this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.Get_key_lang(), c.id, s_json);
             this.app.carrot.Show_msg(app.carrot.L("brain_add", "Create a new command"), "Convert draft dialogue into successfully published conversation! (Dev)");
             if (this.item_command_edit_temp != null) Destroy(this.item_command_edit_temp.gameObject);
-            this.act_delete_cm(this.index_cm_update);
         }
 
         if (this.type_act == Command_Type_Act.edit_command)
@@ -1294,6 +1176,20 @@ public class Command_storage : MonoBehaviour
             this.app.carrot.hide_loading();
         }
 
+        if (this.type_act == Command_Type_Act.edit_command_sys)
+        {
+            chat c = this.get_data_chat();
+            this.chat_data_temp = (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(c));
+            this.app.command.Set_data_item_cmd_index(this.index_cm_update, this.chat_data_temp);
+            if (this.item_command_edit_temp != null)
+            {
+                this.item_command_edit_temp.set_title(c.key);
+                this.item_command_edit_temp.set_tip(c.msg);
+            }
+            this.app.carrot.hide_loading();
+        }
+
+
         if (this.box_add_chat != null) this.box_add_chat.close();
         if (this.app.carrot.model_app == ModelApp.Publish) this.app.ads.show_ads_Interstitial();
     }
@@ -1303,7 +1199,7 @@ public class Command_storage : MonoBehaviour
         this.app.carrot.hide_loading();
         if (this.app.carrot.model_app == ModelApp.Publish)
         {
-            this.add_command_offline(this.chat_data_temp);
+            this.add_command_sys(this.chat_data_temp);
             this.app.carrot.Show_msg(app.carrot.L("brain_add", "Create a new command"), app.carrot.L("brain_add_success", "Your chat has been published successfully!"));
         }
         else
@@ -1316,7 +1212,7 @@ public class Command_storage : MonoBehaviour
     private void Act_done_submit_command_fail(string s_error)
     {
         this.app.carrot.hide_loading();
-        this.add_command_offline(this.chat_data_temp);
+        this.add_command_sys(this.chat_data_temp);
     }
 
     private void act_del_patert_chat()

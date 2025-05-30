@@ -58,7 +58,7 @@ public class Voice_Command : MonoBehaviour
     {
         if (this.app.carrot.os_app == Carrot.OS.Window)
         {
-            if (dictationRecognizer != null)
+            if (dictationRecognizer != null && dictationRecognizer.Status == SpeechSystemStatus.Running)
             {
                 dictationRecognizer.Stop();
                 dictationRecognizer.Dispose();
