@@ -78,7 +78,7 @@ public class Command : MonoBehaviour
 
     public void load_all_data_chat(UnityAction act_done)
     {
-        this.file_name_data_chat = "chat-" + this.app.carrot.lang.Get_key_lang() + ".json";
+        this.file_name_data_chat = "chat-" + PlayerPrefs.GetString("lang", "en") + ".json";
         if (this.app.carrot.get_tool().check_file_exist(this.file_name_data_chat))
         {
             string s_data = this.app.carrot.get_tool().get_file_path(this.file_name_data_chat);
@@ -100,7 +100,7 @@ public class Command : MonoBehaviour
     private void load_all_item_chat(string s_data)
     {
         IDictionary data = (IDictionary)Json.Deserialize(s_data);
-        all_item = data["all_item"] as IList;
+        this.all_item = data["all_item"] as IList;
         Debug.Log("Load " + all_item.Count + " Chat cmd");
         for (int i = 0; i < all_item.Count; i++)
         {
@@ -1114,6 +1114,14 @@ public class Command : MonoBehaviour
         this.app.file.Save_file(paths =>
         {
             string s_path = paths[0];
+
+            foreach (var obj in this.all_item)
+            {
+                if (obj is IDictionary item && item.Contains("index_item"))
+                {
+                    item.Remove("index_item");
+                }
+            }
             IDictionary data_export = Json.Deserialize("{}") as IDictionary;
             data_export["all_item"] = this.all_item;
             //data_export["cmd_offline"] = this.app.command_storage.get_cm_offline();
@@ -1130,7 +1138,8 @@ public class Command : MonoBehaviour
         {
             string s_path = paths[0];
             string s_data = FileHelper.ReadAllText(s_path);
-            this.all_item = Json.Deserialize(s_data) as IList;
+            load_all_item_chat(s_data);
+            this.Update_data_file();
             this.app.carrot.Show_msg("Import Success!");
         });
     }
@@ -1252,7 +1261,7 @@ public class Command : MonoBehaviour
 
     public void Btn_Update_cmd()
     {
-        this.app.carrot.play_sound_click(); 
+        this.app.carrot.play_sound_click();
         this.app.carrot.show_loading();
         this.app.carrot.Get_Data("https://raw.githubusercontent.com/kurotsmile/Database-Store-Json/refs/heads/main/" + this.file_name_data_chat, (s_data) =>
         {
