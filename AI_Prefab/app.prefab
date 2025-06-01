@@ -32887,7 +32887,6 @@ GameObject:
   - component: {fileID: 2130662158616155322}
   - component: {fileID: 2065144560488948737}
   - component: {fileID: 1793282830951987721}
-  - component: {fileID: 5162338886866966751}
   m_Layer: 0
   m_Name: app
   m_TagString: Untagged
@@ -32941,7 +32940,7 @@ MonoBehaviour:
   gemini_AI: {fileID: 2130662158616155322}
   tool: {fileID: 2065144560488948737}
   action: {fileID: 1793282830951987721}
-  ads: {fileID: 5162338886866966751}
+  ads: {fileID: 0}
   file: {fileID: 0}
   is_radio_func: 1
   img_bt_sel_lang: {fileID: 2755477472231957537}
@@ -33850,24 +33849,6 @@ MonoBehaviour:
   - IdleG_wing
   - UMATOBI00
   - 002_SIM01_Final
---- !u!114 &5162338886866966751
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2755477472099462738}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90a2c0946a8c5eb4b9684601f03c85ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  count_step_show_interstitial: 5
-  emplement_Ads: []
-  app_key: 
-  id_banner: 
-  id_video: 
-  id_rewarded: 
 --- !u!1 &2755477472104608252
 GameObject:
   m_ObjectHideFlags: 0
