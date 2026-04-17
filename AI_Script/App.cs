@@ -190,7 +190,15 @@ public class App : MonoBehaviour
 
     public void load_app_where_offline()
     {
-        this.Load("");
+        if (PlayerPrefs.GetString("lang", "") == "")
+        {
+            this.carrot.Show_list_lang(this.Load);
+            this.get_character().gameObject.SetActive(false);
+        }
+        else
+        {
+            this.Load("");
+        }
     }
 
     private void Load(string s_data_lang)
