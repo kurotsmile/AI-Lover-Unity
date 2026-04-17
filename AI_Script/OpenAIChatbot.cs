@@ -31,7 +31,23 @@ public class OpenAIChatbot : MonoBehaviour
         if (this.key_api.Trim() == "") this.key_api = this.get_key_api_random();
         Debug.Log("Get chat GPT (" + userMessage + ")");
 
-        string requestData = "{\"model\": \"gpt-3.5-turbo\",\"messages\":[{\"role\": \"user\",\"content\": \"" + userMessage + "\"}]}";
+        IDictionary requestChat = (IDictionary)Json.Deserialize("{}");
+        requestChat["model"] = "gpt-3.5-turbo";
+        requestChat["temperature"] = 0.3f;
+
+        IList list_message = new ArrayList();
+        IDictionary systemMessage = (IDictionary)Json.Deserialize("{}");
+        systemMessage["role"] = "system";
+        systemMessage["content"] = this.app.tool.Get_ai_assistant_system_prompt();
+        list_message.Add(systemMessage);
+
+        IDictionary userChat = (IDictionary)Json.Deserialize("{}");
+        userChat["role"] = "user";
+        userChat["content"] = userMessage;
+        list_message.Add(userChat);
+        requestChat["messages"] = list_message;
+
+        string requestData = Json.Serialize(requestChat);
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(requestData);
 
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(openaiEndpoint, "POST"))
@@ -45,38 +61,20 @@ public class OpenAIChatbot : MonoBehaviour
             if (www.result == UnityWebRequest.Result.Success)
             {
                 IDictionary chat_ai = (IDictionary)Json.Deserialize(www.downloadHandler.text);
+                if (chat_ai == null || chat_ai["choices"] == null)
+                {
+                    this.app.command.show_msg_no_chat();
+                    yield break;
+                }
+
                 IList choices = (IList)chat_ai["choices"];
 
                 if (choices.Count > 0)
                 {
                     IDictionary choice = (IDictionary)choices[0];
                     IDictionary message = (IDictionary)choice["message"];
-
-                    chat_ai["func"] = "0";
-                    chat_ai["status"] = "pending";
-                    chat_ai["key"] = userMessage;
-                    chat_ai["msg"] = message["content"].ToString();
-                    chat_ai["face"] = UnityEngine.Random.Range(0, 18).ToString();
-                    chat_ai["action"] = UnityEngine.Random.Range(0, this.app.action.list_anim_act_defalt.Length).ToString();
-
-                    Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                    chat_ai["color"] = "#" + ColorUtility.ToHtmlStringRGBA(color_icon);
-
-                    chat_ai["sex_user"] = this.app.setting.get_user_sex();
-                    chat_ai["sex_character"] = this.app.setting.get_character_sex();
-                    chat_ai["date_create"] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                    chat_ai["link"] = "";
-                    chat_ai["lang"] = this.app.carrot.lang.Get_key_lang();
-                    chat_ai["icon"] = "";
-                    chat_ai["pater"] = "";
-                    chat_ai["mp3"] = "";
-                    chat_ai["user"] = null;
-
-                    chat_ai["usage"] = null;
-                    chat_ai["choices"] = null;
-                    chat_ai["created"] = null;
-                    chat_ai["ai"] = "Gpt";
-
+                    string s_content = message["content"] != null ? message["content"].ToString() : "";
+                    chat_ai = this.app.tool.Parse_ai_response_to_chat_data(s_content, userMessage, "Gpt");
                     this.app.command.act_chat(chat_ai);
                 }
                 else
@@ -88,7 +86,7 @@ public class OpenAIChatbot : MonoBehaviour
             else
             {
                 Debug.Log($"Error: {www.error}");
-                this.Check_next_ai(www.error);
+                this.Check_next_ai(userMessage);
             }
         }
     }

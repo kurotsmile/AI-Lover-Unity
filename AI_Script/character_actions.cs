@@ -253,10 +253,18 @@ public class character_actions : MonoBehaviour
         this.play_act_anim(s_name_animation);
     }
 
+    public bool Has_action_animation(string s_name_animation)
+    {
+        if (string.IsNullOrWhiteSpace(s_name_animation)) return false;
+        if (this.check_anim_default(s_name_animation)) return true;
+        if (!this.Ensure_local_animation_data_loaded()) return false;
+        return this.local_animation_clips != null && this.local_animation_clips.ContainsKey(s_name_animation);
+    }
+
     public void play_act_anim(string s_name_animation)
     {
         if (s_name_animation=="") return;
-        if (!this.Ensure_local_animation_data_loaded()) return;
+        if (!this.Has_action_animation(s_name_animation)) return;
 
         this.app.get_character().unpause_ani();
         Animator animator = this.app.get_character().get_anim_character();
@@ -277,10 +285,6 @@ public class character_actions : MonoBehaviour
                     animator.Play("Run");
                     Debug.Log("play_act_anim local:" + s_name_animation);
                 }
-            }
-            else
-            {
-                Debug.LogError("Local animation clip not found: " + s_name_animation);
             }
         }
     }

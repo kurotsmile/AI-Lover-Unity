@@ -203,6 +203,13 @@ public class Command : MonoBehaviour
             }
         }
 
+        IDictionary data_assistant_chat = this.app.tool.Try_build_virtual_assistant_chat(s_key);
+        if (data_assistant_chat != null)
+        {
+            this.act_chat(data_assistant_chat);
+            return;
+        }
+
         Debug.Log("chat online (Id father:" + this.id_cur_chat + ")");
         if (this.app.carrot.is_online())
         {
@@ -672,7 +679,11 @@ public class Command : MonoBehaviour
         }
 
         if (data_chat["action"] != null) this.app.action.play_act_anim_by_index_default(int.Parse(data_chat["action"].ToString()));
-        if (data_chat["act"] != null) this.app.action.play_act_anim(data_chat["act"].ToString());
+        if (data_chat["act"] != null)
+        {
+            string s_act = data_chat["act"].ToString();
+            if (this.app.action.Has_action_animation(s_act)) this.app.action.play_act_anim(s_act);
+        }
         if (data_chat["face"] != null) this.act_cm_face(data_chat["face"].ToString());
         if (data_chat["color"] != null) this.set_color_by_string(data_chat["color"].ToString());
 
@@ -692,7 +703,6 @@ public class Command : MonoBehaviour
             }
         }
 
-        if (data_chat["link"] != null) if (data_chat["link"].ToString().Trim() != "") Application.OpenURL(data_chat["link"].ToString());
         if (data_chat["func"] != null)
         {
             string index_func = data_chat["func"].ToString();
@@ -715,6 +725,15 @@ public class Command : MonoBehaviour
             if (index_func == "18") this.app.tool.off_Flashlight();
             if (index_func == "19") this.app.carrot.delay_function(1.6f, () => this.app.tool.OpenApp_by_bundleId(data_chat["link"].ToString().Trim()));
             if (index_func == "20") this.app.carrot.delay_function(1.6f, () => this.app.setting.show_shop());
+        }
+        if (data_chat["link"] != null)
+        {
+            string s_link = data_chat["link"].ToString().Trim();
+            if (s_link != "" && this.app.tool.Is_direct_url(s_link))
+            {
+                string s_func = data_chat["func"] != null ? data_chat["func"].ToString() : "";
+                if (s_func != "16" && s_func != "19") Application.OpenURL(s_link);
+            }
         }
         if (is_add_log)
         {

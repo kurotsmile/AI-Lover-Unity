@@ -47,10 +47,31 @@ public class Music_playlist : MonoBehaviour
     public void On_load()
     {
         if (this.app.carrot.is_offline()) this.s_data_json_radio_offline = PlayerPrefs.GetString("s_data_json_radio_offline");
-        this.s_data_key_query_music = PlayerPrefs.GetString("key_query_music","");
-        if (this.s_data_key_query_music == "") this.s_data_key_query_music = this.app.carrot.L("key_query_music","");
+        this.s_data_key_query_music = this.Load_query_key_music_by_lang();
         this.length = PlayerPrefs.GetInt("music_length");
         this.Check_show_btn_playlist();
+    }
+
+    private string Get_query_music_pref_key()
+    {
+        return "key_query_music_" + this.app.carrot.lang.Get_key_lang();
+    }
+
+    private string Load_query_key_music_by_lang()
+    {
+        string s_pref_key = this.Get_query_music_pref_key();
+        string s_data = PlayerPrefs.GetString(s_pref_key, "");
+        if (s_data != "") return s_data;
+
+        string s_legacy_data = PlayerPrefs.GetString("key_query_music", "");
+        if (s_legacy_data != "")
+        {
+            PlayerPrefs.SetString(s_pref_key, s_legacy_data);
+            PlayerPrefs.DeleteKey("key_query_music");
+            return s_legacy_data;
+        }
+
+        return this.app.carrot.L("key_query_music", "");
     }
 
     private void Check_show_btn_playlist()
@@ -754,13 +775,15 @@ public class Music_playlist : MonoBehaviour
 
     public string Get_data_key_query_music()
     {
+        this.s_data_key_query_music = this.Load_query_key_music_by_lang();
         return this.s_data_key_query_music;
     }
 
     public void Set_data_key_query_music(string s_keys)
     {
         this.s_data_key_query_music = s_keys;
-        PlayerPrefs.SetString("key_query_music", s_keys);
+        PlayerPrefs.SetString(this.Get_query_music_pref_key(), s_keys);
+        PlayerPrefs.DeleteKey("key_query_music");
     }
 
     private void Search_and_play_offline(string s_key)

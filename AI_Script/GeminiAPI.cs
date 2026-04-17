@@ -30,7 +30,29 @@ public class GeminiAPI : MonoBehaviour
         Debug.Log("Get chat Gemini(" + userMessage + ")");
         if (this.key_api.Trim() == "") this.key_api = this.key_api_default;
 
-        string requestData = "{\"contents\":[{\"parts\":[{\"text\":\"" + userMessage + "\"}]}]}";
+        IDictionary requestChat = (IDictionary)Json.Deserialize("{}");
+        IList contents = new ArrayList();
+
+        IDictionary systemContent = (IDictionary)Json.Deserialize("{}");
+        IList systemParts = new ArrayList();
+        IDictionary systemPart = (IDictionary)Json.Deserialize("{}");
+        systemPart["text"] = this.app.tool.Get_ai_assistant_system_prompt();
+        systemParts.Add(systemPart);
+        systemContent["role"] = "user";
+        systemContent["parts"] = systemParts;
+        contents.Add(systemContent);
+
+        IDictionary userContent = (IDictionary)Json.Deserialize("{}");
+        IList userParts = new ArrayList();
+        IDictionary userPart = (IDictionary)Json.Deserialize("{}");
+        userPart["text"] = userMessage;
+        userParts.Add(userPart);
+        userContent["role"] = "user";
+        userContent["parts"] = userParts;
+        contents.Add(userContent);
+
+        requestChat["contents"] = contents;
+        string requestData = Json.Serialize(requestChat);
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(requestData);
 
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(apiEndpoint + "?key=" + this.key_api, "POST"))
@@ -43,35 +65,37 @@ public class GeminiAPI : MonoBehaviour
             if (www.result == UnityWebRequest.Result.Success)
             {
                 IDictionary gemini_ai = (IDictionary)Json.Deserialize(www.downloadHandler.text);
+                if (gemini_ai == null || gemini_ai["candidates"] == null)
+                {
+                    this.app.command.show_msg_no_chat();
+                    yield break;
+                }
+
                 IList candidates = (IList)gemini_ai["candidates"];
+                if (candidates.Count == 0)
+                {
+                    this.app.command.show_msg_no_chat();
+                    yield break;
+                }
+
                 IDictionary candidate = (IDictionary)candidates[0];
+                if (candidate == null || candidate["content"] == null)
+                {
+                    this.app.command.show_msg_no_chat();
+                    yield break;
+                }
+
                 IDictionary content = (IDictionary)candidate["content"];
+                if (content["parts"] == null)
+                {
+                    this.app.command.show_msg_no_chat();
+                    yield break;
+                }
+
                 IList parts = (IList)content["parts"];
-                IDictionary chat_ai = (IDictionary)parts[0];
-
-                chat_ai["id"] = "chat" + this.app.carrot.generateID();
-                chat_ai["func"] = "0";
-                chat_ai["status"] = "pending";
-                chat_ai["key"] = userMessage;
-                chat_ai["msg"] = chat_ai["text"].ToString();
-                chat_ai["face"] = UnityEngine.Random.Range(0, 18).ToString();
-                chat_ai["action"] = UnityEngine.Random.Range(0, this.app.action.list_anim_act_defalt.Length).ToString();
-
-                Color color_icon = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                chat_ai["color"] = "#" + ColorUtility.ToHtmlStringRGBA(color_icon);
-
-                chat_ai["sex_user"] = this.app.setting.get_user_sex();
-                chat_ai["sex_character"] = this.app.setting.get_character_sex();
-                chat_ai["date_create"] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                chat_ai["link"] = "";
-                chat_ai["lang"] = this.app.carrot.lang.Get_key_lang();
-                chat_ai["icon"] = "";
-                chat_ai["pater"] = "";
-                chat_ai["mp3"] = "";
-                chat_ai["user"] = null;
-
-                chat_ai["text"] = null;
-                chat_ai["ai"] = "Gemini";
+                IDictionary chat_ai = parts.Count > 0 ? (IDictionary)parts[0] : null;
+                string s_content = chat_ai != null && chat_ai["text"] != null ? chat_ai["text"].ToString() : "";
+                chat_ai = this.app.tool.Parse_ai_response_to_chat_data(s_content, userMessage, "Gemini");
 
                 this.app.command.act_chat(chat_ai);
                 //this.app.command_storage.add_command_offline(chat_ai);
@@ -79,7 +103,7 @@ public class GeminiAPI : MonoBehaviour
             else
             {
                 Debug.Log($"Error: {www.error}");
-                this.Check_next_ai(www.error);
+                this.Check_next_ai(userMessage);
             }
         }
     }
