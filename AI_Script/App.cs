@@ -137,17 +137,17 @@ public class App : MonoBehaviour
 
         this.carrot.Load_Carrot(this.check_app_exit);
         this.ads.On_Load();
-        if(this.carrot.os_app==OS.Android)
-            this.file.type=Carrot_File_Type.SimpleFileBrowser;
+        if (this.carrot.os_app == OS.Android)
+            this.file.type = Carrot_File_Type.SimpleFileBrowser;
         else
-            this.file.type=Carrot_File_Type.StandaloneFileBrowser;
+            this.file.type = Carrot_File_Type.StandaloneFileBrowser;
 
         this.carrot.shop.onCarrotPaySuccess += this.onBuySuccessCarrotPay;
         this.carrot.shop.onCarrotRestoreSuccess += this.onRestoreSuccessCarrotPay;
-        this.carrot.game.act_click_watch_ads_in_music_bk=this.ads.ShowRewardedVideo;
+        this.carrot.game.act_click_watch_ads_in_music_bk = this.ads.ShowRewardedVideo;
         this.carrot.act_after_delete_all_data = this.delete_all_data;
         this.carrot.act_after_close_all_box += this.close_all_box;
-        this.carrot.act_buy_ads_success=this.ads.RemoveAds;
+        this.carrot.act_buy_ads_success = this.ads.RemoveAds;
 
         this.GetComponent<Carrot_DeviceOrientationChange>().Check_show_emp_by_resolution();
         this.act_change_Scene_Rotation();
@@ -172,7 +172,7 @@ public class App : MonoBehaviour
 
     private void close_all_box()
     {
-        this.command_dev.close_all_box();;
+        this.command_dev.close_all_box(); ;
     }
 
     public void load_app_where_online()
@@ -207,7 +207,8 @@ public class App : MonoBehaviour
         DateTime currentTime = DateTime.Now;
         int hour = currentTime.Hour;
         this.command.Set_ready_msg_tip();
-        this.command.load_all_data_chat(()=>{
+        this.command.load_all_data_chat(() =>
+        {
             this.command.send_chat("hi_" + hour);
         });
         this.player_music.playlist.On_load();
@@ -234,7 +235,7 @@ public class App : MonoBehaviour
                 if (this.link_deep_app.Contains("ailover:"))
                 {
                     string data_link = this.link_deep_app.Replace("ailover://show/", "");
-                    string[] paramet_chat= data_link.Split('/');
+                    string[] paramet_chat = data_link.Split('/');
                     this.command.Play_chat_by_ID(paramet_chat[0], paramet_chat[1]);
                     this.link_deep_app = "";
                 }
@@ -251,7 +252,7 @@ public class App : MonoBehaviour
                 {
                     string data_link = this.link_deep_app.Replace("contactstore://show/", "");
                     string[] paramet_contact = data_link.Split('/');
-                    this.carrot.user.show_user_by_id(paramet_contact[0], paramet_contact[1]);
+                    this.carrot.user.show_user_by_id(paramet_contact[0]);
                     this.link_deep_app = "";
                 }
             }
@@ -394,7 +395,7 @@ public class App : MonoBehaviour
         }
     }
 
-    public IEnumerator get_weather_buy_lot_and_lat(float weather_longitude,float weather_latitude)
+    public IEnumerator get_weather_buy_lot_and_lat(float weather_longitude, float weather_latitude)
     {
         using UnityWebRequest www = UnityWebRequest.Get("https://api.openweathermap.org/data/2.5/onecall?lat=" + weather_longitude + "&lon=" + weather_latitude + "&exclude=hourly,daily&appid=" + this.get_key_weather_api() + "&lang=" + PlayerPrefs.GetString("lang", "vi") + "&mode=json&units=metric&cnt=3");
         yield return www.SendWebRequest();
@@ -440,13 +441,14 @@ public class App : MonoBehaviour
         IDictionary wind = (IDictionary)data["wind"];
 
         string s_clouds = "";
-        if (data["clouds"]!= null)
+        if (data["clouds"] != null)
         {
             try
             {
                 IDictionary clouds = (IDictionary)data["clouds"];
-                if(clouds["all"]!=null) s_clouds = clouds["all"].ToString();
-            }catch(Exception)
+                if (clouds["all"] != null) s_clouds = clouds["all"].ToString();
+            }
+            catch (Exception)
             {
                 s_clouds = data["clouds"].ToString();
             }
@@ -464,47 +466,47 @@ public class App : MonoBehaviour
         if (data["temp"] != null)
         {
             s_weather_temp = data["temp"].ToString();
-            if(data["sunrise"]!=null) s_sunrise = data["sunrise"].ToString();
-            if(data["sunset"]!=null) s_sunset = data["sunset"].ToString();
-            if(data["wind_speed"]!=null) s_speed = data["wind_speed"].ToString();
-            if(data["wind_deg"]!=null) s_deg = data["wind_deg"].ToString();
-            if(data["pressure"]!=null) s_pressure= data["pressure"].ToString();
-            if(data["humidity"]!=null) s_humidity = data["humidity"].ToString();
+            if (data["sunrise"] != null) s_sunrise = data["sunrise"].ToString();
+            if (data["sunset"] != null) s_sunset = data["sunset"].ToString();
+            if (data["wind_speed"] != null) s_speed = data["wind_speed"].ToString();
+            if (data["wind_deg"] != null) s_deg = data["wind_deg"].ToString();
+            if (data["pressure"] != null) s_pressure = data["pressure"].ToString();
+            if (data["humidity"] != null) s_humidity = data["humidity"].ToString();
             this.s_weather_temp_min = "0.0";
             this.s_weather_temp_max = "0.0";
-            if(data["feels_like"]!=null) this.s_weather_temp_feels_like = data["feels_like"].ToString();
+            if (data["feels_like"] != null) this.s_weather_temp_feels_like = data["feels_like"].ToString();
         }
         else
         {
-            if(main["temp"]!=null) s_weather_temp = main["temp"].ToString();
-            if(sys["sunrise"]!=null) s_sunrise = sys["sunrise"].ToString();
-            if(sys["sunset"]!=null) s_sunset = sys["sunset"].ToString();
-            if(wind["speed"]!=null) s_speed = wind["speed"].ToString();
-            if(wind["deg"]!=null) s_deg = wind["deg"].ToString();
-            if(main["pressure"]!=null) s_pressure = main["pressure"].ToString();
-            if(main["humidity"] != null) s_humidity = main["humidity"].ToString();
-            if(main["temp_min"]!=null) this.s_weather_temp_min = main["temp_min"].ToString();
-            if(main["temp_max"]!=null) this.s_weather_temp_max = main["temp_max"].ToString();
-            if(main["feels_like"]!=null) this.s_weather_temp_feels_like = main["feels_like"].ToString();
+            if (main["temp"] != null) s_weather_temp = main["temp"].ToString();
+            if (sys["sunrise"] != null) s_sunrise = sys["sunrise"].ToString();
+            if (sys["sunset"] != null) s_sunset = sys["sunset"].ToString();
+            if (wind["speed"] != null) s_speed = wind["speed"].ToString();
+            if (wind["deg"] != null) s_deg = wind["deg"].ToString();
+            if (main["pressure"] != null) s_pressure = main["pressure"].ToString();
+            if (main["humidity"] != null) s_humidity = main["humidity"].ToString();
+            if (main["temp_min"] != null) this.s_weather_temp_min = main["temp_min"].ToString();
+            if (main["temp_max"] != null) this.s_weather_temp_max = main["temp_max"].ToString();
+            if (main["feels_like"] != null) this.s_weather_temp_feels_like = main["feels_like"].ToString();
         }
 
-        if(data["visibility"]!=null) s_visibility = data["visibility"].ToString();
+        if (data["visibility"] != null) s_visibility = data["visibility"].ToString();
 
         this.txt_weather_temp.text = s_weather_temp + "°C";
-        if(weather["description"]!=null) this.txt_weather_description.text = weather["description"].ToString();
+        if (weather["description"] != null) this.txt_weather_description.text = weather["description"].ToString();
         this.txt_sunrise.text = UnixTimeStampToDateTime(long.Parse(s_sunrise)).ToString("dd/MM hh:ss tt");
         this.txt_sunset.text = UnixTimeStampToDateTime(long.Parse(s_sunset)).ToString("dd/MM hh:ss tt");
         this.txt_wind_speed.text = s_speed + "m/s";
-        this.txt_wind_deg.text =s_deg + "°";
+        this.txt_wind_deg.text = s_deg + "°";
         this.txt_visibility.text = s_visibility + "m";
-        this.txt_pressur.text = s_pressure+"hPa";
+        this.txt_pressur.text = s_pressure + "hPa";
         this.txt_clouds.text = s_clouds + "%";
         this.txt_humidity.text = s_humidity + "%";
 
-        if (data["name"]!=null)
+        if (data["name"] != null)
             this.setting.set_name_address_weather(data["name"].ToString());
         else
-            this.setting.set_name_address_weather(data["lat"].ToString()+","+ data["lon"].ToString());
+            this.setting.set_name_address_weather(data["lat"].ToString() + "," + data["lon"].ToString());
 
         if (weather["icon"] != null)
         {
@@ -666,7 +668,7 @@ public class App : MonoBehaviour
     public void delete_all_data()
     {
         PlayerPrefs.DeleteAll();
-        this.view.delete_background_image();
+        this.view.clear_legacy_background_data();
         this.carrot.delay_function(1f, this.Start);
     }
 
@@ -675,7 +677,7 @@ public class App : MonoBehaviour
         this.item_cur_log_chat = item_log;
     }
 
-    public void play_sound(int index_sound=0)
+    public void play_sound(int index_sound = 0)
     {
         if (this.carrot.get_status_sound()) this.audio_sound[index_sound].Play();
     }
@@ -728,7 +730,7 @@ public class App : MonoBehaviour
 
     public void show_acc_by_id(string s_id_user)
     {
-        this.carrot.user.show_user_by_id(s_id_user, PlayerPrefs.GetString("lang", "en"));
+        this.carrot.user.show_user_by_id(s_id_user);
     }
 
     public void hide_banner_ads()
@@ -838,13 +840,13 @@ public class App : MonoBehaviour
 
         if (id_product == this.carrot.shop.get_id_by_index(7))
         {
-            this.carrot.Show_msg(carrot.L("shop_all_mp3", "Allows downloading all mp3 music files"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop_all_mp3", "Allows downloading all mp3 music files"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.act_inapp_unlock_downloadmp3();
         }
 
         if (id_product == this.carrot.shop.get_id_by_index(6))
         {
-            this.carrot.Show_msg(carrot.L("shop_fahsion", "Open all outfits"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop_fahsion", "Open all outfits"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.get_character().Check_buy_success_character();
             this.act_inapp_unlock_all_character();
         }
@@ -871,20 +873,14 @@ public class App : MonoBehaviour
 
         if (id_product == this.carrot.shop.get_id_by_index(5))
         {
-            this.carrot.Show_msg(carrot.L("shop", "Shop"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));;
+            this.carrot.Show_msg(carrot.L("shop", "Shop"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function")); ;
             PlayerPrefs.SetInt("is_buy_5", 1);
             this.get_character().Check_buy_success_character();
         }
 
-        if (id_product == this.carrot.shop.get_id_by_index(this.icon.index_buy_category_icon))
-        {
-            this.carrot.Show_msg(carrot.L("shop", "Shop"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
-            this.icon.Act_buy_category_success();
-        }
-
         if (id_product == this.carrot.shop.get_id_by_index(this.action.index_product_buy_act))
         {
-            this.carrot.Show_msg(carrot.L("shop", "Shop"),carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
+            this.carrot.Show_msg(carrot.L("shop", "Shop"), carrot.L("buy_inapp_success", "Payment success! you can now use the purchased function"));
             this.action.check_buy_success_action();
         }
 
@@ -929,7 +925,7 @@ public class App : MonoBehaviour
         PlayerPrefs.SetInt("is_buy_5", 1);
         PlayerPrefs.SetInt("is_buy_6", 1);
         PlayerPrefs.SetInt("is_buy_7", 1);
-        PlayerPrefs.SetInt("is_buy_"+this.action.index_product_buy_all_act, 1);
+        PlayerPrefs.SetInt("is_buy_" + this.action.index_product_buy_all_act, 1);
         this.hide_banner_ads();
     }
 
@@ -946,7 +942,7 @@ public class App : MonoBehaviour
 
     private void act_inapp_unlock_all_animation()
     {
-        PlayerPrefs.SetInt("is_buy_"+this.action.index_product_buy_all_act, 1);
+        PlayerPrefs.SetInt("is_buy_" + this.action.index_product_buy_all_act, 1);
     }
 
     public void act_inapp_unlock_all_character()

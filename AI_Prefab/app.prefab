@@ -2409,7 +2409,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7241564241253532498
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2513,19 +2513,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3554706478431917022}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2395358536460521161}
-        m_TargetAssemblyTypeName: Command_Dev, Assembly-CSharp
-        m_MethodName: show_chat_pass_by_user
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 1
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &2065236888214064485
 GameObject:
   m_ObjectHideFlags: 0
@@ -17976,16 +17964,7 @@ MonoBehaviour:
   - {fileID: 4458148057864671455}
   img_color_bk_list: {fileID: 5023085632404032221}
   img_color_bk_mix: {fileID: 7028980553292046660}
-  img_icon_floor: {fileID: 4283100998739467159}
-  mesh_floor: {fileID: 2755477470766381157}
   slider_zoom: {fileID: 2755477470948309359}
-  icon_list_background: {fileID: 21300000, guid: f2bd4b4a378802a4d96260c2c455fd50, type: 3}
-  sp_bk_default: {fileID: 0}
-  img_background_app: {fileID: 2755477470555521477}
-  img_background_app_thumb: {fileID: 2755477471633611538}
-  slider_color_bk: {fileID: 2755477471965861713}
-  btn_delete_bk: {fileID: 2755477472189238554}
-  icon_floor: {fileID: 21300000, guid: 141553ceb96ffb547bebedb3d0f3219c, type: 3}
 --- !u!1 &2755477471074579371
 GameObject:
   m_ObjectHideFlags: 0
@@ -18490,7 +18469,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2755477471145792843
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19135,19 +19114,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2755477471196747684}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2755477471657277709}
-        m_TargetAssemblyTypeName: Environment, Assembly-CSharp
-        m_MethodName: show_list_background_image
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &2755477471196885987
 GameObject:
   m_ObjectHideFlags: 0
@@ -20395,19 +20362,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2755477471277980514}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2755477471657277709}
-        m_TargetAssemblyTypeName: Environment, Assembly-CSharp
-        m_MethodName: show_list_photo_camera
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &2755477471294359722
 GameObject:
   m_ObjectHideFlags: 0
@@ -20556,7 +20511,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2755477471303628523
 RectTransform:
   m_ObjectHideFlags: 0
@@ -24449,19 +24404,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2755477471633611538}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2755477471657277709}
-        m_TargetAssemblyTypeName: Environment, Assembly-CSharp
-        m_MethodName: show_list_background_image
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &2755477471634474704
 GameObject:
   m_ObjectHideFlags: 0
@@ -30708,19 +30651,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2755477471845755094}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2755477471657277709}
-        m_TargetAssemblyTypeName: Environment, Assembly-CSharp
-        m_MethodName: show_camera
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &2755477471859411434
 GameObject:
   m_ObjectHideFlags: 0
@@ -30846,7 +30777,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2755477471867722538
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31899,19 +31830,7 @@ MonoBehaviour:
   m_Value: 150
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2755477471657277709}
-        m_TargetAssemblyTypeName: Environment, Assembly-CSharp
-        m_MethodName: change_color_im_bk
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &2755477471975670949
 GameObject:
   m_ObjectHideFlags: 0
@@ -33054,7 +32973,6 @@ MonoBehaviour:
   prefab_item_command_chat: {fileID: 8507482465009177127, guid: 5d05e22407fb85d4dbb924821b2ec01a, type: 3}
   prefab_item_command_pc: {fileID: 8742407762213273243, guid: 2a5158c959d070b40ab19bb0f3c1a766, type: 3}
   prefab_item_command_loading: {fileID: 6148873219918758934, guid: cbfd93978c61ea5458d153ef03a78d60, type: 3}
-  prefab_effect_icon_chat: {fileID: 5086793952246010658, guid: d059e57523ad3ef4dab12a5ca507efbf, type: 3}
   obj_btn_clear_all_log: {fileID: 695487053551866572}
   area_body_log_command: {fileID: 2755477472425579002}
   ScrollRect_log_command: {fileID: 2755477471323344126}
@@ -33127,7 +33045,7 @@ MonoBehaviour:
   - fnc_rate
   - fnc_share
   - fnc_exit
-  - fnc_list_background
+  - None
   - fnc_next_music
   - fnc_pause_music
   - sys_action_by_link
@@ -33218,7 +33136,7 @@ MonoBehaviour:
   - bk_zoom
   - app_music_tip
   - loading
-  - bk_background
+  - unused_background
   - replay
   - cancel
   - command_pass
@@ -33496,8 +33414,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
-  index_buy_category_icon: 0
-  sp_icon_icons: {fileID: 21300000, guid: fd187c46b37322047a68d420491b1390, type: 3}
 --- !u!114 &505306152552912675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33801,9 +33717,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 2755477471257207454}
-  url_asset_android: https://firebasestorage.googleapis.com/v0/b/carrotstore.appspot.com/o/AssetBundle%2Fanimations.ai_lover?alt=media&token=04027061-454e-4261-99b8-0d2ce12e289e
-  url_asset_StandaloneWindows: https://firebasestorage.googleapis.com/v0/b/carrotstore.appspot.com/o/AssetBundle%2Fver_2024_2%2FStandaloneWindows%2Fanimations.ai_lover?alt=media&token=65da52dd-4424-4760-97c4-0c1a4ff30dcd
-  url_asset_WSAPlayers: https://firebasestorage.googleapis.com/v0/b/carrotstore.appspot.com/o/AssetBundle%2Fver_2024_2%2FWSAPlayer%2Fanimations.ai_lover?alt=media&token=3ba50b1a-4e90-4fce-924d-b62ead745bc8
   index_product_buy_act: 8
   index_product_buy_all_act: 9
   list_anim_act_defalt:
@@ -34758,19 +34671,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2755477472189238559}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2755477471657277709}
-        m_TargetAssemblyTypeName: Environment, Assembly-CSharp
-        m_MethodName: delete_background_image
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &2755477472204999601
 GameObject:
   m_ObjectHideFlags: 0
@@ -39448,7 +39349,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4606905571202020624
 RectTransform:
   m_ObjectHideFlags: 0
@@ -39552,19 +39453,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5198794659047281427}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2395358536460521161}
-        m_TargetAssemblyTypeName: Command_Dev, Assembly-CSharp
-        m_MethodName: show
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 1
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &3659851915339830837
 GameObject:
   m_ObjectHideFlags: 0
@@ -40894,19 +40783,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7434994200645411288}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2755477471657277709}
-        m_TargetAssemblyTypeName: Environment, Assembly-CSharp
-        m_MethodName: show_list_floor
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &4333775223828128704
 GameObject:
   m_ObjectHideFlags: 0

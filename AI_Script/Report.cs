@@ -1,15 +1,7 @@
 ﻿using Carrot;
-using Newtonsoft.Json;
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
-public struct Ai_Chat_Report_Data
-{
-    public Carrot_Rate_user_data user { get; set; }
-    public string comment { get; set; }
-    public string date { get; set; }
-}
 
 public class Report : MonoBehaviour
 {
@@ -26,7 +18,29 @@ public class Report : MonoBehaviour
     private Carrot_Box_Item item_other_report;
     private Carrot_Box box_report;
 
-    private int index_report_edit = -1;
+    private string get_report_email()
+    {
+        string s_email = "";
+        if (this.app.carrot.user.get_id_user_login() != "")
+            s_email = this.app.carrot.user.get_data_user_login("email");
+
+        if (s_email == "")
+            s_email = "guest@local";
+
+        return s_email;
+    }
+
+    private IList parse_report_rows(string s_data)
+    {
+        object data_raw = Json.Deserialize(s_data);
+        if (data_raw is IList list_data) return list_data;
+
+        IDictionary data_obj = data_raw as IDictionary;
+        if (data_obj == null) return (IList)Json.Deserialize("[]");
+        if (data_obj["items"] is IList items) return items;
+        if (data_obj["data"] is IList data) return data;
+        return (IList)Json.Deserialize("[]");
+    }
 
     public void show(Item_command_chat item_log)
     {
@@ -57,6 +71,10 @@ public class Report : MonoBehaviour
         this.item_other_report.set_lang_data("report_other", "report_other_tip");
         this.item_other_report.load_lang_data();
 
+        Carrot_Box_Btn_Item btn_list_report = this.box_report.create_btn_menu_header(this.app.carrot.icon_carrot_bug);
+        btn_list_report.set_act(() => this.show_list_report_by_object_id(this.id_chat));
+        btn_list_report.set_icon_color(this.app.carrot.color_highlight);
+
         Carrot_Box_Btn_Panel box_panel_btn = this.box_report.create_panel_btn();
 
         Carrot.Carrot_Button_Item btn_done = box_panel_btn.create_btn("btn_done");
@@ -77,65 +95,104 @@ public class Report : MonoBehaviour
     public void done()
     {
         this.app.carrot.show_loading();
-        this.app.carrot.server.Get_doc_by_path("chat-" + this.app.carrot.lang.Get_key_lang(), this.id_chat, Get_data_chat_done, Get_data_chat_fail);
-    }
-
-    private void Get_data_chat_done(string s_data)
-    {
-        Debug.Log("Get_data_chat_done:" + s_data);
-        this.app.carrot.hide_loading();
-        Fire_Document fd = new(s_data);
-        IDictionary data_chat = fd.Get_IDictionary();
-        IList reports;
-        if (data_chat["reports"] != null) reports = (IList)data_chat["reports"];
-        else reports = (IList)Json.Deserialize("[]");
-
-        Ai_Chat_Report_Data report_chat = new Ai_Chat_Report_Data();
-        report_chat.comment = this.item_other_report.get_val();
-        report_chat.date = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
-        if (this.app.carrot.user.get_id_user_login() != "")
-        {
-            Carrot_Rate_user_data user_login = new Carrot_Rate_user_data();
-            user_login.name = this.app.carrot.user.get_data_user_login("name");
-            user_login.id = this.app.carrot.user.get_id_user_login();
-            user_login.lang = this.app.carrot.user.get_lang_user_login();
-            user_login.avatar = this.app.carrot.user.get_data_user_login("avatar");
-            report_chat.user = user_login;
-        }
-
-        if (this.index_report_edit != -1)
-            reports[this.index_report_edit] = report_chat;
-        else
-            reports.Add(report_chat);
-
-        this.app.carrot.log("Index Report:" + this.index_report_edit);
-        data_chat["reports"] = reports;
-        IDictionary chat_data = (IDictionary)Json.Deserialize(JsonConvert.SerializeObject(data_chat));
-        string s_json = this.app.carrot.server.Convert_IDictionary_to_json(chat_data);
-        this.app.carrot.server.Add_Document_To_Collection("chat-" + this.app.carrot.lang.Get_key_lang(),this.id_chat, s_json, Submit_Report_done, Submit_Report_fail);
+        this.app.carrot.hub.AddReport(
+            this.get_report_email(),
+            "chat",
+            this.item_other_report.get_val(),
+            this.app.carrot.user.get_id_user_login(),
+            this.id_chat,
+            Submit_Report_done,
+            Submit_Report_fail
+        );
     }
 
     private void Submit_Report_done(string s_data)
     {
+        this.app.carrot.hide_loading();
         this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), app.carrot.L("report_success"));
         if (this.box_report != null) this.box_report.close();
     }
 
     private void Submit_Report_fail(string s_error)
     {
+        this.app.carrot.hide_loading();
         this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), s_error, Msg_Icon.Error);
         if (this.box_report != null) this.box_report.close();
     }
 
-    private void Get_data_chat_fail(string s_error)
+    public void show_list_report_by_object_id(string object_id)
     {
-        this.app.carrot.hide_loading();
-        this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), string.Format("Document {0} does not exist!",this.id_chat), Msg_Icon.Error);
-        if (this.box_report != null) this.box_report.close();
+        this.id_chat = object_id;
+        if (this.app.carrot.is_offline())
+        {
+            this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), app.carrot.L("list_none", "List is empty, no items found!"));
+            return;
+        }
+
+        this.app.carrot.show_loading();
+        Dictionary<string, object> filters = new()
+        {
+            { "object_id", object_id },
+            { "type", "chat" },
+            { "limit", 100 },
+            { "page", 1 },
+            { "order_key", "created_at" },
+            { "order_type", "DESC" }
+        };
+
+        this.app.carrot.hub.ReadTable("reports", filters, Act_show_list_report_done, Act_show_list_report_fail);
     }
 
     public void show_list_report(IList list_report)
     {
+        if (this.id_chat != "")
+        {
+            this.show_list_report_by_object_id(this.id_chat);
+            return;
+        }
+
+        this.show_list_report_legacy(list_report);
+    }
+
+    private void Act_show_list_report_done(string s_data)
+    {
+        this.app.carrot.hide_loading();
+        IList list_report = this.parse_report_rows(s_data);
+        if (list_report.Count == 0)
+        {
+            this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), app.carrot.L("list_none", "List is empty, no items found!"));
+            return;
+        }
+
+        Carrot_Box box_list_report = this.app.carrot.Create_Box("report_list");
+        box_list_report.set_icon(this.app.command.sp_icon_info_report_chat);
+        box_list_report.set_title(app.carrot.L("report_title", "Report"));
+
+        for (int i = 0; i < list_report.Count; i++)
+        {
+            IDictionary report_data = list_report[i] as IDictionary;
+            if (report_data == null) continue;
+            Carrot_Box_Item item_report = box_list_report.create_item("report_" + i);
+            item_report.set_icon(this.app.carrot.icon_carrot_bug);
+            if (report_data["message"] != null) item_report.set_title(report_data["message"].ToString());
+            if (report_data["created_at"] != null) item_report.set_tip(report_data["created_at"].ToString());
+        }
+    }
+
+    private void Act_show_list_report_fail(string s_error)
+    {
+        this.app.carrot.hide_loading();
+        this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), s_error, Msg_Icon.Error);
+    }
+
+    private void show_list_report_legacy(IList list_report)
+    {
+        if (list_report == null || list_report.Count == 0)
+        {
+            this.app.carrot.Show_msg(app.carrot.L("report_title", "Report"), app.carrot.L("list_none", "List is empty, no items found!"));
+            return;
+        }
+
         Carrot_Box box_list_report = this.app.carrot.Create_Box("report_list");
         box_list_report.set_icon(this.app.command.sp_icon_info_report_chat);
         box_list_report.set_title(app.carrot.L("report_title", "Report"));

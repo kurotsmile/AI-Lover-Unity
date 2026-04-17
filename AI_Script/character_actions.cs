@@ -1,8 +1,7 @@
 using Carrot;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public enum Act_List_Func {Add_Box_Item,View_Category,Select_Dance_Animation}
@@ -12,21 +11,16 @@ public class character_actions : MonoBehaviour
     public App app;
 
     [Header("Character_Actions")]
-    private string url = "";
-    public string url_asset_android = "";
-    public string url_asset_StandaloneWindows = "";
-    public string url_asset_WSAPlayers = "";
     public int index_product_buy_act = 8;
     public int index_product_buy_all_act = 9;
     public string[] list_anim_act_defalt;
-    private AssetBundle bundle;
 
     private IList list_category_animations;
     private Carrot_Box box_list;
     private IList list_name_animation;
     private IDictionary obj_list_dance_animation;
-    private string s_name_animation_by_temp = "";
     private Carrot_Box_Item item_box_temp=null;
+    private Dictionary<string, AnimationClip> local_animation_clips;
 
     private string s_act_animation_dance = "002_SIM01_Final";
     private Act_List_Func func;
@@ -34,22 +28,13 @@ public class character_actions : MonoBehaviour
     public void On_load()
     {
         this.s_act_animation_dance = PlayerPrefs.GetString("act_animation_dance", "002_SIM01_Final");
-
-        if (app.carrot.os_app == OS.Android)
-            this.url = this.url_asset_android;
-        else if (app.carrot.os_app == OS.Window)
-            this.url = this.url_asset_WSAPlayers;
-        else
-            this.url = this.url_asset_StandaloneWindows;
     }
 
     public void btn_show_category(Carrot_Box_Item item_set_data)
     {
         this.func = Act_List_Func.Add_Box_Item;
         this.item_box_temp = item_set_data;
-        if (this.list_category_animations == null)
-            StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(()=>this.box_list_category()));
-        else
+        if (this.Ensure_local_animation_data_loaded())
             this.box_list_category();
     }
 
@@ -59,67 +44,107 @@ public class character_actions : MonoBehaviour
         this.btn_show_category(null);
     }
 
-    IEnumerator DownloadAndLoadCaetgoryAndAnimation(UnityAction act_call_back)
+    private RuntimeAnimatorController Get_base_runtime_animator_controller()
     {
-        using UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url, 1, 0);
-        this.app.carrot.show_loading();
-        yield return request.SendWebRequest();
+        Animator animator = this.app != null && this.app.get_character() != null ? this.app.get_character().get_anim_character() : null;
+        if (animator == null) return null;
 
-        if (request.result == UnityWebRequest.Result.Success)
+        RuntimeAnimatorController controller = animator.runtimeAnimatorController;
+        if (controller is AnimatorOverrideController overrideController && overrideController.runtimeAnimatorController != null)
+            return overrideController.runtimeAnimatorController;
+
+        return controller;
+    }
+
+    private bool Is_dance_animation_name(string s_name_animation)
+    {
+        if (string.IsNullOrEmpty(s_name_animation)) return false;
+        string s_name_lower = s_name_animation.ToLowerInvariant();
+        return s_name_lower.Contains("dance") || s_name_lower.EndsWith("_final") || s_name_lower.Contains("_sim") || s_name_lower.Contains("_sak") || s_name_lower.Contains("_not");
+    }
+
+    private IDictionary Create_animation_category(string s_name, List<string> list_animation_name)
+    {
+        IDictionary data_category = Json.Deserialize("{}") as IDictionary;
+        data_category["name"] = s_name;
+
+        IList list_animation = Json.Deserialize("[]") as IList;
+        for (int i = 0; i < list_animation_name.Count; i++)
         {
-            this.app.carrot.hide_loading();
-            this.bundle = DownloadHandlerAssetBundle.GetContent(request);
-            bool is_unlock_animation = this.app.setting.check_buy_product(this.index_product_buy_all_act);
+            IDictionary data_animation = Json.Deserialize("{}") as IDictionary;
+            data_animation["name"] = list_animation_name[i];
+            data_animation["buy"] = "0";
+            list_animation.Add(data_animation);
+        }
 
-            TextAsset jsonFile = bundle.LoadAsset<TextAsset>("data_animations");
-            string jsonString = jsonFile.text;
-            this.list_category_animations = (IList)Json.Deserialize(jsonString);
-            this.list_name_animation = (IList)Json.Deserialize("[]");
-            for (int i = 0; i < list_category_animations.Count; i++)
-            {
-                IDictionary data_item_anim = (IDictionary)list_category_animations[i];
-                IList data_animations = (IList)data_item_anim["data"];
-                for (int y = 0; y < data_animations.Count; y++)
-                {
-                    IDictionary data_anim = (IDictionary)data_animations[y];
-                    string s_name_item_anim = data_anim["name"].ToString();
-                    bool is_used = false;
-                    if (is_unlock_animation)
-                    {
-                        is_used = true;
-                    }
-                    else
-                    {
-                        if (data_anim["buy"].ToString() != "0")
-                        {
-                            if (PlayerPrefs.GetInt("is_user_act_" + s_name_item_anim) == 1)
-                            {
-                                is_used = true;
-                            }
-                            else
-                            {
-                                is_used = false;
-                            }
-                        }
-                        else
-                        {
-                            is_used = true;
-                        }
-                    }
+        data_category["data"] = list_animation;
+        return data_category;
+    }
 
-                    if (is_used) this.list_name_animation.Add(s_name_item_anim);
-                }
+    private bool Ensure_local_animation_data_loaded()
+    {
+        if (this.list_category_animations != null && this.local_animation_clips != null && this.local_animation_clips.Count > 0) return true;
 
-                if (data_item_anim["name"].ToString() == "Dance") this.obj_list_dance_animation = data_item_anim;
-            }
-            Debug.Log("Download Data Category and list Animation");
-            if (act_call_back != null) act_call_back();
+        RuntimeAnimatorController controller = this.Get_base_runtime_animator_controller();
+        if (controller == null)
+        {
+            Debug.LogError("Animator_npc.controller is not ready to build local action list");
+            return false;
+        }
+
+        this.local_animation_clips = new Dictionary<string, AnimationClip>();
+        this.list_name_animation = Json.Deserialize("[]") as IList;
+        this.list_category_animations = Json.Deserialize("[]") as IList;
+        this.obj_list_dance_animation = null;
+
+        List<string> list_all_animation_name = new List<string>();
+        List<string> list_dance_animation_name = new List<string>();
+
+        AnimationClip[] list_clip = controller.animationClips;
+        for (int i = 0; i < list_clip.Length; i++)
+        {
+            AnimationClip clip = list_clip[i];
+            if (clip == null || string.IsNullOrEmpty(clip.name)) continue;
+            if (this.local_animation_clips.ContainsKey(clip.name)) continue;
+
+            this.local_animation_clips.Add(clip.name, clip);
+            this.list_name_animation.Add(clip.name);
+            list_all_animation_name.Add(clip.name);
+            if (this.Is_dance_animation_name(clip.name)) list_dance_animation_name.Add(clip.name);
+        }
+
+        if (list_all_animation_name.Count == 0)
+        {
+            Debug.LogError("No local animations found in Animator_npc.controller");
+            return false;
+        }
+
+        IDictionary all_category = this.Create_animation_category("All", list_all_animation_name);
+        this.list_category_animations.Add(all_category);
+
+        if (list_dance_animation_name.Count > 0)
+        {
+            this.obj_list_dance_animation = this.Create_animation_category("Dance", list_dance_animation_name);
+            this.list_category_animations.Add(this.obj_list_dance_animation);
         }
         else
         {
-            this.app.carrot.hide_loading();
-            Debug.LogError(request.error);
+            this.obj_list_dance_animation = all_category;
         }
+
+        if (!this.local_animation_clips.ContainsKey(this.s_act_animation_dance))
+        {
+            IList list_dance_data = this.obj_list_dance_animation["data"] as IList;
+            if (list_dance_data != null && list_dance_data.Count > 0)
+                this.s_act_animation_dance = ((IDictionary)list_dance_data[0])["name"].ToString();
+            else
+                this.s_act_animation_dance = list_all_animation_name[0];
+
+            PlayerPrefs.SetString("act_animation_dance", this.s_act_animation_dance);
+        }
+
+        Debug.Log("Loaded local animation list from Animator_npc.controller (" + list_all_animation_name.Count + " clips)");
+        return true;
     }
 
     private void box_list_category()
@@ -128,9 +153,6 @@ public class character_actions : MonoBehaviour
         this.box_list = this.app.carrot.Create_Box();
         this.box_list.set_title(PlayerPrefs.GetString("act","List Action Category"));
         this.box_list.set_icon(this.app.command_storage.sp_icon_action);
-
-        Carrot_Box_Btn_Item btn_buy=this.box_list.create_btn_menu_header(this.app.setting.sp_icon_buy);
-        btn_buy.set_act(() => this.app.buy_product(this.index_product_buy_all_act));
 
         string s_action = PlayerPrefs.GetString("act", "Action");
 
@@ -159,21 +181,12 @@ public class character_actions : MonoBehaviour
         this.box_list.set_title(data_category["name"].ToString());
         this.box_list.set_icon(this.app.command_storage.sp_icon_action);
 
-        if (this.func == Act_List_Func.Select_Dance_Animation)
-        {
-            if (!this.app.setting.check_buy_product(this.index_product_buy_all_act))
-            {
-                Carrot_Box_Btn_Item btn_buy = this.box_list.create_btn_menu_header(this.app.setting.sp_icon_buy);
-                btn_buy.set_act(() => this.app.buy_product(this.index_product_buy_all_act));
-            }
-        }
-        else
+        if (this.func != Act_List_Func.Select_Dance_Animation)
         {
             Carrot_Box_Btn_Item btn_category = this.box_list.create_btn_menu_header(this.app.carrot.icon_carrot_all_category);
             btn_category.set_act(() => this.btn_show_category(this.item_box_temp));
         }
 
-        bool is_unlock_animation = this.app.setting.check_buy_product(this.index_product_buy_all_act);
         IList list_animations = (IList)data_category["data"];
         for (int i = 0; i <list_animations.Count; i++)
         {
@@ -183,51 +196,7 @@ public class character_actions : MonoBehaviour
             item_anim.set_title(data_item_anim["name"].ToString());
             item_anim.set_tip(data_item_anim["name"].ToString());
             item_anim.set_icon(this.app.command_storage.sp_icon_action);
-
-            bool is_used = false;
-
-            if (this.app.carrot.model_app == ModelApp.Publish)
-            {
-                if (is_unlock_animation)
-                {
-                    is_used = true;
-                }
-                else
-                {
-                    if (data_item_anim["buy"].ToString() != "0")
-                    {
-                        if(PlayerPrefs.GetInt("is_user_act_" + s_name) == 1)
-                        {
-                            is_used = true;
-                        }
-                        else
-                        {
-                            is_used = false;
-                        }
-                    }
-                    else
-                    {
-                        is_used = true;
-                    }
-                }
-            }
-            else
-            {
-                is_used = true;
-            }
-
-            if (is_used)
-            {
-                item_anim.set_act(() => this.act_sel_action(s_name));
-            }
-            else
-            {
-                Carrot_Box_Btn_Item btn_buy = item_anim.create_item();
-                btn_buy.set_icon(this.app.setting.sp_icon_buy);
-                btn_buy.set_color(this.app.carrot.color_highlight);
-                Destroy(btn_buy.GetComponent<Button>());
-                item_anim.set_act(() => this.act_buy_action(s_name));
-            }
+            item_anim.set_act(() => this.act_sel_action(s_name));
 
             if (this.func == Act_List_Func.Select_Dance_Animation)
             {
@@ -277,12 +246,6 @@ public class character_actions : MonoBehaviour
         
     }
 
-    private void act_buy_action(string s_name_anim)
-    {
-        this.s_name_animation_by_temp = s_name_anim;
-        this.app.buy_product(this.index_product_buy_act);
-    }
-
     private void act_test_anim(string s_name_animation)
     {
         this.show_test();
@@ -293,6 +256,9 @@ public class character_actions : MonoBehaviour
     public void play_act_anim(string s_name_animation)
     {
         if (s_name_animation=="") return;
+        if (!this.Ensure_local_animation_data_loaded()) return;
+
+        this.app.get_character().unpause_ani();
         Animator animator = this.app.get_character().get_anim_character();
         if (this.check_anim_default(s_name_animation))
         {
@@ -300,27 +266,21 @@ public class character_actions : MonoBehaviour
         }
         else
         {
-            if (bundle == null)
+            if (this.local_animation_clips != null && this.local_animation_clips.TryGetValue(s_name_animation, out AnimationClip animClip))
             {
-                Debug.Log("play_act_anim download:" + s_name_animation);
-                StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(() => this.play_act_anim(s_name_animation)));
-            }
-            else
-            {
-                AnimationClip animClip = bundle.LoadAsset<AnimationClip>(s_name_animation);
-                if (animClip != null)
+                RuntimeAnimatorController controller = this.Get_base_runtime_animator_controller();
+                if (controller != null)
                 {
-                    AnimatorOverrideController overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+                    AnimatorOverrideController overrideController = new AnimatorOverrideController(controller);
                     overrideController["Run"] = animClip;
                     animator.runtimeAnimatorController = overrideController;
                     animator.Play("Run");
-                    Debug.Log("play_act_anim load:" + s_name_animation);
+                    Debug.Log("play_act_anim local:" + s_name_animation);
                 }
-                else
-                {
-                    Debug.Log("play_act_anim download:" + s_name_animation);
-                    StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(() => this.play_act_anim(s_name_animation)));
-                }
+            }
+            else
+            {
+                Debug.LogError("Local animation clip not found: " + s_name_animation);
             }
         }
     }
@@ -368,30 +328,22 @@ public class character_actions : MonoBehaviour
 
     public IList get_list_all_name_animations()
     {
+        this.Ensure_local_animation_data_loaded();
         return this.list_name_animation;
     }
 
     public void check_buy_success_action()
     {
-        if (this.s_name_animation_by_temp != "")
-        {
-            PlayerPrefs.SetInt("is_user_act_" + this.s_name_animation_by_temp, 1);
-            this.act_sel_action(this.s_name_animation_by_temp);
-            this.s_name_animation_by_temp = "";
-        }
     }
 
     public void show_list_animtion_dance()
     {
         this.func = Act_List_Func.Select_Dance_Animation;
         this.app.carrot.play_sound_click();
+        if (!this.Ensure_local_animation_data_loaded()) return;
         if(this.obj_list_dance_animation != null)
         {
             this.box_list_animation(this.obj_list_dance_animation);
-        }
-        else
-        {
-            StartCoroutine(this.DownloadAndLoadCaetgoryAndAnimation(this.show_list_animtion_dance));
         }
     }
 

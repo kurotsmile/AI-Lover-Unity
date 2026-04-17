@@ -120,6 +120,7 @@ public class Music_playlist : MonoBehaviour
 
     private void act_play_song(IDictionary data_music)
     {
+        this.normalize_media_item(data_music);
         this.app.player_music.act_play_data(data_music);
         if(this.box_search_inp!=null) this.box_search_inp.close();
         if (this.box_list != null) this.box_list.close();
@@ -157,6 +158,50 @@ public class Music_playlist : MonoBehaviour
         this.box_search_inp=this.app.carrot.show_search(Act_search_music,app.carrot.L("search_song_tip", "Enter the name of the song you want to listen to"));
     }
 
+    private void normalize_media_item(IDictionary data_item)
+    {
+        if (data_item == null) return;
+        this.normalize_media_field(data_item, "avatar");
+        this.normalize_media_field(data_item, "mp3");
+        this.normalize_media_field(data_item, "icon");
+        this.normalize_media_field(data_item, "url");
+        this.normalize_media_field(data_item, "link_ytb");
+    }
+
+    private void normalize_media_field(IDictionary data_item, string field_name)
+    {
+        if (data_item[field_name] == null) return;
+        string s_val = data_item[field_name].ToString();
+        if (s_val == "") return;
+        data_item[field_name] = this.app.carrot.GetUrlFile(s_val);
+    }
+
+    private List<IDictionary> parse_worker_song_list(string s_data, string s_type = "online")
+    {
+        List<IDictionary> list_song = new();
+        object data_raw = Json.Deserialize(s_data);
+        IList list_data = data_raw as IList;
+        if (list_data == null)
+        {
+            IDictionary data_obj = data_raw as IDictionary;
+            if (data_obj != null && data_obj["items"] is IList items) list_data = items;
+        }
+
+        if (list_data == null) return list_song;
+
+        for (int i = 0; i < list_data.Count; i++)
+        {
+            IDictionary data_song = list_data[i] as IDictionary;
+            if (data_song == null) continue;
+            this.normalize_media_item(data_song);
+            data_song["type"] = s_type;
+            data_song["index"] = i;
+            list_song.Add(data_song);
+        }
+
+        return list_song;
+    }
+
     private void Act_search_music(string key_search)
     {
         this.s_key_search_temp = key_search;
@@ -164,10 +209,16 @@ public class Music_playlist : MonoBehaviour
         this.app.carrot.show_loading();
         if (this.app.carrot.is_online())
         {
-            StructuredQuery q = new("song");
-            q.Set_where("name",Query_OP.EQUAL,key_search);
-            q.Set_limit(20);
-            this.app.carrot.server.Get_doc(q.ToJson(), Act_search_music_done, Act_search_music_fail);
+            this.app.carrot.hub.SearchSong(
+                key_search,
+                this.app.carrot.lang.Get_key_lang(),
+                1,
+                20,
+                Act_search_music_done,
+                Act_search_music_fail,
+                this.app.carrot.user.get_id_user_login(),
+                false
+            );
         }
         else
         {
@@ -182,26 +233,19 @@ public class Music_playlist : MonoBehaviour
 
     private void Act_search_music_done(string s_data)
     {
-        Fire_Collection fc = new(s_data);
         this.app.carrot.hide_loading();
-        if (fc.is_null)
+        List<IDictionary> list_song = this.parse_worker_song_list(s_data);
+        if (list_song.Count == 0)
         {
             Debug.Log("Search song oline data offline");
-            IList list_song = this.get_list_song_online_by_search_key(this.s_key_search_temp);
-            if (list_song.Count != 0)
-                this.Box_list_song(list_song);
+            IList list_song_cache = this.get_list_song_online_by_search_key(this.s_key_search_temp);
+            if (list_song_cache.Count != 0)
+                this.Box_list_song(list_song_cache);
             else
                 this.Box_list_song(this.get_list_song_offline_by_search_key(this.s_key_search_temp));
         }
         else
         {
-            IList list_song = (IList)Json.Deserialize("[]");
-            for(int i=0;i<fc.fire_document.Length;i++)
-            {
-                IDictionary data_music = fc.fire_document[i].Get_IDictionary();
-                data_music["type"] = "online";
-                list_song.Add(data_music);
-            }
             this.Box_list_song(list_song);
         }
     }
@@ -324,6 +368,7 @@ public class Music_playlist : MonoBehaviour
 
     private void Item_song(IDictionary data_song)
     {
+        this.normalize_media_item(data_song);
         string s_id_song = data_song["id"].ToString();
         Carrot.Carrot_Box_Item item_song = this.box_list.create_item("song_" + s_id_song);
         Sprite sp_avatar = this.app.player_music.get_avatar_music(s_id_song);
@@ -423,7 +468,7 @@ public class Music_playlist : MonoBehaviour
             this.type = Playlist_Type.radio;
             StructuredQuery q = new("radio");
             q.Set_limit(20);
-            this.app.carrot.server.Get_doc(q.ToJson(), Act_show_list_radio_done, Act_show_list_radio_fail);
+            this.app.carrot.hub.Get_doc(q.ToJson(), Act_show_list_radio_done, Act_show_list_radio_fail);
         }
         else
         {
@@ -461,6 +506,7 @@ public class Music_playlist : MonoBehaviour
             for (int i = 0; i < fc.fire_document.Length; i++)
             {
                 IDictionary data_radio = fc.fire_document[i].Get_IDictionary();
+                this.normalize_media_item(data_radio);
                 data_radio["type"] = "radio";
                 list_radio.Add(data_radio);
             }
@@ -483,7 +529,7 @@ public class Music_playlist : MonoBehaviour
         q.Set_limit(20);
         q.Add_order("publishedAt", Query_Order_Direction.DESCENDING);
         if (lang != "") q.Add_where("lang", Query_OP.EQUAL, lang);
-        this.app.carrot.server.Get_doc(q.ToJson(), get_data_list_playlist_done, get_data_list_playlist_fail);
+        this.app.carrot.hub.Get_doc(q.ToJson(), get_data_list_playlist_done, get_data_list_playlist_fail);
     }
 
     private void get_data_list_playlist_fail(string s_error)
@@ -503,6 +549,7 @@ public class Music_playlist : MonoBehaviour
             for(int i=0;i<fc.fire_document.Length;i++)
             {
                 IDictionary data_music = fc.fire_document[i].Get_IDictionary();
+                this.normalize_media_item(data_music);
                 data_music["type"] = "online";
                 data_music["index"] = index_song;
                 this.list_music_online.Add(data_music);
@@ -544,7 +591,7 @@ public class Music_playlist : MonoBehaviour
         StructuredQuery q = new("song");
         q.Set_limit(20);
         q.Add_order("publishedAt", Query_Order_Direction.DESCENDING);
-        this.app.carrot.server.Get_doc(q.ToJson(), Act_get_more_song_done, Act_get_more_song_fail);
+        this.app.carrot.hub.Get_doc(q.ToJson(), Act_get_more_song_done, Act_get_more_song_fail);
     }
 
     private void Act_get_more_song_done(string s_data)
@@ -558,6 +605,7 @@ public class Music_playlist : MonoBehaviour
             for (int i = 0; i < fc.fire_document.Length; i++)
             {
                 IDictionary data_music = fc.fire_document[i].Get_IDictionary();
+                this.normalize_media_item(data_music);
                 data_music["type"] = "online";
                 data_music["index"] = index_next;
                 index_next++;
@@ -604,7 +652,7 @@ public class Music_playlist : MonoBehaviour
         else
             q.Add_order("name", Query_Order_Direction.ASCENDING);
 
-        this.app.carrot.server.Get_doc(q.ToJson(), Act_get_data_list_by_order_done, Act_get_data_list_by_order_fail);
+        this.app.carrot.hub.Get_doc(q.ToJson(), Act_get_data_list_by_order_done, Act_get_data_list_by_order_fail);
     }
 
     private void Act_get_data_list_by_order_done(string s_data)
@@ -618,6 +666,7 @@ public class Music_playlist : MonoBehaviour
             for(int i=0;i<fc.fire_document.Length;i++)
             {
                 IDictionary data_music = fc.fire_document[i].Get_IDictionary();
+                this.normalize_media_item(data_music);
                 data_music["type"] = "online";
                 data_music["index"] = index_song;
                 this.list_music_online.Add(data_music);
@@ -668,22 +717,25 @@ public class Music_playlist : MonoBehaviour
     private void get_song_by_name(string s_name)
     {
         this.app.carrot.show_loading();
-        StructuredQuery q = new StructuredQuery("song");
-        q.Add_where("name", Query_OP.EQUAL, s_name);
-        q.Set_limit(1);
-        this.app.carrot.server.Get_doc(q.ToJson(), Get_song_by_name_done, Get_song_by_name_fail);
+        this.app.carrot.hub.SearchSong(
+            s_name,
+            this.app.carrot.lang.Get_key_lang(),
+            1,
+            1,
+            Get_song_by_name_done,
+            Get_song_by_name_fail,
+            this.app.carrot.user.get_id_user_login(),
+            false
+        );
     }
 
     private void Get_song_by_name_done(string s_data)
     {
         this.app.carrot.hide_loading();
-
-        Fire_Collection fc = new(s_data);
-        if (!fc.is_null)
+        List<IDictionary> list_song = this.parse_worker_song_list(s_data);
+        if (list_song.Count > 0)
         {
-            IDictionary data_music = fc.fire_document[0].Get_IDictionary();
-            data_music["type"] = "online";
-            data_music["index"] = 0;
+            IDictionary data_music = list_song[0];
             this.app.player_music.act_play_data(data_music);
             this.app.command.send_chat_no_father("found_song");
             return;

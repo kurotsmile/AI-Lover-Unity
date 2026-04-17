@@ -135,8 +135,24 @@ public class character_manager : MonoBehaviour
         this.app.carrot.clear_contain(this.transform);
         this.obj_npc = Instantiate(this.obj_character_phone[sel_index]);
         this.obj_npc.transform.SetParent(this.transform);
+        this.transform.localRotation = Quaternion.identity;
         this.obj_npc.transform.localPosition = Vector3.zero;
+        this.obj_npc.transform.localRotation = Quaternion.identity;
+        this.Align_character_to_main_view();
         obj_npc.SetActive(true);
+    }
+
+    private void Align_character_to_main_view()
+    {
+        if (this.obj_npc == null) return;
+        Camera cam_main = this.app != null && this.app.view != null ? this.app.view.cam : null;
+        if (cam_main == null) return;
+
+        Vector3 v_face_to_cam = cam_main.transform.position - this.obj_npc.transform.position;
+        v_face_to_cam.y = 0f;
+        if (v_face_to_cam.sqrMagnitude <= 0.0001f) return;
+
+        this.obj_npc.transform.rotation = Quaternion.LookRotation(v_face_to_cam.normalized, Vector3.up);
     }
 
     public void choise_character(int sel_index)
@@ -265,7 +281,7 @@ public class character_manager : MonoBehaviour
 
         StructuredQuery q = new("character_fashion");
         q.Set_where("type", Query_OP.EQUAL, this.get_npc().s_type_costumes);
-        this.app.carrot.server.Get_doc(q.ToJson(), Act_load_costumes_by_style_character_query_done, Act_load_costumes_by_style_character_query_fail);
+        this.app.carrot.hub.Get_doc(q.ToJson(), Act_load_costumes_by_style_character_query_done, Act_load_costumes_by_style_character_query_fail);
     }
 
     private void Act_load_costumes_by_style_character_query_done(string s_data)
@@ -388,7 +404,7 @@ public class character_manager : MonoBehaviour
         this.panel_head.SetActive(false);
         StructuredQuery q = new("character_fashion");
         q.Set_where("type", Query_OP.EQUAL, this.get_npc().s_type_head);
-        this.app.carrot.server.Get_doc(q.ToJson(), Act_load_head_by_style_character_query_done, Act_load_head_by_style_character_query_fail);
+        this.app.carrot.hub.Get_doc(q.ToJson(), Act_load_head_by_style_character_query_done, Act_load_head_by_style_character_query_fail);
     }
 
     private void Act_load_head_by_style_character_query_done(string s_data)

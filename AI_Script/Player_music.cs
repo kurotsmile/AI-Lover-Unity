@@ -90,8 +90,28 @@ public class Player_music : MonoBehaviour
     private IDictionary data_cur = null;
     private repeat_music repeat = repeat_music.repeat_one;
 
+    private void normalize_media_item(IDictionary data_item)
+    {
+        if (data_item == null) return;
+        this.normalize_media_field(data_item, "avatar");
+        this.normalize_media_field(data_item, "mp3");
+        this.normalize_media_field(data_item, "icon");
+        this.normalize_media_field(data_item, "url");
+        this.normalize_media_field(data_item, "link_ytb");
+        this.normalize_media_field(data_item, "link_store");
+    }
+
+    private void normalize_media_field(IDictionary data_item, string field_name)
+    {
+        if (data_item[field_name] == null) return;
+        string s_val = data_item[field_name].ToString();
+        if (s_val == "") return;
+        data_item[field_name] = this.app.carrot.GetUrlFile(s_val);
+    }
+
     public void act_play_data(IDictionary data_music)
     {
+        this.normalize_media_item(data_music);
         this.data_song = Carrot.Json.Serialize(data_music);
         this.data_cur = data_music;
 
@@ -558,7 +578,7 @@ public class Player_music : MonoBehaviour
 
     public void Play_song_by_id(string s_id)
     {
-        this.app.carrot.server.Get_doc_by_path("song", s_id, Act_play_song_by_id_done, Act_play_song_by_id_fail);
+        this.app.carrot.hub.Get_doc_by_path("song", s_id, Act_play_song_by_id_done, Act_play_song_by_id_fail);
     }
 
     private void Act_play_song_by_id_done(string s_data)
@@ -566,6 +586,7 @@ public class Player_music : MonoBehaviour
         Fire_Document fd = new(s_data);
         IDictionary data_song = fd.Get_IDictionary();
         data_song["type"] = "music";
+        this.normalize_media_item(data_song);
         this.act_play_data(data_song);
     }
 

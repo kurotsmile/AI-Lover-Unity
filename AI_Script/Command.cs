@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using Carrot;
 using Crosstales;
 using Crosstales.Common.Util;
@@ -20,7 +23,6 @@ public class Command : MonoBehaviour
     public GameObject prefab_item_command_chat;
     public GameObject prefab_item_command_pc;
     public GameObject prefab_item_command_loading;
-    public GameObject prefab_effect_icon_chat;
 
     public GameObject obj_btn_clear_all_log;
     public Transform area_body_log_command;
@@ -69,6 +71,20 @@ public class Command : MonoBehaviour
     private bool is_ready_msg_tip = false;
     IList all_item = null;
     private string file_name_data_chat = "";
+    private string load_resource_cmd_data(string s_lang)
+    {
+        TextAsset data_lang = Resources.Load<TextAsset>("DataAiLover/cmd_" + s_lang);
+        if (data_lang != null) return data_lang.text;
+
+        if (s_lang != "en")
+        {
+            TextAsset data_en = Resources.Load<TextAsset>("DataAiLover/cmd_en");
+            if (data_en != null) return data_en.text;
+        }
+
+        return "";
+    }
+
     public void load()
     {
         this.obj_btn_clear_all_log.SetActive(false);
@@ -78,8 +94,16 @@ public class Command : MonoBehaviour
 
     public void load_all_data_chat(UnityAction act_done)
     {
-        this.file_name_data_chat = "chat-" + PlayerPrefs.GetString("lang", "en") + ".json";
-        if (this.app.carrot.get_tool().check_file_exist(this.file_name_data_chat))
+        string s_lang = PlayerPrefs.GetString("lang", "en");
+        this.file_name_data_chat = "cmd_" + s_lang + ".json";
+        string s_local_cmd_data = this.load_resource_cmd_data(s_lang);
+
+        if (s_local_cmd_data != "")
+        {
+            load_all_item_chat(s_local_cmd_data);
+            act_done.Invoke();
+        }
+        else if (this.app.carrot.get_tool().check_file_exist(this.file_name_data_chat))
         {
             string s_data = this.app.carrot.get_tool().get_file_path(this.file_name_data_chat);
             string s_text = FileHelper.ReadAllText(s_data);
@@ -88,19 +112,21 @@ public class Command : MonoBehaviour
         }
         else
         {
-            this.app.carrot.Get_Data("https://raw.githubusercontent.com/kurotsmile/Database-Store-Json/refs/heads/main/" + this.file_name_data_chat, (s_data) =>
-            {
-                this.load_all_item_chat(s_data);
-                this.app.carrot.get_tool().save_file(this.file_name_data_chat, s_data);
-                act_done.Invoke();
-            });
+            this.load_all_item_chat("[]");
+            act_done.Invoke();
         }
     }
 
     private void load_all_item_chat(string s_data)
     {
-        IDictionary data = (IDictionary)Json.Deserialize(s_data);
-        this.all_item = data["all_item"] as IList;
+        object data_raw = Json.Deserialize(s_data);
+        if (data_raw is IList list_data)
+            this.all_item = list_data;
+        else if (data_raw is IDictionary data && data["all_item"] is IList all_items)
+            this.all_item = all_items;
+        else
+            this.all_item = Json.Deserialize("[]") as IList;
+
         Debug.Log("Load " + all_item.Count + " Chat cmd");
         for (int i = 0; i < all_item.Count; i++)
         {
@@ -222,52 +248,173 @@ public class Command : MonoBehaviour
             this.show_msg_no_chat();
         }
     }
+
+    private string Normalize_chat_key(string s_key)
+    {
+        if (string.IsNullOrWhiteSpace(s_key)) return "";
+
+        string s_lower = s_key.Trim().ToLowerInvariant().Replace('đ', 'd');
+        string s_form_d = s_lower.Normalize(NormalizationForm.FormD);
+        StringBuilder s_builder = new();
+        bool is_last_space = false;
+
+        for (int i = 0; i < s_form_d.Length; i++)
+        {
+            char c = s_form_d[i];
+            UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (category == UnicodeCategory.NonSpacingMark) continue;
+
+            if (char.IsLetterOrDigit(c))
+            {
+                s_builder.Append(c);
+                is_last_space = false;
+            }
+            else if (!is_last_space && s_builder.Length > 0)
+            {
+                s_builder.Append(' ');
+                is_last_space = true;
+            }
+        }
+
+        string[] arr_tokens = s_builder.ToString().Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < arr_tokens.Length; i++) arr_tokens[i] = this.Normalize_chat_token_alias(arr_tokens[i]);
+        return string.Join(" ", arr_tokens).Trim();
+    }
+
+    private string Normalize_chat_token_alias(string s_token)
+    {
+        if (string.IsNullOrEmpty(s_token)) return "";
+        if (s_token == "k" || s_token == "ko" || s_token == "kh" || s_token == "hok" || s_token == "hong") return "khong";
+        if (s_token == "dc" || s_token == "dk") return "duoc";
+        if (s_token == "iu") return "yeu";
+        if (s_token == "j") return "gi";
+        if (s_token == "bik" || s_token == "bit") return "biet";
+        return s_token;
+    }
+
+    private List<string> Get_chat_key_variants(string s_key)
+    {
+        List<string> list_variant = new();
+        if (string.IsNullOrWhiteSpace(s_key)) return list_variant;
+
+        string[] arr_variant = s_key.Split(new[] { '\n', ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < arr_variant.Length; i++)
+        {
+            string s_variant = arr_variant[i].Trim();
+            if (s_variant != "") list_variant.Add(s_variant);
+        }
+
+        if (list_variant.Count == 0) list_variant.Add(s_key.Trim());
+        return list_variant;
+    }
+
+    private HashSet<string> Get_chat_key_tokens(string s_key_norm)
+    {
+        if (string.IsNullOrEmpty(s_key_norm)) return new HashSet<string>();
+        return new HashSet<string>(s_key_norm.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    private bool Is_match_chat_profile(IDictionary item_c)
+    {
+        string s_user_sex = item_c["sex_user"] != null ? item_c["sex_user"].ToString().ToLower() : "";
+        string s_character_sex = item_c["sex_character"] != null ? item_c["sex_character"].ToString().ToLower() : "";
+        string s_pater = item_c["pater"] != null ? item_c["pater"].ToString() : "";
+
+        return s_user_sex == this.app.setting.get_user_sex() &&
+               s_character_sex == this.app.setting.get_character_sex() &&
+               s_pater == this.id_cur_chat;
+    }
+
+    private int Get_chat_match_score(string s_input_raw, string s_input_norm, IDictionary item_c)
+    {
+        if (item_c == null || item_c["key"] == null) return -1;
+
+        List<string> list_variant = this.Get_chat_key_variants(item_c["key"].ToString());
+        HashSet<string> input_tokens = this.Get_chat_key_tokens(s_input_norm);
+        int best_score = -1;
+
+        for (int i = 0; i < list_variant.Count; i++)
+        {
+            string s_variant_raw = list_variant[i].Trim().ToLowerInvariant();
+            string s_variant_norm = this.Normalize_chat_key(s_variant_raw);
+            if (s_variant_norm == "") continue;
+
+            int score = -1;
+            if (s_variant_raw == s_input_raw || s_variant_norm == s_input_norm)
+            {
+                score = 1000;
+            }
+            else if (s_variant_norm.Contains(s_input_norm) || s_input_norm.Contains(s_variant_norm))
+            {
+                int len_bonus = Mathf.Min(s_variant_norm.Length, s_input_norm.Length);
+                score = 800 + Mathf.Min(len_bonus, 150);
+            }
+            else
+            {
+                HashSet<string> variant_tokens = this.Get_chat_key_tokens(s_variant_norm);
+                if (variant_tokens.Count > 0 && input_tokens.Count > 0)
+                {
+                    int count_same = variant_tokens.Intersect(input_tokens).Count();
+                    if (count_same > 0)
+                    {
+                        float overlap_max = (float)count_same / Mathf.Max(variant_tokens.Count, input_tokens.Count);
+                        float overlap_min = (float)count_same / Mathf.Min(variant_tokens.Count, input_tokens.Count);
+                        bool is_full_cover = count_same == variant_tokens.Count || count_same == input_tokens.Count;
+
+                        if (is_full_cover && count_same >= 2)
+                            score = 720 + Mathf.RoundToInt(overlap_min * 100f);
+                        else if (count_same >= 2 && overlap_max >= 0.5f)
+                            score = 620 + Mathf.RoundToInt(overlap_max * 100f);
+                        else if (count_same >= 3)
+                            score = 560 + count_same * 10;
+                    }
+                }
+            }
+
+            if (score > best_score) best_score = score;
+        }
+
+        return best_score;
+    }
+
     private IDictionary Check_cmd_data(string s_key)
     {
         Debug.Log("Check_cmd_data");
         if (all_item != null)
         {
-            IList list_cmd = Json.Deserialize("[]") as IList;
+            string s_key_raw = s_key.Trim().ToLowerInvariant();
+            string s_key_norm = this.Normalize_chat_key(s_key_raw);
+            if (s_key_norm == "") return null;
+
+            List<IDictionary> list_cmd = new();
+            int best_score = -1;
             for (int i = 0; i < this.all_item.Count; i++)
             {
                 IDictionary item_c = this.all_item[i] as IDictionary;
+                if (item_c == null) continue;
                 if (item_c["pater"] == null) item_c["pater"] = "";
                 if (item_c["key"] == null) item_c["key"] = "";
-                if (item_c["key"].ToString().Trim().ToLower() == s_key.Trim() &&
-                    item_c["sex_user"].ToString().ToLower() == this.app.setting.get_user_sex() &&
-                    item_c["sex_character"].ToString().ToLower() == this.app.setting.get_character_sex() &&
-                    item_c["pater"].ToString() == this.id_cur_chat)
+                if (!this.Is_match_chat_profile(item_c)) continue;
+
+                int score = this.Get_chat_match_score(s_key_raw, s_key_norm, item_c);
+                if (score < 0) continue;
+
+                if (score > best_score)
+                {
+                    best_score = score;
+                    list_cmd.Clear();
                     list_cmd.Add(item_c);
-            }
-
-            if (list_cmd.Count == 0)
-            {
-                for (int i = 0; i < this.all_item.Count; i++)
+                }
+                else if (score == best_score)
                 {
-                    IDictionary item_c = this.all_item[i] as IDictionary;
-
-                    if (item_c["pater"] == null) item_c["pater"] = "";
-                    if (item_c["key"] == null) item_c["key"] = "";
-                    if (item_c["key"].ToString().Trim().ToLower().Contains(s_key.Trim()) &&
-                        item_c["sex_user"].ToString().ToLower() == this.app.setting.get_user_sex() &&
-                        item_c["sex_character"].ToString().ToLower() == this.app.setting.get_character_sex() &&
-                        item_c["pater"].ToString() == this.id_cur_chat)
-                        list_cmd.Add(item_c);
+                    list_cmd.Add(item_c);
                 }
             }
 
-            if (list_cmd.Count != 0)
+            if (list_cmd.Count != 0 && best_score >= 560)
             {
-                IDictionary data_c;
-                if (list_cmd.Count == 0)
-                {
-                    data_c = list_cmd[0] as IDictionary;
-                }
-                else
-                {
-                    int r_index = Random.Range(0, list_cmd.Count);
-                    data_c = list_cmd[r_index] as IDictionary;
-                }
+                int r_index = UnityEngine.Random.Range(0, list_cmd.Count);
+                IDictionary data_c = list_cmd[r_index];
                 if (data_c["id_import"] != null) data_c["id"] = data_c["id_import"];
                 return data_c;
             }
@@ -283,7 +430,7 @@ public class Command : MonoBehaviour
         q.Add_where("sex_character", Query_OP.EQUAL, this.app.setting.get_character_sex());
         q.Add_where("pater", Query_OP.EQUAL, this.id_cur_chat);
         q.Set_limit(10);
-        this.app.carrot.server.Get_doc(q.ToJson(), Act_doc_done, Act_doc_fail);
+        this.app.carrot.hub.Get_doc(q.ToJson(), Act_doc_done, Act_doc_fail);
     }
 
     private void Act_doc_done(string s_data)
@@ -561,7 +708,6 @@ public class Command : MonoBehaviour
             if (index_func == "10") this.app.carrot.show_rate();
             if (index_func == "11") this.app.carrot.show_share();
             if (index_func == "12") this.app.carrot.delay_function(3.6f, this.app.exit_app);
-            if (index_func == "13") this.app.carrot.delay_function(2f, this.app.view.show_list_background_image);
             if (index_func == "14") this.app.player_music.btn_next();
             if (index_func == "15") this.app.player_music.btn_pause();
             if (index_func == "16") this.app.carrot.delay_function(1.6f, () => this.app.tool.open_content_Intent(data_chat["link"].ToString().Trim()));
@@ -570,26 +716,6 @@ public class Command : MonoBehaviour
             if (index_func == "19") this.app.carrot.delay_function(1.6f, () => this.app.tool.OpenApp_by_bundleId(data_chat["link"].ToString().Trim()));
             if (index_func == "20") this.app.carrot.delay_function(1.6f, () => this.app.setting.show_shop());
         }
-        if (data_chat["icon"] != null)
-        {
-            if (data_chat["icon"].ToString() != "")
-            {
-                string s_id_icon = data_chat["icon"].ToString();
-                if (s_id_icon != "undefined")
-                {
-                    Sprite sp_icon_chat = this.app.carrot.get_tool().get_sprite_to_playerPrefs(s_id_icon);
-                    if (sp_icon_chat != null)
-                    {
-                        this.act_play_effect_icon_chat(sp_icon_chat.texture);
-                    }
-                    else
-                    {
-                        if (s_id_icon != "") this.get_effect_icon_chat(s_id_icon);
-                    }
-                }
-            }
-        }
-
         if (is_add_log)
         {
             this.add_item_pc_chat(s_msg_chat, this.app.get_character().icon_sex, data_chat);
@@ -751,31 +877,6 @@ public class Command : MonoBehaviour
         this.send_chat("hit", true);
     }
 
-    private void get_effect_icon_chat(string s_id_icon)
-    {
-        this.app.carrot.server.Get_doc_by_path("icon", s_id_icon, act_get_effect_icon_chat_done);
-    }
-
-    private void act_get_effect_icon_chat_done(string s_data)
-    {
-        Fire_Document fd = new(s_data);
-        IDictionary icon_data = fd.Get_IDictionary();
-        this.app.carrot.get_img_and_save_playerPrefs(icon_data["icon"].ToString(), null, fd.Get_id(), act_play_effect_icon_chat);
-    }
-
-    private void act_play_effect_icon_chat(Texture2D tex_icon)
-    {
-        GameObject effect_icon = Instantiate(this.prefab_effect_icon_chat);
-        effect_icon.transform.SetParent(this.app.view.mouseOrbit_Improved.target.transform);
-        effect_icon.transform.localPosition = Vector3.zero;
-        effect_icon.transform.localScale = new Vector3(1f, 1f, 1f);
-
-        ParticleSystem sys_effec = effect_icon.GetComponent<ParticleSystem>();
-        ParticleSystemRenderer renderer_effec = sys_effec.GetComponent<ParticleSystemRenderer>();
-        renderer_effec.material.mainTexture = tex_icon;
-        Destroy(effect_icon, 3f);
-    }
-
     public void clear_log_chat()
     {
         this.app.carrot.clear_contain(this.area_body_log_command);
@@ -881,7 +982,7 @@ public class Command : MonoBehaviour
                                     else this.app.carrot.get_img_and_save_playerPrefs(data_user["avatar"].ToString(), item_user.img_icon, "avatar_user_" + data_user["id"]);
                                 }
 
-                                item_user.set_act(() => this.app.carrot.user.show_user_by_id(user_id, user_lang));
+                                item_user.set_act(() => this.app.carrot.user.show_user_by_id(user_id));
                             }
                         }
                     }
@@ -983,7 +1084,15 @@ public class Command : MonoBehaviour
                             s_field_title = app.carrot.L("report_title", "Report");
                             s_field_val = list_report.Count + " Report";
                             item_field.set_icon(this.sp_icon_info_report_chat);
-                            item_field.set_act(() => this.app.report.show_list_report(list_report));
+                            if (data_chat["id"] != null)
+                            {
+                                string s_id_chat_report = data_chat["id"].ToString();
+                                item_field.set_act(() => this.app.report.show_list_report_by_object_id(s_id_chat_report));
+                            }
+                            else
+                            {
+                                item_field.set_act(() => this.app.report.show_list_report(list_report));
+                            }
 
                             Carrot_Box_Btn_Item btn_list_report = item_field.create_item();
                             btn_list_report.set_icon(this.app.carrot.icon_carrot_bug);
@@ -1002,6 +1111,16 @@ public class Command : MonoBehaviour
                     }
                 }
             }
+        }
+
+        if (data_chat["id"] != null && data_chat["reports"] == null)
+        {
+            string s_id_chat_report = data_chat["id"].ToString();
+            Carrot_Box_Item item_report = this.box_list.create_item("field_report");
+            item_report.set_icon(this.sp_icon_info_report_chat);
+            item_report.set_title(app.carrot.L("report_title", "Report"));
+            item_report.set_tip("View reports for this chat");
+            item_report.set_act(() => this.app.report.show_list_report_by_object_id(s_id_chat_report));
         }
 
         if (data_chat["status"] != null)
@@ -1087,7 +1206,7 @@ public class Command : MonoBehaviour
 
     public void Play_chat_by_ID(string s_id, string s_lang)
     {
-        this.app.carrot.server.Get_doc_by_path("chat-" + s_lang, s_id, Act_play_chat_by_ID_done, Act_play_chat_by_ID_fail);
+        this.app.carrot.hub.Get_doc_by_path("chat-" + s_lang, s_id, Act_play_chat_by_ID_done, Act_play_chat_by_ID_fail);
     }
 
     private void Act_play_chat_by_ID_done(string s_data)
