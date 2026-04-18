@@ -166,10 +166,10 @@ public class Setting : MonoBehaviour
         group_sys.set_icon(this.sp_icon_sys);
         group_sys.transform.SetSiblingIndex(0);
 
-        group_sys.add_item(box_setting.area_all_item.GetChild(1).GetComponent<Carrot.Carrot_Box_Item>());
-        group_sys.add_item(box_setting.area_all_item.GetChild(2).GetComponent<Carrot.Carrot_Box_Item>());
-        group_sys.add_item(box_setting.area_all_item.GetChild(3).GetComponent<Carrot.Carrot_Box_Item>());
-        group_sys.add_item(box_setting.area_all_item.GetChild(4).GetComponent<Carrot.Carrot_Box_Item>());
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_name("lang"));
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_name("setting_login"));
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_name("top_player"));
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_name("sound"));
 
         item_weather_pin = box_setting.create_item("weather_pin");
         item_weather_pin.set_icon(this.sp_icon_weather);
@@ -482,40 +482,34 @@ public class Setting : MonoBehaviour
         Carrot.Carrot_Box_Item_group other_group = box_setting.add_item_group("other_group");
         other_group.set_icon(this.sp_icon_other);
 
-        box_setting.area_all_item.GetChild(5).SetSiblingIndex(24);
-        box_setting.area_all_item.GetChild(7).SetSiblingIndex(30);
-        box_setting.area_all_item.GetChild(8).SetSiblingIndex(31);
-        box_setting.area_all_item.GetChild(6).SetSiblingIndex(32);
-        box_setting.area_all_item.GetChild(6).SetSiblingIndex(33);
-        box_setting.area_all_item.GetChild(6).SetSiblingIndex(34);
+        Carrot.Carrot_Box_Item item_removeads = this.find_setting_item_by_name("remove_ads");
+        if (item_removeads != null)
+        {
+            item_removeads.set_lang_data("remove_ads", "remove_ads_tip");
+            item_removeads.load_lang_data();
+            Carrot.Carrot_Box_Btn_Item btn_by_ads = item_removeads.create_item();
+            if (this.app.ads.get_status_ads())
+                btn_by_ads.set_icon(this.sp_icon_buy);
+            else
+                btn_by_ads.set_icon(this.app.carrot.icon_carrot_done);
+            btn_by_ads.set_color(this.app.carrot.color_highlight);
+            Destroy(btn_by_ads.GetComponent<Button>());
+            if (this.check_buy_product(2)) item_removeads.gameObject.SetActive(false);
 
-        Carrot.Carrot_Box_Item item_removeads = box_setting.area_all_item.GetChild(19).GetComponent<Carrot.Carrot_Box_Item>();
-        item_removeads.set_lang_data("remove_ads", "remove_ads_tip");
-        item_removeads.load_lang_data();
-        Carrot.Carrot_Box_Btn_Item btn_by_ads = item_removeads.create_item();
-        if (this.app.ads.get_status_ads())
-            btn_by_ads.set_icon(this.sp_icon_buy);
-        else
-            btn_by_ads.set_icon(this.app.carrot.icon_carrot_done);
-        btn_by_ads.set_color(this.app.carrot.color_highlight);
-        Destroy(btn_by_ads.GetComponent<Button>());
-        if (this.check_buy_product(2)) item_removeads.gameObject.SetActive(false);
+            shop_group.add_item(item_removeads);
+        }
 
-        shop_group.add_item(item_removeads);
-        Carrot.Carrot_Box_Item item_share = box_setting.area_all_item.GetChild(25).GetComponent<Carrot.Carrot_Box_Item>();
-        other_group.add_item(item_share);
+        this.add_item_to_group_if_found(other_group, this.find_setting_item_by_name("share"));
+        this.add_item_to_group_if_found(other_group, this.find_setting_item_by_name("in_app_restore"));
+        this.add_item_to_group_if_found(other_group, this.find_setting_item_by_name("rate"));
+        this.add_item_to_group_if_found(other_group, this.find_setting_item_by_icon(this.app.carrot.sp_icon_more_app));
 
-        Carrot.Carrot_Box_Item item_restore = box_setting.area_all_item.GetChild(26).GetComponent<Carrot.Carrot_Box_Item>();
-        other_group.add_item(item_restore);
-
-        Carrot.Carrot_Box_Item item_rate = box_setting.area_all_item.GetChild(27).GetComponent<Carrot.Carrot_Box_Item>();
-        other_group.add_item(item_rate);
-
-        other_group.add_item(box_setting.area_all_item.GetChild(28).GetComponent<Carrot.Carrot_Box_Item>());
-//        other_group.add_item(box_setting.area_all_item.GetChild(29).GetComponent<Carrot.Carrot_Box_Item>());
-
-        group_sys.add_item(box_setting.area_all_item.GetChild(1).GetComponent<Carrot.Carrot_Box_Item>());
-        group_sys.add_item(box_setting.area_all_item.GetChild(5).GetComponent<Carrot.Carrot_Box_Item>());
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_name("list_bk_music"));
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_name("vibrate"));
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_name("theme"));
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_icon(this.app.carrot.sp_icon_fullscene));
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_icon(this.app.carrot.sp_icon_del_data));
+        this.add_item_to_group_if_found(group_sys, this.find_setting_item_by_icon(this.app.carrot.icon_carrot_bug));
 
         Carrot_Box_Item item_fb_fanpage = this.box_setting.create_item("item_fb_fanpage");
         item_fb_fanpage.set_icon(this.sp_icon_facebook);
@@ -1142,6 +1136,44 @@ public class Setting : MonoBehaviour
             this.app.carrot.Show_msg(s_title, app.carrot.L("setting_on", "Turn on"));
         else
             this.app.carrot.Show_msg(s_title,app.carrot.L("setting_off", "Turn off"));
+    }
+
+    private Carrot_Box_Item find_setting_item_by_name(string item_name)
+    {
+        if (this.box_setting == null || this.box_setting.area_all_item == null) return null;
+
+        foreach (Transform tr in this.box_setting.area_all_item)
+        {
+            if (tr == null) continue;
+            if (tr.name != item_name) continue;
+
+            Carrot_Box_Item item = tr.GetComponent<Carrot_Box_Item>();
+            if (item != null) return item;
+        }
+
+        return null;
+    }
+
+    private Carrot_Box_Item find_setting_item_by_icon(Sprite icon)
+    {
+        if (icon == null || this.box_setting == null || this.box_setting.area_all_item == null) return null;
+
+        foreach (Transform tr in this.box_setting.area_all_item)
+        {
+            if (tr == null) continue;
+
+            Carrot_Box_Item item = tr.GetComponent<Carrot_Box_Item>();
+            if (item == null || item.img_icon == null) continue;
+            if (item.img_icon.sprite == icon) return item;
+        }
+
+        return null;
+    }
+
+    private void add_item_to_group_if_found(Carrot_Box_Item_group group, Carrot_Box_Item item)
+    {
+        if (group == null || item == null) return;
+        group.add_item(item);
     }
 
     public void show_list_ai_prioritize()
